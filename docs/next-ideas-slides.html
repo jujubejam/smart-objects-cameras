@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What Else Can Your Camera See? — Smart Objects</title>
+
+  <!-- Reveal.js 5.x from CDN (no npm install needed) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.min.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/github.min.css">
+
+  <!-- Google Fonts: Instrument Serif + Inter + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --font-heading: "Instrument Serif", Georgia, "Times New Roman", serif;
+      --font-sans: "Inter", "Helvetica Neue", -apple-system, system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-muted: #a8a29e;
+      --text-faint: #c8c4bf;
+      --bg-page: #fafaf9;
+      --bg-card: #ffffff;
+      --border-subtle: #e7e5e4;
+      --green-accent: #16a34a;
+      --green-bg: #f0fdf4;
+      --green-border: #bbf7d0;
+      --red-accent: #dc2626;
+      --red-bg: #fef2f2;
+      --red-border: #fecaca;
+      --blue-accent: #2563eb;
+      --blue-bg: #eff6ff;
+      --blue-border: #bfdbfe;
+      --purple-accent: #7c3aed;
+      --purple-bg: #f5f3ff;
+      --purple-border: #ddd6fe;
+      --amber-accent: #d97706;
+      --amber-bg: #fffbeb;
+      --amber-border: #fde68a;
+    }
+
+    .reveal, .reveal .slide-background {
+      background: var(--bg-page);
+    }
+
+    .reveal {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 22px;
+      color: var(--text-secondary);
+      text-align: left;
+    }
+    .reveal .slides section { text-align: left; }
+
+    .reveal h1 {
+      font-family: var(--font-heading);
+      font-size: 2.4em;
+      font-weight: 400;
+      font-style: italic;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 0.5em;
+    }
+
+    .reveal h2 {
+      font-family: var(--font-heading);
+      font-size: 1.6em;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      margin-bottom: 0.5em;
+    }
+
+    .reveal h3 {
+      font-family: var(--font-sans);
+      font-size: 0.65em;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1.5em;
+    }
+
+    .reveal p, .reveal li {
+      font-size: 0.95em;
+      line-height: 1.65;
+      color: var(--text-secondary);
+    }
+
+    .reveal strong {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .reveal a {
+      color: var(--blue-accent);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .reveal pre {
+      font-family: var(--font-mono);
+      font-size: 0.7em;
+      line-height: 1.55;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 1em 1.25em;
+      box-shadow: none;
+      width: 100%;
+      margin: 0.75em 0;
+    }
+
+    .reveal code {
+      font-family: var(--font-mono);
+    }
+
+    .reveal p code, .reveal li code, .reveal td code {
+      background: #f5f5f4;
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 0.1em 0.4em;
+      font-size: 0.85em;
+      color: var(--green-accent);
+    }
+
+    .section-label {
+      font-size: 0.65em !important;
+      letter-spacing: 0.3em !important;
+      color: var(--text-muted) !important;
+      text-transform: uppercase;
+      margin-bottom: 0.5em !important;
+    }
+
+    .command-card {
+      background: #f5f5f4;
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 0.8em 1.1em;
+      font-family: var(--font-mono);
+      font-size: 0.8em;
+      color: var(--green-accent);
+      margin: 0.5em 0;
+    }
+
+    .info-card {
+      background: var(--blue-bg);
+      border: 1px solid var(--blue-border);
+      border-radius: 6px;
+      padding: 0.8em 1.1em;
+      font-size: 0.85em;
+      margin: 0.5em 0;
+    }
+
+    .idea-card {
+      background: var(--purple-bg);
+      border: 1px solid var(--purple-border);
+      border-radius: 6px;
+      padding: 0.8em 1.1em;
+      font-size: 0.85em;
+      margin: 0.5em 0;
+    }
+
+    .idea-card strong {
+      color: var(--purple-accent);
+    }
+
+    .warn-card {
+      background: var(--amber-bg);
+      border: 1px solid var(--amber-border);
+      border-radius: 6px;
+      padding: 0.8em 1.1em;
+      font-size: 0.85em;
+      margin: 0.5em 0;
+    }
+
+    .warn-card strong {
+      color: var(--amber-accent);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2em;
+      align-items: start;
+    }
+
+    .three-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1.5em;
+      align-items: start;
+    }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .checklist li {
+      position: relative;
+      padding: 0.4em 0 0.4em 1.5em;
+      border-bottom: 1px solid var(--border-subtle);
+      list-style: none;
+    }
+
+    .checklist li::before {
+      content: "\2713";
+      color: var(--green-accent);
+      font-size: 0.85em;
+      position: absolute;
+      left: 0;
+    }
+
+    .reveal table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8em;
+      margin-top: 0.75em;
+    }
+
+    .reveal table th {
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-primary);
+      border-bottom: 2px solid var(--border-subtle);
+      padding: 0.5em 0.75em;
+      font-size: 0.9em;
+    }
+
+    .reveal table td {
+      padding: 0.45em 0.75em;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .reveal table td code {
+      color: var(--green-accent);
+    }
+
+    .pipeline-label {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.7em;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 0.2em 0.6em;
+      color: var(--text-secondary);
+      margin: 0 0.15em;
+    }
+
+    .pipeline-arrow {
+      display: inline-block;
+      color: var(--text-muted);
+      font-size: 0.85em;
+      margin: 0 0.2em;
+    }
+
+    .pipeline-flow {
+      margin: 0.75em 0;
+      line-height: 2.2;
+    }
+
+    .badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.65em;
+      font-weight: 500;
+      padding: 0.15em 0.5em;
+      border-radius: 4px;
+      vertical-align: middle;
+      margin-left: 0.5em;
+    }
+
+    .badge-rvc2 {
+      background: var(--green-bg);
+      border: 1px solid var(--green-border);
+      color: var(--green-accent);
+    }
+
+    .badge-fps {
+      background: var(--amber-bg);
+      border: 1px solid var(--amber-border);
+      color: var(--amber-accent);
+    }
+
+    .reveal .slide-number {
+      font-family: var(--font-mono);
+      font-size: 0.7em;
+      color: var(--text-muted);
+      background: none;
+      left: 50%;
+      transform: translateX(-50%);
+      right: auto;
+      bottom: 1em;
+    }
+
+    .reveal .progress span {
+      background: var(--border-subtle);
+    }
+  </style>
+</head>
+<body>
+
+<div class="reveal">
+  <div class="slides">
+
+    <!-- ============================================
+         SLIDE 1 — Title
+         ============================================ -->
+    <section>
+      <h3>SMART OBJECTS</h3>
+      <h1>What Else Can Your Camera See?</h1>
+      <p>Five project ideas from the oak-examples repo<br>that work on our hardware today.</p>
+      <p style="font-size: 0.75em; color: var(--text-muted); margin-top: 2em;">
+        SVA MFA Interaction Design &middot; Spring 2026
+      </p>
+    </section>
+
+    <!-- ============================================
+         SLIDE 2 — What we already have
+         ============================================ -->
+    <section>
+      <h3>CONTEXT</h3>
+      <h2>What You Already Have</h2>
+      <p>Four detectors running on your OAK-D cameras, all controllable via Discord:</p>
+      <table>
+        <thead>
+          <tr><th>Detector</th><th>What It Sees</th><th>Pipeline</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>person_detector.py</code></td>
+            <td>People in frame, count</td>
+            <td>YOLO v6 (single stage)</td>
+          </tr>
+          <tr>
+            <td><code>fatigue_detector.py</code></td>
+            <td>Drowsiness, head tilt</td>
+            <td>YuNet &rarr; MediaPipe landmarks</td>
+          </tr>
+          <tr>
+            <td><code>gaze_detector.py</code></td>
+            <td>Where someone is looking</td>
+            <td>YuNet &rarr; Head pose &rarr; Gaze ADAS</td>
+          </tr>
+          <tr>
+            <td><code>whiteboard_reader.py</code></td>
+            <td>Text on a whiteboard</td>
+            <td>PaddlePaddle detect + recognize</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="info-card" style="margin-top: 1em;">
+        <strong>The pattern:</strong> every detector writes a JSON status file &rarr; the Discord bot reads it &rarr; you ask questions in chat and get answers.
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 3 — Hand Pose: overview
+         ============================================ -->
+    <section>
+      <h3>IDEA 1</h3>
+      <h2>Hand Gesture Recognition</h2>
+      <div class="two-col">
+        <div>
+          <p><strong>What it does</strong></p>
+          <p>Detects hands in frame, maps 21 keypoints per hand, then classifies the pose into a gesture.</p>
+          <p style="margin-top: 0.5em;"><strong>Built-in gestures:</strong></p>
+          <p>FIST, OK, PEACE, ONE, TWO, THREE, FOUR, FIVE</p>
+          <div class="pipeline-flow" style="margin-top: 1em;">
+            <span class="pipeline-label">MediaPipe Palm Detection</span>
+            <span class="pipeline-arrow">&rarr;</span>
+            <span class="pipeline-label">Hand Landmarker (21 pts)</span>
+            <span class="pipeline-arrow">&rarr;</span>
+            <span class="pipeline-label">Gesture classifier</span>
+          </div>
+        </div>
+        <div>
+          <p><strong>Example location</strong></p>
+          <div class="command-card">
+            oak-examples/neural-networks/<br>pose-estimation/hand-pose/
+          </div>
+          <p style="margin-top: 0.75em;"><strong>On our hardware</strong></p>
+          <p>
+            Works on RVC2 <span class="badge badge-rvc2">RVC2</span>
+            <br>Default ~8 FPS <span class="badge badge-fps">~8 fps</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 4 — Hand Pose: interaction ideas
+         ============================================ -->
+    <section>
+      <h3>IDEA 1</h3>
+      <h2>Gestures as Conversation</h2>
+      <div class="idea-card">
+        <strong>Core concept:</strong> Your hand becomes a controller. No keyboard, no mouse &mdash; just hold up a gesture and the camera responds.
+      </div>
+      <div class="two-col" style="margin-top: 1em;">
+        <div>
+          <p><strong>Discord interaction ideas</strong></p>
+          <ul style="padding-left: 1.2em;">
+            <li><code>!gesture</code> &mdash; what gesture is the camera seeing right now?</li>
+            <li><code>!vote</code> &mdash; thumbs up / thumbs down to vote on something</li>
+            <li><code>!gesture-trigger add PEACE "lights on"</code> &mdash; bind a gesture to an action</li>
+            <li>Raise a fist to pause notifications, open palm to resume</li>
+          </ul>
+        </div>
+        <div>
+          <p><strong>Wilder ideas</strong></p>
+          <ul style="padding-left: 1.2em;">
+            <li>Silent classroom polling &mdash; "Hold up 1, 2, or 3"</li>
+            <li>Gesture-controlled slideshow &mdash; swipe to advance</li>
+            <li>Multi-camera gesture relay &mdash; gesture on orbit triggers action on horizon</li>
+            <li>Combine with gaze: gesture + looking at camera = confirmed command</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 5 — Human Pose: overview
+         ============================================ -->
+    <section>
+      <h3>IDEA 2</h3>
+      <h2>Full Body Pose Estimation</h2>
+      <div class="two-col">
+        <div>
+          <p><strong>What it does</strong></p>
+          <p>Detects people with YOLO, then estimates 17 body keypoints per person &mdash; head, shoulders, elbows, wrists, hips, knees, ankles. A full skeleton.</p>
+          <div class="pipeline-flow" style="margin-top: 1em;">
+            <span class="pipeline-label">YOLOv6 nano</span>
+            <span class="pipeline-arrow">&rarr;</span>
+            <span class="pipeline-label">Lite-HRNet (17 keypoints)</span>
+          </div>
+          <p style="margin-top: 0.75em; font-size: 0.85em; color: var(--text-muted);">
+            Alternative: YOLOv8 Pose (single-stage, 17 keypoints in one pass)
+          </p>
+        </div>
+        <div>
+          <p><strong>Example location</strong></p>
+          <div class="command-card">
+            oak-examples/neural-networks/<br>pose-estimation/human-pose/
+          </div>
+          <p style="margin-top: 0.75em;"><strong>On our hardware</strong></p>
+          <p>
+            Works on RVC2 <span class="badge badge-rvc2">RVC2</span>
+            <br>Default ~5 FPS <span class="badge badge-fps">~5 fps</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 6 — Human Pose: interaction ideas
+         ============================================ -->
+    <section>
+      <h3>IDEA 2</h3>
+      <h2>Bodies as Input</h2>
+      <div class="idea-card">
+        <strong>Core concept:</strong> The camera understands posture and body language &mdash; not just "someone is there" but <em>what they're doing</em>.
+      </div>
+      <div class="two-col" style="margin-top: 1em;">
+        <div>
+          <p><strong>Discord interaction ideas</strong></p>
+          <ul style="padding-left: 1.2em;">
+            <li><code>!hand-raised</code> &mdash; is anyone raising their hand? (wrist above shoulder)</li>
+            <li><code>!posture</code> &mdash; standing, sitting, or slouching?</li>
+            <li><code>!activity</code> &mdash; classify what the person is doing based on keypoint positions</li>
+            <li>Alert when someone stands up or sits down</li>
+          </ul>
+        </div>
+        <div>
+          <p><strong>Wilder ideas</strong></p>
+          <ul style="padding-left: 1.2em;">
+            <li>Classroom hand-raise queue &mdash; first hand up gets called on first</li>
+            <li>Movement energy score &mdash; how active is the room?</li>
+            <li>Pose mirroring game &mdash; match the skeleton on screen</li>
+            <li>Combine with person detector: track individual skeletons over time</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 7 — DeepSORT Tracking: overview
+         ============================================ -->
+    <section>
+      <h3>IDEA 3</h3>
+      <h2>Object Tracking with Persistent IDs</h2>
+      <div class="two-col">
+        <div>
+          <p><strong>What it does</strong></p>
+          <p>Detects objects with YOLO, then extracts a visual "fingerprint" (embedding) for each one. DeepSORT matches fingerprints across frames so each object keeps its ID &mdash; even if it leaves and returns.</p>
+          <div class="pipeline-flow" style="margin-top: 1em;">
+            <span class="pipeline-label">YOLOv6 nano</span>
+            <span class="pipeline-arrow">&rarr;</span>
+            <span class="pipeline-label">OSNet embedding</span>
+            <span class="pipeline-arrow">&rarr;</span>
+            <span class="pipeline-label">DeepSORT tracker</span>
+          </div>
+        </div>
+        <div>
+          <p><strong>Example location</strong></p>
+          <div class="command-card">
+            oak-examples/neural-networks/<br>object-tracking/deepsort-tracking/
+          </div>
+          <p style="margin-top: 0.75em;"><strong>On our hardware</strong></p>
+          <p>
+            Works on RVC2 <span class="badge badge-rvc2">RVC2</span>
+            <br>Default ~5 FPS <span class="badge badge-fps">~5 fps</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 8 — DeepSORT Tracking: interaction ideas
+         ============================================ -->
+    <section>
+      <h3>IDEA 3</h3>
+      <h2>Tracking as Memory</h2>
+      <div class="idea-card">
+        <strong>Core concept:</strong> The current person detector is goldfish-brained &mdash; it knows someone is here <em>right now</em> but not that they were here five seconds ago. Tracking adds continuity.
+      </div>
+      <div class="two-col" style="margin-top: 1em;">
+        <div>
+          <p><strong>Discord interaction ideas</strong></p>
+          <ul style="padding-left: 1.2em;">
+            <li><code>!track</code> &mdash; list everyone currently tracked with their ID</li>
+            <li><code>!who-left</code> &mdash; report IDs that disappeared in the last N minutes</li>
+            <li><code>!dwell-time</code> &mdash; how long has person #3 been in frame?</li>
+            <li>Announce arrivals and departures to a Discord channel</li>
+          </ul>
+        </div>
+        <div>
+          <p><strong>Wilder ideas</strong></p>
+          <ul style="padding-left: 1.2em;">
+            <li>Trajectory heatmap &mdash; overlay paths people walked</li>
+            <li>Traffic flow &mdash; how many people crossed left-to-right vs. right-to-left?</li>
+            <li>Multi-camera handoff &mdash; person leaves orbit's view, appears in gravity's</li>
+            <li>Track non-person objects too &mdash; YOLO detects 80 COCO classes</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 9 — Re-identification: overview
+         ============================================ -->
+    <section>
+      <h3>IDEA 4</h3>
+      <h2>Human Re-Identification</h2>
+      <div class="two-col">
+        <div>
+          <p><strong>What it does</strong></p>
+          <p>Detects faces or bodies, computes a unique embedding, then compares it against previously seen embeddings using cosine similarity. Recognizes <em>the same person</em> appearing again &mdash; even after leaving and coming back.</p>
+          <p style="margin-top: 0.5em;"><strong>Two modes:</strong></p>
+          <ul style="padding-left: 1.2em; font-size: 0.9em;">
+            <li><strong>Pose mode</strong> &mdash; SCRFD person detection + OSNet body embedding</li>
+            <li><strong>Face mode</strong> &mdash; SCRFD/YuNet face detection + ArcFace embedding</li>
+          </ul>
+        </div>
+        <div>
+          <p><strong>Example location</strong></p>
+          <div class="command-card">
+            oak-examples/neural-networks/<br>reidentification/<br>human-reidentification/
+          </div>
+          <p style="margin-top: 0.75em;"><strong>On our hardware</strong></p>
+          <p>
+            Works on RVC2 <span class="badge badge-rvc2">RVC2</span>
+            <br>Default ~2 FPS <span class="badge badge-fps">~2 fps</span>
+          </p>
+          <div class="warn-card" style="margin-top: 0.5em;">
+            <strong>Slow but powerful.</strong> 2 FPS is fine for attendance-style use cases where you don't need real-time.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 10 — Re-identification: interaction ideas
+         ============================================ -->
+    <section>
+      <h3>IDEA 4</h3>
+      <h2>Recognition as Relationship</h2>
+      <div class="idea-card">
+        <strong>Core concept:</strong> The camera doesn't just see <em>a person</em> &mdash; it remembers <em>which</em> person. It can greet regulars, notice when someone hasn't been around, or learn visitor patterns.
+      </div>
+      <div class="two-col" style="margin-top: 1em;">
+        <div>
+          <p><strong>Discord interaction ideas</strong></p>
+          <ul style="padding-left: 1.2em;">
+            <li><code>!attendance</code> &mdash; who has the camera seen today?</li>
+            <li><code>!register "Alex"</code> &mdash; name the current face for future recognition</li>
+            <li><code>!seen "Alex"</code> &mdash; when was Alex last spotted?</li>
+            <li>Auto-greet returning people in Discord</li>
+          </ul>
+        </div>
+        <div>
+          <p><strong>Wilder ideas</strong></p>
+          <ul style="padding-left: 1.2em;">
+            <li>Privacy-first: store only embeddings, never photos</li>
+            <li>Anonymous re-id: "Person A has visited 3 times" without knowing who A is</li>
+            <li>Pair with fatigue: "Alex looks tired today" (personalized observation)</li>
+            <li>Opt-in system: only track people who register themselves</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 11 — Segmentation: overview
+         ============================================ -->
+    <section>
+      <h3>IDEA 5</h3>
+      <h2>Segmentation &amp; Silhouettes</h2>
+      <div class="two-col">
+        <div>
+          <p><strong>What it does</strong></p>
+          <p>Instead of drawing a bounding box, segmentation classifies <em>every pixel</em> &mdash; is it a person, or is it background? You get a precise silhouette, not a rectangle.</p>
+          <p style="margin-top: 0.5em;"><strong>Two examples available:</strong></p>
+          <ul style="padding-left: 1.2em; font-size: 0.9em;">
+            <li><strong>Background blur</strong> &mdash; DeepLab V3+, blur everything that isn't a person</li>
+            <li><strong>Depth crop</strong> &mdash; DeepLab + stereo depth, isolate people by distance <em>and</em> shape</li>
+          </ul>
+          <div class="pipeline-flow" style="margin-top: 0.75em;">
+            <span class="pipeline-label">DeepLab V3+</span>
+            <span class="pipeline-arrow">&rarr;</span>
+            <span class="pipeline-label">Per-pixel mask</span>
+          </div>
+        </div>
+        <div>
+          <p><strong>Example locations</strong></p>
+          <div class="command-card">
+            oak-examples/neural-networks/<br>segmentation/blur-background/
+          </div>
+          <div class="command-card">
+            oak-examples/neural-networks/<br>segmentation/depth-crop/
+          </div>
+          <p style="margin-top: 0.75em;"><strong>On our hardware</strong></p>
+          <p>
+            Works on RVC2 <span class="badge badge-rvc2">RVC2</span>
+            <br>Blur: ~4 FPS <span class="badge badge-fps">~4 fps</span>
+            <br>Depth crop: ~10 FPS <span class="badge badge-fps">~10 fps</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 12 — Segmentation: interaction ideas
+         ============================================ -->
+    <section>
+      <h3>IDEA 5</h3>
+      <h2>Shape Without Identity</h2>
+      <div class="idea-card">
+        <strong>Core concept:</strong> Silhouettes are inherently privacy-preserving. You can see presence, movement, and form without ever capturing a recognizable face. This is a camera that sees people <em>without watching them</em>.
+      </div>
+      <div class="two-col" style="margin-top: 1em;">
+        <div>
+          <p><strong>Discord interaction ideas</strong></p>
+          <ul style="padding-left: 1.2em;">
+            <li><code>!silhouette</code> &mdash; screenshot showing only person outlines</li>
+            <li><code>!privacy-mode on</code> &mdash; switch from full frame to silhouette-only capture</li>
+            <li><code>!background</code> &mdash; extract and share just the background (people removed)</li>
+            <li><code>!depth-mask</code> &mdash; combine segmentation + depth to isolate by distance</li>
+          </ul>
+        </div>
+        <div>
+          <p><strong>Wilder ideas</strong></p>
+          <ul style="padding-left: 1.2em;">
+            <li>Shadow puppet theater &mdash; silhouettes as art output</li>
+            <li>Anonymous occupancy &mdash; count body shapes, not faces</li>
+            <li>Background timelapse &mdash; capture the room without people over hours</li>
+            <li>Combine with depth: "how much of the room is occupied?"</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 13 — Combining ideas
+         ============================================ -->
+    <section>
+      <h3>COMBINING IDEAS</h3>
+      <h2>The Interesting Part Is the Overlap</h2>
+      <p>Each idea is useful alone. Together, they start to describe a room that <em>understands</em> what's happening inside it.</p>
+      <div class="three-col" style="margin-top: 1em;">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0.8em;">
+          <p style="font-size: 0.85em;"><strong>Tracking + Pose</strong></p>
+          <p style="font-size: 0.8em;">Person #3 raised their hand 12 seconds ago and is still waiting.</p>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0.8em;">
+          <p style="font-size: 0.85em;"><strong>Re-id + Fatigue</strong></p>
+          <p style="font-size: 0.8em;">Alex looks tired today. Send a private DM instead of a public alert.</p>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0.8em;">
+          <p style="font-size: 0.85em;"><strong>Gesture + Segmentation</strong></p>
+          <p style="font-size: 0.8em;">Privacy-safe voting: count raised fists from silhouettes, no faces stored.</p>
+        </div>
+      </div>
+      <div class="info-card" style="margin-top: 1em;">
+        <strong>Implementation is easy:</strong> each detector writes a JSON status file. A new script can read <em>multiple</em> status files and fuse the information &mdash; no need to modify existing detectors.
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 14 — FPS reality check
+         ============================================ -->
+    <section>
+      <h3>REALITY CHECK</h3>
+      <h2>Working Within RVC2 Limits</h2>
+      <p>Our OAK-D cameras use the RVC2 chip (Myriad X). It works &mdash; but it's not fast. Here's what to expect:</p>
+      <table>
+        <thead>
+          <tr><th>Example</th><th>FPS on RVC2</th><th>Good For</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Hand gestures</td>
+            <td>~8 fps</td>
+            <td>Interactive commands, voting</td>
+          </tr>
+          <tr>
+            <td>Human pose</td>
+            <td>~5 fps</td>
+            <td>Posture checks, hand-raise detection</td>
+          </tr>
+          <tr>
+            <td>DeepSORT tracking</td>
+            <td>~5 fps</td>
+            <td>Arrivals/departures, dwell time</td>
+          </tr>
+          <tr>
+            <td>Re-identification</td>
+            <td>~2 fps</td>
+            <td>Attendance, periodic check-ins</td>
+          </tr>
+          <tr>
+            <td>Segmentation (blur)</td>
+            <td>~4 fps</td>
+            <td>Privacy screenshots, silhouettes</td>
+          </tr>
+          <tr>
+            <td>Segmentation (depth crop)</td>
+            <td>~10 fps</td>
+            <td>Distance-based isolation</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="warn-card" style="margin-top: 0.75em;">
+        <strong>Key insight:</strong> These frame rates are fine for conversational interaction. You're asking the camera a question via Discord and getting an answer &mdash; you're not streaming 60fps video. 2 FPS is plenty fast for "who's in the room?"
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 15 — OAK 4 upgrade path
+         ============================================ -->
+    <section>
+      <h3>UPGRADE PATH</h3>
+      <h2>OAK 4: 40x Faster (Ships March 20)</h2>
+      <p>The <strong>OAK 4</strong> line uses the RVC4 platform (Qualcomm QCS8550) &mdash; <strong>52 TOPS</strong> vs. ~1.4 TOPS on our current Myriad X. Every pipeline above would hit 30 FPS.</p>
+      <div class="two-col" style="margin-top: 1em;">
+        <div>
+          <table>
+            <thead>
+              <tr><th>Model</th><th>Price</th><th>Depth</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>OAK 4 S</strong></td>
+                <td>~$749</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td><strong>OAK 4 D</strong></td>
+                <td>~$849</td>
+                <td>Yes</td>
+              </tr>
+              <tr>
+                <td><strong>OAK 4 D Pro</strong></td>
+                <td>~$949</td>
+                <td>Yes + laser</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 0.5em;">8 GB RAM, 128 GB storage, 48 MP RGB. <strong>USB + PoE built into every unit.</strong></p>
+          <div class="info-card" style="margin-top: 0.5em;">
+            <strong>One camera, both setups.</strong> The same OAK 4 D works for USB stations and the PoE spatial tracking rig &mdash; just plug in the right cable.
+          </div>
+        </div>
+        <div>
+          <p><strong>What it unlocks</strong></p>
+          <ul style="padding-left: 1.2em;">
+            <li>All five ideas on this deck at <strong>30 FPS</strong> instead of 2&ndash;8</li>
+            <li>RVC4-only examples: YOLO-World (detect anything by text), DINO tracking, people demographics</li>
+            <li>Standalone on-device apps &mdash; camera processes without a host</li>
+            <li>Larger, more accurate models that won't fit on Myriad X</li>
+          </ul>
+          <p style="margin-top: 0.75em;"><strong>Alternatively: offload to a GPU.</strong> Stream frames from the current OAK-D to your PC or a cloud GPU (RunPod) and run inference there. Same speed boost, no new hardware.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 16 — Getting started
+         ============================================ -->
+    <section>
+      <h3>GETTING STARTED</h3>
+      <h2>Try an Example</h2>
+      <p>All five examples live in the <code>oak-examples</code> repo and follow the same pattern:</p>
+      <div class="command-card">
+        $ ssh orbit<br>
+        $ activate-oak<br>
+        $ cd ~/oak-examples/neural-networks/pose-estimation/hand-pose/<br>
+        $ pip install -r requirements.txt<br>
+        $ python3 main.py
+      </div>
+      <p style="margin-top: 1em;">To make it a Smart Objects detector, follow the existing pattern:</p>
+      <ul class="checklist">
+        <li>Copy structure from the closest existing detector (e.g. <code>fatigue_detector.py</code>)</li>
+        <li>Write a JSON status file so the Discord bot can read it</li>
+        <li>Add <code>--discord</code> / <code>--log</code> / <code>--display</code> flags</li>
+        <li>Add new <code>!commands</code> to <code>discord_bot.py</code></li>
+        <li>Announce startup and shutdown to Discord</li>
+      </ul>
+    </section>
+
+    <!-- ============================================
+         SLIDE 16 — Quick reference
+         ============================================ -->
+    <section>
+      <h3>REFERENCE</h3>
+      <h2>Example Paths</h2>
+      <table>
+        <thead>
+          <tr><th>Idea</th><th>Path in oak-examples</th><th>Models</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Hand gestures</td>
+            <td><code>neural-networks/pose-estimation/hand-pose/</code></td>
+            <td>MediaPipe Palm + Hand Landmarker</td>
+          </tr>
+          <tr>
+            <td>Human pose</td>
+            <td><code>neural-networks/pose-estimation/human-pose/</code></td>
+            <td>YOLOv6 + Lite-HRNet</td>
+          </tr>
+          <tr>
+            <td>Object tracking</td>
+            <td><code>neural-networks/object-tracking/deepsort-tracking/</code></td>
+            <td>YOLOv6 + OSNet + DeepSORT</td>
+          </tr>
+          <tr>
+            <td>Re-identification</td>
+            <td><code>neural-networks/reidentification/human-reidentification/</code></td>
+            <td>SCRFD/YuNet + OSNet/ArcFace</td>
+          </tr>
+          <tr>
+            <td>Segmentation</td>
+            <td><code>neural-networks/segmentation/blur-background/</code></td>
+            <td>DeepLab V3+</td>
+          </tr>
+          <tr>
+            <td>Depth crop</td>
+            <td><code>neural-networks/segmentation/depth-crop/</code></td>
+            <td>DeepLab V3+ + StereoDepth</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="info-card" style="margin-top: 0.75em;">
+        <strong>Browse all models:</strong> <a href="https://models.luxonis.com" target="_blank">models.luxonis.com</a> &mdash; filter by RVC2 to see what runs on our cameras.
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 17 — Closing
+         ============================================ -->
+    <section>
+      <h3>SMART OBJECTS</h3>
+      <h1>Pick One. Make It Talk.</h1>
+      <p>The camera already sees. Your job is to decide what it should <em>say</em>.</p>
+      <p style="font-size: 0.85em; color: var(--text-secondary); margin-top: 1.5em;">
+        Start from an existing example. Write a status file.<br>
+        Add a Discord command. Make the camera conversational.
+      </p>
+      <p style="font-size: 0.75em; color: var(--text-muted); margin-top: 2em;">
+        <a href="https://github.com/kandizzy/smart-objects-cameras" target="_blank">github.com/kandizzy/smart-objects-cameras</a>
+      </p>
+    </section>
+
+  </div><!-- /.slides -->
+</div><!-- /.reveal -->
+
+<!-- Reveal.js + plugins from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.min.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: true,
+    plugins: [RevealHighlight],
+    width: 1280,
+    height: 720,
+    margin: 0.1,
+    transition: 'none',
+    backgroundTransition: 'none',
+    center: false,
+  });
+</script>
+</body>
+</html>
