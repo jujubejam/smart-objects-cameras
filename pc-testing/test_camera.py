@@ -14,7 +14,7 @@ import depthai as dai
 
 def main():
     parser = argparse.ArgumentParser(description="Test OAK camera connectivity")
-    parser.add_argument("--ip", help="PoE camera IP address (e.g., 192.168.1.100)")
+    parser.add_argument("--ip", help="PoE camera IP address")
     args = parser.parse_args()
 
     # Connect to device

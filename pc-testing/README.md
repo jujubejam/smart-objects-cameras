@@ -60,8 +60,8 @@ python test_camera.py
 python test_skeleton_depth.py
 
 # PoE camera (specify IP)
-python test_camera.py --ip 192.168.1.100
-python test_skeleton_depth.py --ip 192.168.1.100
+python test_camera.py --ip <your-camera-ip>
+python test_skeleton_depth.py --ip <your-camera-ip>
 ```
 
 Press `q` to quit any script with a display window.
