@@ -77,6 +77,33 @@ last_screenshot_time = 0
 COCO_CLASSES = ['person', 'bicycle', 'car', 'motorcycle',
                 'airplane', 'bus', 'train', 'truck', 'boat']
 
+# ── Classroom API integration ────────────────────────────────────────────────
+CLASSROOM_API_URL = os.getenv("CLASSROOM_API_URL", "")
+CLASSROOM_API_KEY = os.getenv("CLASSROOM_API_KEY", "")
+
+
+def push_to_classroom(camera_id: str, detected: bool, count: int,
+                      username: str = None, hostname: str = None):
+    """Push person detection to the classroom API (fire-and-forget)."""
+    if not CLASSROOM_API_URL:
+        return
+    try:
+        import requests
+        requests.post(
+            f"{CLASSROOM_API_URL.rstrip('/')}/push/state",
+            json={
+                "camera_id": camera_id,
+                "person_detected": detected,
+                "person_count": count,
+                "detector_host": hostname,
+                "detector_user": username,
+            },
+            headers={"X-API-Key": CLASSROOM_API_KEY},
+            timeout=2,
+        )
+    except Exception:
+        pass  # Never block the detection loop
+
 
 def log_event(message: str):
     """Print and optionally log an event."""
@@ -253,6 +280,7 @@ def run_detection():
                                 # Update status file
                                 update_status_file(
                                     person_detected, person_count, running=True, username=username, hostname=hostname)
+                                push_to_classroom(hostname, person_detected, person_count, username, hostname)
                         else:
                             # New pending state - start the timer
                             pending_state = person_detected
@@ -274,6 +302,7 @@ def run_detection():
                     detected = last_status if last_status is not None else False
                     count = last_count if last_status else 0
                     update_status_file(detected, count, running=True, username=username, hostname=hostname)
+                    push_to_classroom(hostname, detected, count, username, hostname)
                     last_status_update_time = current_time
 
                 # Periodic screenshot save (for Discord bot)

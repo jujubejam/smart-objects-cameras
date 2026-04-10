@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docs — Smart Objects Cameras</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --font-heading: "Instrument Serif", Georgia, "Times New Roman", serif;
+      --font-sans: "Inter", "Helvetica Neue", -apple-system, system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-muted: #a8a29e;
+      --text-faint: #c8c4bf;
+      --bg-page: #fafaf9;
+      --bg-card: #ffffff;
+      --border-subtle: #e7e5e4;
+      --green-accent: #16a34a;
+      --green-bg: #f0fdf4;
+      --green-border: #bbf7d0;
+      --blue-accent: #2563eb;
+      --blue-bg: #eff6ff;
+      --blue-border: #bfdbfe;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg-page);
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.6;
+      padding: 4rem 2rem;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 3rem;
+    }
+
+    .label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-family: var(--font-heading);
+      font-size: 2.2rem;
+      font-weight: 400;
+      font-style: italic;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .doc-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .doc-item {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      padding: 0.9rem 1.1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      text-decoration: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .doc-item:hover {
+      border-color: #d6d3d1;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .doc-name {
+      font-weight: 500;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      white-space: nowrap;
+    }
+
+    .doc-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .doc-badge {
+      font-size: 0.55rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      padding: 0.15em 0.5em;
+      border-radius: 3px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .badge-slides {
+      background: var(--green-bg);
+      color: var(--green-accent);
+      border: 1px solid var(--green-border);
+    }
+
+    .badge-md {
+      background: var(--blue-bg);
+      color: var(--blue-accent);
+      border: 1px solid var(--blue-border);
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border-subtle);
+      margin: 2rem 0;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 2.5rem;
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border-subtle);
+      transition: color 0.15s;
+    }
+
+    .back-link:hover { color: var(--text-secondary); }
+
+    @media (max-width: 600px) {
+      body { padding: 2.5rem 1.25rem; }
+      h1 { font-size: 1.6rem; }
+      .doc-item { flex-direction: column; gap: 0.3rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="label">Smart Objects Cameras</div>
+      <h1>Documentation</h1>
+      <p>Guides and references for working with the OAK-D cameras and Raspberry Pis.</p>
+    </header>
+
+    <div class="label">Overview</div>
+    <div class="doc-list">
+      <a href="readme-slides.html" class="doc-item">
+        <span class="doc-badge badge-slides">SLIDES</span>
+        <span class="doc-name">README Overview</span>
+        <span class="doc-desc">14-slide project introduction</span>
+      </a>
+      <a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/README.md" target="_blank" class="doc-item">
+        <span class="doc-badge badge-md">MD</span>
+        <span class="doc-name">README</span>
+        <span class="doc-desc">Full documentation with all details</span>
+      </a>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">For Students</div>
+    <div class="doc-list">
+      <a href="student-quickstart-slides.html" class="doc-item">
+        <span class="doc-badge badge-slides">SLIDES</span>
+        <span class="doc-name">Student Quick Start</span>
+        <span class="doc-desc">28-slide setup walkthrough</span>
+      </a>
+      <a href="cheatsheet-slides.html" class="doc-item">
+        <span class="doc-badge badge-slides">SLIDES</span>
+        <span class="doc-name">Cheat Sheet</span>
+        <span class="doc-desc">Common commands at a glance</span>
+      </a>
+      <a href="workflow-slides.html" class="doc-item">
+        <span class="doc-badge badge-slides">SLIDES</span>
+        <span class="doc-name">Workflow</span>
+        <span class="doc-desc">Edit-copy-run loop explained</span>
+      </a>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Project Ideas</div>
+    <div class="doc-list">
+      <a href="next-ideas-slides.html" class="doc-item">
+        <span class="doc-badge badge-slides">SLIDES</span>
+        <span class="doc-name">What Else Can Your Camera See?</span>
+        <span class="doc-desc">Five project ideas from oak-examples</span>
+      </a>
+      <a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/NEXT_IDEAS.md" target="_blank" class="doc-item">
+        <span class="doc-badge badge-md">MD</span>
+        <span class="doc-name">Next Ideas</span>
+        <span class="doc-desc">Full details with example paths</span>
+      </a>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">V-JEPA 2</div>
+    <div class="doc-list">
+      <a href="v-jepa-research-slides.html" class="doc-item">
+        <span class="doc-badge badge-slides">SLIDES</span>
+        <span class="doc-name">V-JEPA Research</span>
+        <span class="doc-desc">Video understanding for activity recognition</span>
+      </a>
+      <a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/v-jepa/CLASSROOM_CLIP_STRATEGY.md" target="_blank" class="doc-item">
+        <span class="doc-badge badge-md">MD</span>
+        <span class="doc-name">Classroom Clip Strategy</span>
+        <span class="doc-desc">Recording and classifying video clips</span>
+      </a>
+      <a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/v-jepa/windows/README.md" target="_blank" class="doc-item">
+        <span class="doc-badge badge-md">MD</span>
+        <span class="doc-name">Windows Tools</span>
+        <span class="doc-desc">Training probes on Windows with OAK-D</span>
+      </a>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Hardware &amp; Equipment</div>
+    <div class="doc-list">
+      <a href="equipment-list-slides.html" class="doc-item">
+        <span class="doc-badge badge-slides">SLIDES</span>
+        <span class="doc-name">Equipment List</span>
+        <span class="doc-desc">Components, pricing, upgrade paths</span>
+      </a>
+      <a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/EQUIPMENT_LIST.md" target="_blank" class="doc-item">
+        <span class="doc-badge badge-md">MD</span>
+        <span class="doc-name">Equipment List</span>
+        <span class="doc-desc">Full details with links</span>
+      </a>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Reference</div>
+    <div class="doc-list">
+      <a href="working-versions-slides.html" class="doc-item">
+        <span class="doc-badge badge-slides">SLIDES</span>
+        <span class="doc-name">Working Versions</span>
+        <span class="doc-desc">Tested library versions</span>
+      </a>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Tools &amp; Workflow</div>
+    <div class="doc-list">
+      <a href="claude-code-slides.html" class="doc-item">
+        <span class="doc-badge badge-slides">SLIDES</span>
+        <span class="doc-name">Claude Code Workflow</span>
+        <span class="doc-desc">AI-assisted development with task tracking</span>
+      </a>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Networking &amp; Collaboration</div>
+    <div class="doc-list">
+      <a href="wifi-management-slides.html" class="doc-item">
+        <span class="doc-badge badge-slides">SLIDES</span>
+        <span class="doc-name">WiFi Management</span>
+        <span class="doc-desc">Switching networks on Pi</span>
+      </a>
+      <a href="multi-user-access-slides.html" class="doc-item">
+        <span class="doc-badge badge-slides">SLIDES</span>
+        <span class="doc-name">Multi-User Access</span>
+        <span class="doc-desc">Sharing cameras and Pis</span>
+      </a>
+      <a href="git-collaboration-slides.html" class="doc-item">
+        <span class="doc-badge badge-slides">SLIDES</span>
+        <span class="doc-name">Git Collaboration</span>
+        <span class="doc-desc">Branch and fork strategies</span>
+      </a>
+    </div>
+
+    <a href="https://github.com/kandizzy/smart-objects-cameras" class="back-link" target="_blank">View on GitHub &rarr;</a>
+  </div>
+</body>
+</html>

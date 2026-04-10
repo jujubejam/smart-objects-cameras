@@ -528,6 +528,84 @@ async def toggle_notifications(ctx):
         await ctx.send(f"❌ Error toggling notifications: {str(e)}")
 
 
+# --- Classroom API Commands (reads from Supabase via classroom_api.py) ---
+
+CLASSROOM_API_URL = os.getenv("CLASSROOM_API_URL", "")
+
+
+@bot.command(name='classroom', help='Show full classroom state from Supabase')
+async def classroom_command(ctx):
+    """Full classroom state from all cameras via the classroom API."""
+    if not CLASSROOM_API_URL:
+        await ctx.send("❌ `CLASSROOM_API_URL` not configured in .env")
+        return
+
+    try:
+        import requests
+        r = requests.get(f"{CLASSROOM_API_URL}/state", timeout=5)
+        r.raise_for_status()
+        state = r.json()
+
+        mode = state.get("room_mode", "unknown")
+        persons = state.get("total_persons", 0)
+        whiteboard = "active" if state.get("whiteboard_active") else "idle"
+
+        mode_emoji = {
+            "solo": "🎉", "duo": "☕", "group": "🎊",
+            "focus": "📝", "presentation": "🎤", "empty": "🪑",
+        }.get(mode, "❓")
+
+        lines = [
+            f"{mode_emoji} **Room Mode: {mode.upper()}**",
+            f"👥 People: **{persons}**  |  📋 Whiteboard: **{whiteboard}**",
+            "",
+        ]
+
+        cameras = state.get("cameras", {})
+        for cam_id, cam in cameras.items():
+            probe = cam.get("predicted_class", "?")
+            conf = cam.get("prediction_confidence", 0)
+            count = cam.get("person_count", 0)
+            lines.append(
+                f"  **{cam_id}**: {count} people, "
+                f"probe=`{probe}` ({conf:.0%})"
+            )
+
+        await ctx.send("\n".join(lines))
+
+    except Exception as e:
+        await ctx.send(f"❌ Classroom API error: {e}")
+
+
+@bot.command(name='mode', help='Show current room mode')
+async def mode_command(ctx):
+    """Current room mode from the classroom API."""
+    if not CLASSROOM_API_URL:
+        await ctx.send("❌ `CLASSROOM_API_URL` not configured in .env")
+        return
+
+    try:
+        import requests
+        r = requests.get(f"{CLASSROOM_API_URL}/mode", timeout=5)
+        r.raise_for_status()
+        data = r.json()
+
+        mode = data.get("room_mode", "unknown")
+        persons = data.get("total_persons", 0)
+        probe = data.get("probe_consensus") or "none"
+
+        mode_emoji = {
+            "solo": "🎉", "duo": "☕", "group": "🎊",
+            "focus": "📝", "presentation": "🎤", "empty": "🪑",
+        }.get(mode, "❓")
+
+        msg = f"{mode_emoji} **{mode.upper()}** — {persons} people, probe consensus: `{probe}`"
+        await ctx.send(msg)
+
+    except Exception as e:
+        await ctx.send(f"❌ Classroom API error: {e}")
+
+
 @bot.command(name='help', help='Show available commands')
 async def help_command(ctx):
     """Display help message with all available commands."""
@@ -551,6 +629,10 @@ async def help_command(ctx):
 `!set-confidence <0.0-1.0>` - Set OCR confidence threshold
 `!set-fps <1-30>` - Set camera FPS
 `!toggle-notifications` - Toggle Discord notifications
+
+**Classroom (Supabase):**
+`!classroom` - Full classroom state from all cameras
+`!mode` - Current room mode (solo/duo/group/focus/presentation)
 
 **Multi-Camera:**
 `!orbit <command>` - Send command to Orbit only

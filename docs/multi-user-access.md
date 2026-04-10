@@ -1,5 +1,7 @@
 # Multi-User Access
 
+> **Prefer slides?** View the [Multi-User Access Slides](https://kandizzy.github.io/smart-objects-cameras/multi-user-access-slides.html) for a visual walkthrough.
+
 Multiple students can access the same Pi simultaneously for collaborative work.
 
 ---

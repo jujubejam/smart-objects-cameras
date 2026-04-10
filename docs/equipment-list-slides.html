@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equipment List — Smart Objects Cameras</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.min.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/github.min.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --font-heading: "Instrument Serif", Georgia, "Times New Roman", serif;
+      --font-sans: "Inter", "Helvetica Neue", -apple-system, system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-muted: #a8a29e;
+      --text-faint: #c8c4bf;
+      --bg-page: #fafaf9;
+      --bg-card: #ffffff;
+      --border-subtle: #e7e5e4;
+      --green-accent: #16a34a;
+      --green-bg: #f0fdf4;
+      --green-border: #bbf7d0;
+      --red-accent: #dc2626;
+      --red-bg: #fef2f2;
+      --red-border: #fecaca;
+      --blue-accent: #2563eb;
+      --blue-bg: #eff6ff;
+      --blue-border: #bfdbfe;
+    }
+
+    .reveal, .reveal .slide-background { background: var(--bg-page); }
+
+    .reveal {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 22px;
+      color: var(--text-secondary);
+      text-align: left;
+    }
+    .reveal .slides section { text-align: left; }
+
+    .reveal h1 {
+      font-family: var(--font-heading);
+      font-size: 2.2em; font-weight: 400; font-style: italic;
+      letter-spacing: -0.02em;
+      color: var(--text-primary); margin-bottom: 0.6em;
+    }
+    .reveal h2 {
+      font-family: var(--font-heading);
+      font-size: 1.5em; font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--text-primary); margin-bottom: 0.5em;
+    }
+    .reveal h3 {
+      font-family: var(--font-sans);
+      font-size: 0.65em; font-weight: 600; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.5em;
+    }
+    .reveal p, .reveal li {
+      font-size: 0.95em; line-height: 1.65; color: var(--text-secondary);
+    }
+    .reveal strong { font-weight: 600; color: var(--text-primary); }
+
+    .reveal pre {
+      font-family: var(--font-mono); font-size: 0.7em; line-height: 1.55;
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: 8px; padding: 0.8em 1.1em; box-shadow: none;
+      width: 100%; margin: 0.6em 0;
+    }
+    .reveal code { font-family: var(--font-mono); }
+    .reveal p code, .reveal li code, .reveal td code {
+      background: #f5f5f4; border: 1px solid var(--border-subtle);
+      border-radius: 4px; padding: 0.1em 0.4em; font-size: 0.85em;
+      color: var(--green-accent);
+    }
+
+    .info-card {
+      background: var(--blue-bg); border: 1px solid var(--blue-border);
+      border-radius: 6px; padding: 0.7em 1em; font-size: 0.85em; margin: 0.5em 0;
+    }
+    .two-col {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.8em; align-items: start;
+      text-align: left;
+    }
+    .checklist { list-style: none; padding: 0; margin: 0; }
+    .checklist li {
+      position: relative; padding: 0.4em 0 0.4em 1.5em;
+      border-bottom: 1px solid var(--border-subtle);
+      list-style: none;
+    }
+    .checklist li::before {
+      content: "\2713"; color: var(--green-accent); font-size: 0.85em;
+      position: absolute; left: 0;
+    }
+
+    .reveal table { width: 100%; border-collapse: collapse; font-size: 0.78em; margin-top: 0.6em; }
+    .reveal table th {
+      text-align: left; font-weight: 600; color: var(--text-primary);
+      border-bottom: 2px solid var(--border-subtle); padding: 0.45em 0.7em;
+    }
+    .reveal table td {
+      padding: 0.4em 0.7em; border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .reveal .slide-number {
+      font-family: var(--font-mono); font-size: 0.7em; color: var(--text-muted);
+      background: none; bottom: 1em; left: 50%; transform: translateX(-50%); right: auto;
+    }
+    .reveal .progress span { background: var(--border-subtle); }
+
+    .read-more {
+      font-size: 0.6em !important; color: var(--text-muted) !important;
+      font-family: var(--font-mono); text-align: center;
+      margin-top: 1em !important;
+    }
+    .read-more a {
+      color: var(--text-muted) !important; border-bottom: 1px solid var(--border-subtle);
+      transition: color 0.15s;
+    }
+    .read-more a:hover { color: var(--text-secondary) !important; }
+  </style>
+</head>
+
+<body>
+<div class="reveal">
+<div class="slides">
+
+  <!-- Slide 1 — Title -->
+  <section>
+    <h3>SMART OBJECTS CAMERAS</h3>
+    <h1>Equipment List</h1>
+    <p>Smart Objects Camera System</p>
+    <p style="margin-top: 2em; font-size: 0.8em; color: var(--text-muted);">
+      SVA MFA Interaction Design &mdash; Winter 2026<br>
+      3 stations &bull; AI-powered cameras &bull; networked sensing
+    </p>
+  </section>
+
+  <!-- Slide 2 — Per-Station Setup -->
+  <section>
+    <h3>PER-STATION SETUP</h3>
+    <h2>Single Station Components</h2>
+    <p style="font-size: 0.82em; margin-bottom: 0.4em;">Each of the 3 stations (Orbit, Gravity, Horizon) requires:</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Spec / Model</th>
+          <th>Qty</th>
+          <th>Est. Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Raspberry Pi 5</strong></td>
+          <td>16 GB RAM</td>
+          <td>1</td>
+          <td>~$205</td>
+        </tr>
+        <tr>
+          <td><strong>OAK-D Camera</strong></td>
+          <td>Luxonis OAK-D (USB)</td>
+          <td>1</td>
+          <td>~$299</td>
+        </tr>
+        <tr>
+          <td><strong>MicroSD Card</strong></td>
+          <td>64 GB, Class 10 / A2</td>
+          <td>1</td>
+          <td>~$9</td>
+        </tr>
+        <tr>
+          <td><strong>USB-C Power Supply</strong></td>
+          <td>Official Pi 5 27 W PSU (5.1 V / 5 A)</td>
+          <td>1</td>
+          <td>~$12</td>
+        </tr>
+        <tr>
+          <td><strong>USB 3.0 Cable</strong></td>
+          <td>USB-A to USB-C, ~1 m</td>
+          <td>1</td>
+          <td>~$5</td>
+        </tr>
+        <tr>
+          <td><strong>5V DC Power Supply</strong></td>
+          <td>5V 2A, 5.5 mm &times; 2.5 mm barrel jack</td>
+          <td>1</td>
+          <td>~$9</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="margin-top: 0.6em; font-size: 0.9em;"><strong>Per-station subtotal: ~$539</strong></p>
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/EQUIPMENT_LIST.md" target="_blank">Full list &rarr;</a></p>
+  </section>
+
+  <!-- Slide 3 — Full Set + Optional -->
+  <section>
+    <h3>FULL SET + OPTIONAL EXTRAS</h3>
+    <h2>3-Station Total &amp; Add-ons</h2>
+    <div class="two-col">
+      <div>
+        <p style="font-size: 0.85em; font-weight: 600; color: var(--text-primary); margin-bottom: 0.3em;">3-Station Total</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Qty</th>
+              <th>Est. Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Raspberry Pi 5 (16 GB)</td>
+              <td>3</td>
+              <td>~$615</td>
+            </tr>
+            <tr>
+              <td>OAK-D Camera</td>
+              <td>3</td>
+              <td>~$897</td>
+            </tr>
+            <tr>
+              <td>MicroSD Card (64 GB)</td>
+              <td>3</td>
+              <td>~$27</td>
+            </tr>
+            <tr>
+              <td>USB-C PSU (27 W)</td>
+              <td>3</td>
+              <td>~$36</td>
+            </tr>
+            <tr>
+              <td>USB 3.0 Cable</td>
+              <td>3</td>
+              <td>~$15</td>
+            </tr>
+            <tr>
+              <td>5V DC Power Supply (barrel jack)</td>
+              <td>3</td>
+              <td>~$27</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin-top: 0.5em; font-size: 0.88em;"><strong>3-station total: ~$1,617</strong></p>
+      </div>
+      <div>
+        <p style="font-size: 0.85em; font-weight: 600; color: var(--text-primary); margin-bottom: 0.3em;">Optional but Recommended</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Qty</th>
+              <th>Est. Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Ethernet Cables (Cat6)</td>
+              <td>3</td>
+              <td>~$15</td>
+            </tr>
+            <tr>
+              <td>Network Switch (5-port Gigabit)</td>
+              <td>1</td>
+              <td>~$20</td>
+            </tr>
+            <tr>
+              <td>USB Keyboard + Mouse</td>
+              <td>1</td>
+              <td>~$25</td>
+            </tr>
+            <tr>
+              <td>Micro-HDMI to HDMI Cable</td>
+              <td>1</td>
+              <td>~$10</td>
+            </tr>
+            <tr>
+              <td>Anker 737 Power Bank (per station)</td>
+              <td>1</td>
+              <td>~$100</td>
+            </tr>
+            <tr>
+              <td>USB-A to Barrel Jack Cable</td>
+              <td>1</td>
+              <td>~$9</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin-top: 0.5em; font-size: 0.88em;"><strong>Optional extras: ~$179</strong></p>
+        <div class="info-card" style="margin-top: 0.8em;">
+          Keyboard, mouse, and HDMI cable are shared across stations. Battery kit enables portable operation (~3 hr runtime).
+        </div>
+      </div>
+    </div>
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/EQUIPMENT_LIST.md" target="_blank">Full list &rarr;</a></p>
+  </section>
+
+  <!-- Slide 4 — What This System Does -->
+  <section>
+    <h3>CAPABILITIES</h3>
+    <h2>What This System Does</h2>
+    <div class="two-col">
+      <div>
+        <p style="font-size: 0.85em; font-weight: 600; color: var(--text-primary); margin-bottom: 0.4em;">Each station is a self-contained smart object</p>
+        <ul class="checklist">
+          <li>Detect people (or other objects) using <strong>YOLO neural networks</strong> running on the camera's dedicated VPU</li>
+          <li>Send <strong>real-time alerts</strong> to a shared Discord channel</li>
+          <li>Respond to interactive <strong>Discord commands</strong> (<code>!status</code>, <code>!detect</code>, <code>!screenshot</code>)</li>
+          <li>Coordinate across multiple cameras as a <strong>networked sensing system</strong></li>
+        </ul>
+        <p style="font-size: 0.8em; margin-top: 0.8em; color: var(--text-muted);">
+          Students learn computer vision, hardware integration, networked systems, and Python development through hands-on experimentation.
+        </p>
+      </div>
+      <div>
+        <p style="font-size: 0.85em; font-weight: 600; color: var(--text-primary); margin-bottom: 0.4em;">Software Stack (all free)</p>
+        <ul class="checklist">
+          <li><strong>Raspberry Pi OS</strong> &mdash; Bookworm 64-bit</li>
+          <li><strong>DepthAI 3.x</strong> + depthai-nodes &mdash; open source</li>
+          <li><strong>Python 3 + OpenCV + NumPy</strong></li>
+          <li><strong>Discord</strong> &mdash; bot + webhooks</li>
+          <li><strong>VS Code</strong> + Remote SSH extension</li>
+          <li><strong>RealVNC Viewer</strong> &mdash; free for non-commercial use</li>
+        </ul>
+        <div class="info-card" style="margin-top: 0.8em;">
+          No paid software licenses required. Everything runs on the Pi locally.
+        </div>
+      </div>
+    </div>
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/EQUIPMENT_LIST.md" target="_blank">Full list &rarr;</a></p>
+  </section>
+
+  <!-- Slide 5 — PoE Spatial Tracking Rig -->
+  <section>
+    <h3>OPTIONAL UPGRADE</h3>
+    <h2>PoE Spatial Tracking Rig</h2>
+    <p style="font-size: 0.85em; margin-bottom: 0.5em;">
+      A multi-camera spatial tracking setup using <strong>3 OAK-D PoE cameras</strong> connected to a single Raspberry Pi over powered Ethernet.
+      The PoE switch delivers both power and data to each camera &mdash; no USB cables or separate power supplies needed per camera.
+    </p>
+    <div class="two-col">
+      <div>
+        <p style="font-size: 0.82em; font-weight: 600; color: var(--text-primary); margin-bottom: 0.3em;">Additional Items Needed</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Qty</th>
+              <th>Est. Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>PoE+ Switch (Ubiquiti UniFi Pro Max 16)</td>
+              <td>1</td>
+              <td>~$399</td>
+            </tr>
+            <tr>
+              <td>Ethernet Cables (Cat6)</td>
+              <td>3</td>
+              <td>~$15</td>
+            </tr>
+            <tr>
+              <td>Raspberry Pi 5 (16 GB)</td>
+              <td>1</td>
+              <td>~$205</td>
+            </tr>
+            <tr>
+              <td>MicroSD Card (64 GB)</td>
+              <td>1</td>
+              <td>~$12</td>
+            </tr>
+            <tr>
+              <td>USB-C PSU (27 W)</td>
+              <td>1</td>
+              <td>~$20</td>
+            </tr>
+            <tr>
+              <td>Compact Switch (Ubiquiti Flex Mini)</td>
+              <td>1</td>
+              <td>~$87</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin-top: 0.4em; font-size: 0.85em;"><strong>PoE rig subtotal: ~$738</strong> <span style="color: var(--text-muted);">(not counting cameras already owned)</span></p>
+      </div>
+      <div>
+        <p style="font-size: 0.82em; font-weight: 600; color: var(--text-primary); margin-bottom: 0.3em;">What Spatial Tracking Enables</p>
+        <ul class="checklist">
+          <li>Track people/objects across a room using <strong>triangulated positions</strong> from 3 camera angles</li>
+          <li>Each OAK-D PoE runs its own <strong>neural network on-device</strong> and reports detections over the network</li>
+          <li>The Pi <strong>fuses detection data</strong> from all 3 cameras into a unified spatial map</li>
+          <li><strong>Cleaner cable runs</strong> &mdash; one Ethernet cable per camera replaces USB + power</li>
+        </ul>
+      </div>
+    </div>
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/EQUIPMENT_LIST.md" target="_blank">Full list &rarr;</a></p>
+  </section>
+
+  <!-- Slide 6 — OAK 4 Upgrade Path -->
+  <section>
+    <h3>UPGRADE PATH</h3>
+    <h2>OAK 4 Cameras (RVC4)</h2>
+    <p style="font-size: 0.85em; margin-bottom: 0.5em;">
+      The current OAK-D uses the <strong>RVC2 (Myriad X)</strong> chip &mdash; capable but slow for multi-stage pipelines (2&ndash;8 FPS).
+      The <strong>OAK 4</strong> line uses <strong>RVC4</strong> (Qualcomm QCS8550) with <strong>52 TOPS</strong> &mdash; roughly <strong>40&times; faster</strong>.
+    </p>
+    <div class="two-col">
+      <div>
+        <p style="font-size: 0.82em; font-weight: 600; color: var(--text-primary); margin-bottom: 0.3em;">OAK 4 Models</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Price</th>
+              <th>Stereo</th>
+              <th>Key Difference</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>OAK 4 S</strong></td>
+              <td>~$749</td>
+              <td>No</td>
+              <td>Single RGB only</td>
+            </tr>
+            <tr>
+              <td><strong>OAK 4 D</strong></td>
+              <td>~$849</td>
+              <td>Yes</td>
+              <td>Direct OAK-D replacement</td>
+            </tr>
+            <tr>
+              <td><strong>OAK 4 D Pro</strong></td>
+              <td>~$949</td>
+              <td>Yes + laser</td>
+              <td>Best depth in low-light</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-size: 0.78em; color: var(--text-muted); margin-top: 0.4em;">All models: 8 GB RAM, 128 GB storage, 48 MP RGB, standalone capable. <strong>USB + PoE built into every unit.</strong><br>Ships March 20, 2026 from <a href="https://shop.luxonis.com/" target="_blank">shop.luxonis.com</a>.</p>
+      </div>
+      <div>
+        <p style="font-size: 0.82em; font-weight: 600; color: var(--text-primary); margin-bottom: 0.3em;">USB Stations Upgrade (OAK 4 D &times; 3)</p>
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Current</th>
+              <th>Upgrade</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Cameras (&times;3)</td>
+              <td>~$897</td>
+              <td>~$2,547</td>
+            </tr>
+            <tr>
+              <td>Pis + accessories</td>
+              <td>~$720</td>
+              <td>~$720</td>
+            </tr>
+            <tr>
+              <td><strong>Total</strong></td>
+              <td><strong>~$1,617</strong></td>
+              <td><strong>~$3,267</strong></td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-size: 0.82em; font-weight: 600; color: var(--text-primary); margin-bottom: 0.3em; margin-top: 0.6em;">PoE Rig Upgrade (OAK 4 D &times; 3)</p>
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Current</th>
+              <th>Upgrade</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Cameras (&times;3)</td>
+              <td><em>owned</em></td>
+              <td>~$2,547</td>
+            </tr>
+            <tr>
+              <td>Switch + Pi + acc.</td>
+              <td>~$738</td>
+              <td>~$738</td>
+            </tr>
+            <tr>
+              <td><strong>Total</strong></td>
+              <td><strong>~$738</strong></td>
+              <td><strong>~$3,285</strong></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="info-card" style="margin-top: 0.5em;">
+          <strong>What it unlocks:</strong> 30 FPS multi-stage pipelines, open-vocabulary detection, on-device standalone apps. Same PoE switch &amp; cables work.
+        </div>
+      </div>
+    </div>
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/EQUIPMENT_LIST.md" target="_blank">Full list &rarr;</a></p>
+  </section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.min.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: true,
+    plugins: [RevealHighlight],
+    width: 1280,
+    height: 720,
+    margin: 0.1,
+    transition: 'none',
+    backgroundTransition: 'none',
+    center: false,
+  });
+</script>
+</body>
+</html>

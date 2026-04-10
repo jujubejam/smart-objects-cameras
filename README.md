@@ -4,6 +4,9 @@ This is a **template project** for building Discord bots that communicate with L
 
 **What's Included:**
 - 👁️ Real-time person detection using YOLO
+- 😴 Fatigue detection (eye tracking + head pose)
+- 👀 Gaze estimation (where someone is looking)
+- 📝 Whiteboard OCR reader
 - 🤖 Discord bot with commands (!status, !detect, !screenshot)
 - 📢 Automatic webhook notifications
 - 🎯 Temporal smoothing for stable detection
@@ -47,6 +50,10 @@ Instead, you:
 
 - **[STUDENT_QUICKSTART.md](docs/STUDENT_QUICKSTART.md)** - Start here! Quick setup and common commands
 - **[WORKFLOW.md](docs/WORKFLOW.md)** - How to copy files from your laptop to the Pi
+- **[CHEATSHEET.md](docs/CHEATSHEET.md)** - Quick command reference (print this!)
+- **Claude Code** - AI coding assistant (see installation in [STUDENT_QUICKSTART.md](docs/STUDENT_QUICKSTART.md#using-claude-code-for-help))
+
+> **Prefer slides?** [View all documentation as slides](https://kandizzy.github.io/smart-objects-cameras/)
 
 ### Getting Started
 
@@ -63,14 +70,18 @@ Instead, you:
 
 - [WiFi Network Management](docs/wifi-management.md) - Switching between home and classroom networks
 - [Multi-User Access](docs/multi-user-access.md) - Collaborative work on shared Pis
-- [Discord Integration](docs/discord-integration.md) - Webhooks and bot setup
+- [Discord Integration](docs/discord-integration.md) - Webhook setup (simple, one-way)
+- [Discord Bot Setup](docs/DISCORD_BOT_PLAN.md) - Full bot with commands (advanced, two-way)
 - [VS Code Remote Development](#vs-code-remote-development) - Professional development environment
 
 ### Additional Resources
 
 - [Next Steps](#next-steps)
-- [INITIAL_SETUP.md](INITIAL_SETUP.md) - For instructors: setting up new Pis from scratch
-- [CHEATSHEET.md](CHEATSHEET.md) - Quick command reference (print this!)
+- [INITIAL_SETUP.md](docs/INITIAL_SETUP.md) - For instructors: setting up new Pis from scratch
+- [CHEATSHEET.md](docs/CHEATSHEET.md) - Quick command reference (print this!)
+- [WORKING_VERSIONS.md](docs/WORKING_VERSIONS.md) - Package version compatibility
+- [NEXT_IDEAS.md](docs/NEXT_IDEAS.md) - Project extension ideas
+- [EQUIPMENT_LIST.md](docs/EQUIPMENT_LIST.md) - Hardware reference
 - [CLAUDE.md](CLAUDE.md) - For AI assistant context only
 
 ---
@@ -183,12 +194,18 @@ You should see:
 └── venv/                    # Shared Python virtual environment (all users)
 
 ~/oak-projects/              # Your personal project directory
-├── person_detector.py       # Main detection script
-├── discord_notifier.py      # Discord webhook module (optional)
-├── discord_bot.py           # Discord bot for two-way interaction (optional)
-├── camera_status.json       # Status file for bot integration (auto-generated)
-├── .env                     # Environment variables (webhook URL, bot token)
-└── person_detection_*.log   # Detection logs (if --log used)
+├── person_detector.py       # Person detection (YOLO)
+├── fatigue_detector.py      # Fatigue detection (EAR + head pose)
+├── gaze_detector.py         # Gaze direction estimation
+├── whiteboard_reader.py     # OCR text detection
+├── discord_notifier.py      # Discord webhook module
+├── discord_bot.py           # Discord bot for commands
+├── discord_dm_notifier.py   # Personal DM notifications
+├── utils/                   # Helper modules
+├── depthai_models/          # Model YAML configurations
+├── camera_status.json       # Status for bot (auto-generated)
+├── .env                     # Environment variables
+└── *.log                    # Detection logs (if --log used)
 ```
 
 ### Activating the Virtual Environment
@@ -238,6 +255,8 @@ The script uses the OAK-D camera to detect people in real-time using a neural ne
 - Optional logging to timestamped files
 - Adjustable confidence threshold
 - Discord notifications (webhooks and bot support)
+
+**Package versions:** See [WORKING_VERSIONS.md](docs/WORKING_VERSIONS.md) for tested compatible versions.
 
 **To view the full script:**
 ```bash
@@ -291,7 +310,7 @@ Once you're confident about what a camera should do permanently (for example, "C
 
 ### How to Set It Up (When Ready)
 
-If you eventually want a camera to auto-start, see [INITIAL_SETUP.md](INITIAL_SETUP.md) for systemd service configuration instructions.
+If you eventually want a camera to auto-start, see [INITIAL_SETUP.md](docs/INITIAL_SETUP.md) for systemd service configuration instructions.
 
 **Basic concept:**
 1. Create a systemd service file at `/etc/systemd/system/person-detector.service`
@@ -357,7 +376,7 @@ activate-oak
 python3 -c "import depthai as dai; devices = dai.Device.getAllAvailableDevices(); print(f'Found {len(devices)} camera(s)')"
 
 # Quick camera test with device info
-python3 -c "import depthai as dai; device = dai.Device(); print(f'Device: {device.getMxId()}')"
+python3 -c "import depthai as dai; device = dai.Device(); print(f'Device: {device.getDeviceId()}')"
 
 # Monitor system resources
 htop
@@ -384,12 +403,18 @@ tail -f ~/oak-projects/person_detection_*.log
 └── venv/                    # Shared Python virtual environment (all users)
 
 ~/oak-projects/              # Your personal project directory
-├── person_detector.py       # Main detection script
+├── person_detector.py       # Person detection (YOLO)
+├── fatigue_detector.py      # Fatigue detection (EAR + head pose)
+├── gaze_detector.py         # Gaze direction estimation
+├── whiteboard_reader.py     # OCR text detection
 ├── discord_notifier.py      # Discord webhook module
-├── discord_bot.py           # Discord bot for two-way interaction
-├── camera_status.json       # Status file for bot integration (auto-generated)
-├── .env                     # Environment variables (webhook URL, bot token)
-└── person_detection_*.log   # Detection logs (if --log used)
+├── discord_bot.py           # Discord bot for commands
+├── discord_dm_notifier.py   # Personal DM notifications
+├── utils/                   # Helper modules
+├── depthai_models/          # Model YAML configurations
+├── camera_status.json       # Status for bot (auto-generated)
+├── .env                     # Environment variables
+└── *.log                    # Detection logs (if --log used)
 ```
 
 ---
@@ -424,7 +449,7 @@ activate-oak
 python3 -c "import depthai as dai; device = dai.Device(); print(f'Bootloader: {device.getBootloaderVersion()}')"
 ```
 
-**Note for USB OAK-D cameras:** USB cameras boot from the host and typically show `None` for bootloader version - this is normal and expected. The depthai library manages bootloader compatibility automatically. Firmware updates are typically only needed for PoE cameras. See [INITIAL_SETUP.md](INITIAL_SETUP.md) for detailed firmware information.
+**Note for USB OAK-D cameras:** USB cameras boot from the host and typically show `None` for bootloader version - this is normal and expected. The depthai library manages bootloader compatibility automatically. Firmware updates are typically only needed for PoE cameras. See [INITIAL_SETUP.md](docs/INITIAL_SETUP.md) for detailed firmware information.
 
 ### Permission Denied
 
@@ -590,12 +615,12 @@ You should now see the project files in the Explorer sidebar.
 
 1. Open any `.py` file
 2. Look at the bottom status bar — click where it shows the Python version
-3. Select: `~/oak-projects/venv/bin/python`
+3. Select: `/opt/oak-shared/venv/bin/python`
 
 Or use Command Palette:
 
 1. `Ctrl+Shift+P` → `Python: Select Interpreter`
-2. Choose: `~/oak-projects/venv/bin/python`
+2. Choose: `/opt/oak-shared/venv/bin/python`
 
 ---
 

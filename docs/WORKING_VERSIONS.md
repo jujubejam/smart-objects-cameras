@@ -1,5 +1,7 @@
 # Working Package Versions - OAK-D Camera Setup
 
+> **Prefer slides?** View the [Working Versions Slides](https://kandizzy.github.io/smart-objects-cameras/working-versions-slides.html) for a visual overview.
+
 **Last Updated:** 2026-02-04
 **Platform:** Raspberry Pi 5 (16GB)
 **OS:** Debian GNU/Linux 13 (trixie) - aarch64

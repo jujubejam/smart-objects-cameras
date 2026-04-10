@@ -4,846 +4,414 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **template repository** for creating Discord bots that communicate with Luxonis OAK-D cameras (DepthAI 3.x). It serves as an educational stepping stone for students learning to build smart object systems with computer vision and interactive communication.
+Educational template repository for Discord bots that communicate with Luxonis OAK-D cameras (DepthAI 3.x) on Raspberry Pi 5. Students learn to build smart object systems with computer vision and interactive communication.
 
-**What This Template Provides:**
-- Person detection using YOLO on OAK-D's onboard VPU
-- Discord bot integration (commands: !status, !detect, !screenshot)
-- Discord webhook notifications (automatic alerts)
-- Temporal smoothing and debouncing for stable detection
-- Camera frame capture and status file management
+**Target Hardware:** Three Raspberry Pi 5s (16GB each) named `orbit`, `gravity`, `horizon` — each with an OAK-D camera. SSH via `ssh orbit`, `ssh gravity`, `ssh horizon`.
 
-**Learning Goals:**
-- Browse documentation to understand DepthAI 3.x architecture
-- Collaborate on new bot ideas and communication patterns
-- Extend to multiple cameras (smart objects network)
-- Experiment with different detection models and features
-- Build interactive systems that bridge physical sensing and digital communication
+**Core concept:** Cameras as conversational agents — reconfigure and query them in real-time through Discord, not just passive sensors configured once via SSH.
 
-**Target Hardware:**
-- **Orbit (16GB)**: Desktop environment with VNC access (hostname: `orbit`)
-- **Gravity (16GB)**: Desktop environment with VNC access (hostname: `gravity`)
-- **Horizon (16GB)**: Desktop environment with VNC access (hostname: `horizon`)
+## Workflow Orchestration
 
-**Note:** All three Raspberry Pis have VNC enabled, but only one user can hold the desktop seat at a time. Multiple users can SSH in simultaneously.
+### 1. Plan Mode Default
 
-**Students should feel encouraged to:**
-- Fork this template for their own projects
-- Modify detection logic for different use cases
-- Create new Discord commands and bot features
-- Experiment with multiple cameras communicating together
-- Share discoveries and collaborate on improvements
+- Enter plan mode for ANY non-trivial task (3+ steps or architectural decisions)
+- If something goes sideways, STOP and re-plan immediately - don't keep pushing
+- Use plan mode for verification steps, not just building
+- Write detailed specs upfront to reduce ambiguity
+
+### 2. Subagent Strategy
+
+- Use subagents liberally to keep main context window clean
+- Offload research, exploration, and parallel analysis to subagents
+- For complex problems, throw more compute at it via subagents
+- One task per subagent for focused execution
+
+### 3. Self-Improvement Loop
+
+- After ANY correction from the user: update `tasks/lessons.md` with the pattern
+- Write rules for yourself that prevent the same mistake
+- Ruthlessly iterate on these lessons until mistake rate drops
+- Review lessons at session start for relevant project
+
+### 4. Verification Before Done
+
+- Never mark a task complete without proving it works
+- Diff behavior between main and your changes when relevant
+- Ask yourself: "Would a staff engineer approve this?"
+- Run tests, check logs, demonstrate correctness
+
+### 5. Demand Elegance (Balanced)
+
+- For non-trivial changes: pause and ask "is there a more elegant way?"
+- If a fix feels hacky: "Knowing everything I know now, implement the elegant solution"
+- Skip this for simple, obvious fixes - don't over-engineer
+- Challenge your own work before presenting it
+
+### 6. Autonomous Bug Fixing
+
+- When given a bug report: just fix it. Don't ask for hand-holding
+- Point at logs, errors, failing tests - then resolve them
+- Zero context switching required from the user
+- Go fix failing CI tests without being told how
+
+### Task Management
+
+1. **Plan First**: Write plan to `tasks/todo.md` with checkable items
+2. **Verify Plan**: Check in before starting implementation
+3. **Track Progress**: Mark items complete as you go
+4. **Explain Changes**: High-level summary at each step
+5. **Document Results**: Add review section to `tasks/todo.md`
+6. **Capture Lessons**: Update `tasks/lessons.md` after corrections
+
+### Core Principles
+
+- **Simplicity First**: Make every change as simple as possible. Impact minimal code.
+- **No Laziness**: Find root causes. No temporary fixes. Senior developer standards.
+- **Minimal Impact**: Changes should only touch what's necessary. Avoid introducing bugs.
 
 ## Development Environment
 
-### Python Setup
-All Python development uses a **shared virtual environment** for efficiency:
-
 ```bash
-# Activate the shared venv
+# Activate shared venv (REQUIRED before running any script)
 source /opt/oak-shared/venv/bin/activate
-# Or use the alias: activate-oak
+# Or use alias: activate-oak
 
-# Always activate before running scripts
+# Key packages: depthai, depthai-nodes, opencv-python, numpy, discord.py, requests, aiohttp, python-dotenv
 ```
 
-The shared virtual environment includes:
-- `depthai` - Luxonis DepthAI 3.x for OAK camera access (low-level pipeline API)
-- `depthai-nodes` - High-level neural network parsing nodes for depthai 3.x
-- `opencv-python` - Computer vision library
-- `numpy` - Numerical computing
-- `requests` - HTTP library for Discord webhooks
-- `aiohttp` - Async HTTP for Discord notifications
-- `python-dotenv` - Environment variable management
-- `discord.py` - Discord bot library (optional, for interactive bot)
+**Critical versions** (see `docs/WORKING_VERSIONS.md`): depthai 3.3.0, depthai-nodes 0.3.7, opencv-contrib-python 4.10.0.84, numpy 1.26.4 (numpy <2.0 required).
 
-### Key Paths
-```
-/opt/oak-shared/
-└── venv/                    # Shared Python virtual environment (all users)
+**Secrets:** Each user has `~/oak-projects/.env` with `DISCORD_WEBHOOK_URL` and `DISCORD_BOT_TOKEN`. Never commit `.env` files.
 
-~/oak-projects/              # Personal project directory
-├── person_detector.py       # Main detection script
-├── discord_notifier.py      # Discord webhook notification module
-├── discord_bot.py           # Discord bot for two-way interaction (optional)
-├── camera_status.json       # Status file for bot integration (auto-generated)
-├── .env                     # Environment variables (webhook URL, bot token)
-└── person_detection_*.log   # Detection logs (when using --log)
-```
+## Running Detectors
 
-### User Accounts
-- Main user account created during OS installation (e.g., `carrie`, not `pi`)
-- `root` - Superuser accessed via `sudo`
-- Modern Raspberry Pi OS doesn't create a default `pi` user
-
-## Running the Person Detector
-
-The main script is `person_detector.py` with the following usage:
+Each Pi has ONE camera — only ONE detector script should run at a time. Run with `--discord` so others see when the camera is free.
 
 ```bash
-# Basic detection (console output only)
-python3 person_detector.py
-
-# With video display (requires X11 display, use on VNC Pi or via X forwarding)
-python3 person_detector.py --display
-
-# With file logging
-python3 person_detector.py --log
-
-# With Discord notifications
-python3 person_detector.py --discord
-
-# Discord notifications (quiet mode - only alerts on detection, not when clear)
-python3 person_detector.py --discord --discord-quiet
-
-# Adjust detection threshold (0.0-1.0, default 0.5)
-python3 person_detector.py --threshold 0.7
-
-# Combine options
+# Person detection (YOLO v6, COCO class 0)
 python3 person_detector.py --discord --log --threshold 0.6
+python3 person_detector.py --display              # requires X11/VNC
+
+# Fatigue detection (YuNet + MediaPipe landmarks, EAR + head pose)
+python3 fatigue_detector.py --dm                  # Discord DM notifications
+python3 fatigue_detector.py --dm --dm-quiet       # only alert on fatigue
+
+# Gaze direction (YuNet + head pose + gaze estimation ADAS)
+python3 gaze_detector.py --display --log
+
+# Whiteboard OCR - detection only (finds text regions)
+python3 whiteboard_reader.py --discord --display
+
+# Whiteboard OCR - full (detection + recognition, reads text content)
+python3 whiteboard_reader_full.py --discord --log
 ```
 
-Stop the script with `Ctrl+C`.
+Stop any detector with `Ctrl+C`. The systemd service (`sudo systemctl status person-detector`) can auto-start the person detector on boot.
 
-## Architecture (depthai 3.x with depthai-nodes)
+## Code Architecture
 
-### Pipeline-Based Approach
-The person detector uses **depthai 3.x** low-level pipeline API with **depthai-nodes** for high-level neural network parsing:
+### Repository Structure
 
-**Key Components:**
+```
+├── person_detector.py           # YOLO person detection (template baseline)
+├── person_detector_with_display.py  # Person detection with OpenCV visualization
+├── fatigue_detector.py          # EAR + head tilt fatigue monitoring
+├── gaze_detector.py             # 3-stage gaze direction estimation
+├── whiteboard_reader.py         # OCR text detection only
+├── whiteboard_reader_full.py    # OCR detection + recognition (reads text)
+├── discord_bot.py               # Interactive bot (!status, !detect, !screenshot, !whiteboard, etc.)
+├── discord_notifier.py          # Webhook notifications (sync & async)
+├── discord_dm_notifier.py       # DM-based notifications for fatigue detector
+├── utils/
+│   ├── face_landmarks.py        # MediaPipe EAR calculation, head pose Euler angles
+│   ├── process_keypoints.py     # Keypoint processing for gaze detection
+│   ├── node_creators.py         # DepthAI node creation helpers
+│   ├── host_concatenate_head_pose.py  # Head pose vector concatenation
+│   ├── ocr_crop_creator.py      # OCR text region cropping
+│   └── config_sender_script.py  # Configuration management
+├── depthai_models/              # Model YAML configs (RVC2/RVC4 variants)
+│   ├── yunet*.yaml              # Face detection
+│   ├── head_pose_estimation*.yaml
+│   ├── gaze_estimation_adas*.yaml
+│   ├── mediapipe_face_landmarker*.yaml
+│   └── paddle_text_*.yaml       # OCR detection + recognition
+└── docs/                        # Extended documentation
+```
 
-1. **Device Connection** - `dai.Device()`
-   - Connects to OAK camera
-   - Creates pipeline context
-   - Manages device lifecycle
-   - **API Note**: Use `device.getDeviceId()` not deprecated `getMxId()`
+### DepthAI 3.x Pipeline Pattern
 
-2. **Pipeline** - `dai.Pipeline(device)`
-   - Context manager for proper resource cleanup
-   - Container for all nodes (camera, NN, outputs)
+All detectors follow this pattern:
 
-3. **ColorCamera Node** - `pipeline.create(dai.node.ColorCamera)`
-   - RGB camera configuration (512x288 @ 15 FPS)
-   - Preview output sized to match model input
-   - Non-interleaved RGB format
-   - **API Note**: ColorCamera is deprecated (warning shown) but still works
-   - New `dai.node.Camera` has a completely different API - use ColorCamera for now
+```python
+with dai.Device() as device:
+    platform = device.getPlatformAsString()
+    with dai.Pipeline(device) as pipeline:
+        # 1. Camera node
+        cam = pipeline.create(dai.node.ColorCamera)
+        cam.setPreviewSize(W, H)  # match model input
+        cam.setInterleaved(False)
+        cam.setFps(15)
 
-4. **Neural Network with Parser** - `ParsingNeuralNetwork` from depthai-nodes
-   - Uses YOLO v6 model from Luxonis Hub: `luxonis/yolov6-nano:r2-coco-512x288`
-   - Model description: `dai.NNModelDescription(model_ref, platform=platform)`
-   - Model archive: `dai.NNArchive(dai.getModelFromZoo(model_description))`
-   - **Automatic parsing**: depthai-nodes handles YOLO output parsing
-   - Detects 80 COCO classes (person is class 0)
-   - Runs on OAK-D's onboard Myriad X VPU
+        # 2. Neural network with automatic parsing (from depthai-nodes)
+        model_desc = dai.NNModelDescription(model_ref, platform=platform)
+        nn_archive = dai.NNArchive(dai.getModelFromZoo(model_desc))
+        nn = pipeline.create(ParsingNeuralNetwork).build(cam.preview, nn_archive)
 
-5. **Output Queues** - Created directly from node outputs
-   - **IMPORTANT**: No `XLinkOut` or `XOut` nodes in depthai 3.x!
-   - Create queues directly: `output.createOutputQueue(maxSize=4, blocking=False)`
-   - Example: `q_det = nn_with_parser.out.createOutputQueue(...)`
-   - Example: `q_preview = cam_rgb.preview.createOutputQueue(...)`
-   - Must be created before `pipeline.start()`
-   - Returns parsed detection objects with label, confidence, bbox
+        # 3. Output queues — create BEFORE pipeline.start()
+        q_det = nn.out.createOutputQueue(maxSize=4, blocking=False)
+        q_preview = cam.preview.createOutputQueue(maxSize=4, blocking=False)
+
+        pipeline.start()
+        # 4. Main loop: poll queues, apply temporal debouncing, update status files
+```
+
+**Critical depthai 3.x API rules:**
+- **No XLinkOut/XOut nodes** — create queues directly: `node.output.createOutputQueue()`
+- **Use `ColorCamera`** not `Camera` — the new Camera node API is different and poorly documented
+- **Use `getDeviceId()`** not deprecated `getMxId()`
+- **Create all queues BEFORE `pipeline.start()`**
+
+### Inter-Process Communication
+
+Detectors and the Discord bot communicate via JSON status files in `~/oak-projects/`:
+
+| File | Writer | Reader | Contents |
+|------|--------|--------|----------|
+| `camera_status.json` | person_detector.py | discord_bot.py | detection state, person count, username, hostname |
+| `fatigue_status.json` | fatigue_detector.py | discord_bot.py | fatigue state, EAR values, head pose |
+| `whiteboard_status.json` | whiteboard_reader*.py | discord_bot.py | detected text, confidence, region count |
+| `whiteboard_history.jsonl` | whiteboard_reader*.py | discord_bot.py | time-series OCR readings (append-only) |
+| `latest_frame.jpg` | person_detector.py | discord_bot.py | screenshot for !screenshot command |
+| `latest_fatigue_frame.jpg` | fatigue_detector.py | discord_bot.py | screenshot with landmarks overlay |
+| `latest_whiteboard_frame.jpg` | whiteboard_reader*.py | discord_bot.py | screenshot with text region boxes |
 
 ### Detection Logic
-The script monitors detection events with temporal smoothing:
-- **Debouncing (1.5 seconds)**: State must persist before triggering to prevent flickering
-- Filters for person detections only (COCO class 0)
-- Tracks when people appear/disappear
-- Counts number of people detected
-- Only logs on confirmed state changes to reduce noise
-- Writes status to JSON file (`camera_status.json`) for Discord bot integration
 
-### Systemd Service
-The detector can auto-start on boot via systemd:
+All detectors use temporal debouncing (1.5-2 seconds) — state must persist before triggering a notification to prevent flickering. State changes are logged to console, optionally to file (`--log`), and optionally sent to Discord (`--discord` or `--dm`).
 
-```bash
-# Service controls
-sudo systemctl status person-detector
-sudo systemctl start person-detector
-sudo systemctl stop person-detector
+### Discord Bot Commands
 
-# View live logs
-journalctl -u person-detector -f
+The bot (`discord_bot.py`) reads status files to respond to queries:
+
+```
+!ping                    !status              !detect              !screenshot
+!whiteboard              !whiteboard-status   !whiteboard-history  !whiteboard-screenshot
+!whiteboard-consensus    !set-confidence <v>  !set-fps <v>         !toggle-notifications
+!help
 ```
 
-Service file location: `/etc/systemd/system/person-detector.service`
+### Multi-Stage Pipelines
 
-## Discord Integration
+- **Person detector:** Single-stage (YOLO v6, 80 COCO classes, person = class 0)
+- **Fatigue detector:** Two-stage (YuNet face detection → MediaPipe landmarks → EAR + head pose via solvePnP)
+- **Gaze detector:** Three-stage (YuNet → head pose estimation → gaze estimation ADAS)
+- **Whiteboard reader:** Two-stage (PaddlePaddle text detection → PaddlePaddle text recognition)
 
-The system supports two types of Discord integration:
-
-### Option 1: Webhooks (One-Way Notifications)
-Sends real-time notifications to Discord when detection events occur.
-
-**Setup:**
-1. Create a Discord webhook (see `README.md` Appendix B for detailed instructions)
-2. Create a `.env` file in `~/oak-projects/`
-3. Add your webhook URL to `.env`:
-   ```bash
-   DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_TOKEN
-   ```
-4. Install dependencies:
-   ```bash
-   pip install requests aiohttp python-dotenv
-   ```
-
-### Option 2: Discord Bot (Two-Way Interaction)
-Interactive bot that can respond to commands and query camera status.
-
-**Setup:**
-See `DISCORD_BOT_PLAN.md` for complete setup guide (30-45 minutes).
-
-**Key Features:**
-- Interactive commands: `!ping`, `!status`, `!detect`, `!help`
-- Reads status from `camera_status.json` (written by person_detector.py)
-- Bot runs on Raspberry Pi using discord.py library
-- Requires Discord bot token in `.env`:
-  ```bash
-  DISCORD_BOT_TOKEN=your_bot_token_here
-  ```
-
-**Integration with person_detector.py:**
-- person_detector.py writes detection status to `~/oak-projects/camera_status.json`
-- discord_bot.py reads this file when users query `!status` or `!detect`
-- Status file updated on startup and whenever detection state changes
-
-### Usage
-```bash
-# Enable Discord notifications
-python3 person_detector.py --discord
-
-# Quiet mode (only notify on detection, not when area clears)
-python3 person_detector.py --discord --discord-quiet
-```
-
-### Discord Module
-The `discord_notifier.py` module provides simple webhook-based notifications:
-
-```python
-from discord_notifier import send_notification
-
-# Send a notification
-send_notification("🟢 Person detected!")
-
-# Custom username
-send_notification("Alert!", username="Camera 1")
-
-# Without timestamp
-send_notification("Message", add_timestamp=False)
-```
-
-### Testing
-```bash
-# Test notification system
-python3 discord_notifier.py
-
-# Send custom test message
-python3 discord_notifier.py "Test message from camera"
-```
-
-### Systemd Integration
-To enable Discord notifications in the auto-start service, add the `--discord` flag:
-
-```ini
-[Service]
-EnvironmentFile=/home/pi/oak-projects/.env
-ExecStart=/home/pi/oak-projects/venv/bin/python3 /home/pi/oak-projects/person_detector.py --discord --log
-```
-
-## Hardware Considerations
-
-### Camera Connection
-- OAK-D connects via USB 3.0 (blue ports preferred)
-- Powered USB hub recommended for stability
-- USB permissions configured via udev rules at `/etc/udev/rules.d/80-movidius.rules`
-
-### Testing Camera
-```bash
-# Check camera is detected (depthai 3.x)
-python3 -c "import depthai as dai; devices = dai.Device.getAllAvailableDevices(); print(f'Found {len(devices)} camera(s)')"
-
-# Get device info
-python3 -c "import depthai as dai; device = dai.Device(); print(f'Device: {device.getMxId()}, Platform: {device.getPlatformAsString()}')"
-
-# Should output device count and ID
-# If error, check USB connection
-```
-
-### Camera Firmware Notes
-
-**USB OAK-D cameras** (OAK-D, OAK-D-Lite, OAK-1) boot from the host computer and don't require firmware updates. They automatically use the bootloader embedded in the depthai library.
-
-**PoE cameras** (OAK-D-POE) have onboard flash and can be updated if needed.
-
-```bash
-# Check current bootloader version
-python3 -c "import depthai as dai; device = dai.Device(); print(f'Bootloader: {device.getBootloaderVersion()}')"
-```
-
-**Expected outputs:**
-- **USB cameras**: Will typically show `None` - this is normal and expected
-- **PoE cameras**: Will show actual bootloader version
-
-**For most USB setups, you can skip firmware updates entirely.** The depthai library manages bootloader compatibility automatically.
-
-See [INITIAL_SETUP.md](INITIAL_SETUP.md) for detailed firmware information.
-
-### USB Permissions
-If getting permission errors:
-```bash
-# Reload udev rules
-sudo udevadm control --reload-rules && sudo udevadm trigger
-
-# Or add user to video group
-sudo usermod -aG video $USER
-# Logout and back in for changes to take effect
-```
-
-## Code Modification Guidelines (depthai 3.x)
-
-### Important API Notes for depthai 3.x
-
-**Before modifying pipelines, be aware of these API differences:**
-
-1. **No XLinkOut/XOut nodes** - Create queues directly from outputs: `node.output.createOutputQueue()`
-2. **ColorCamera is deprecated but works** - New `Camera` node has different API (not well documented yet)
-3. **Use `getDeviceId()` not `getMxId()`** - Old method is deprecated
-4. **Queue creation order matters** - Create all queues BEFORE `pipeline.start()`
-
-See "Common Issues → depthai 3.x API Errors" section for detailed examples.
+## Modifying Code
 
 ### Changing Detection Models
-To use a different model, modify the model reference in `person_detector.py`:
-
-```python
-# Use the --model command-line argument:
+```bash
 python3 person_detector.py --model luxonis/yolov8-nano:r2-coco-640x640
-
-# Or modify the default in the script:
-parser.add_argument('--model', type=str, default='luxonis/yolov6-nano:r2-coco-512x288')
 ```
-
-**Available models from Luxonis Hub:**
-- `luxonis/yolov6-nano:r2-coco-512x288` (current default, 80 COCO classes)
-- `luxonis/yolov8-nano:r2-coco-640x640` (YOLOv8, more accurate)
-- `luxonis/yolov5-nano:r2-coco-416x416` (YOLOv5 variant)
-- Browse more at: https://models.luxonis.com
-
-**Model architecture:**
-```python
-# How models are loaded from Luxonis Hub:
-model_description = dai.NNModelDescription(args.model, platform=platform)
-nn_archive = dai.NNArchive(dai.getModelFromZoo(model_description))
-
-# ParsingNeuralNetwork from depthai-nodes handles YOLO parsing
-nn_with_parser = pipeline.create(ParsingNeuralNetwork).build(
-    cam_rgb.preview, nn_archive
-)
-```
-
-### Adding Depth Information
-The OAK-D supports stereo depth. With depthai 3.x, you need to:
-
-1. Create stereo depth nodes (left and right mono cameras)
-2. Configure depth alignment
-3. Use spatial detection features
-
-This is more complex than the high-level SDK. Refer to:
-- https://docs.luxonis.com/software-v3/depthai/
-- depthai-python examples for spatial detection
+Browse models at https://models.luxonis.com. Model YAML configs live in `depthai_models/`.
 
 ### Adjusting Performance
-- **Detection threshold**: Use `--threshold` CLI arg (higher = fewer false positives)
-- **Frame rate**: Modify `cam_rgb.setFps(15)` in the script
-- **Resolution**: Modify `cam_rgb.setPreviewSize(512, 288)` to match model input size
-- **Debounce time**: Adjust `DEBOUNCE_SECONDS = 1.5` to change temporal smoothing
+- **Threshold:** `--threshold 0.7` (higher = fewer false positives)
+- **Frame rate:** `cam.setFps(15)` in script, or `--fps-limit` on fatigue/gaze detectors
+- **Resolution:** `cam.setPreviewSize(W, H)` must match model input size
+- **Debounce:** `DEBOUNCE_SECONDS` constant in each detector script
 
-## Networking
+### Adding New Detectors
+Follow the pattern in existing scripts:
+1. Copy structure from the closest existing detector
+2. Use `ParsingNeuralNetwork` from depthai-nodes for automatic output parsing
+3. Write status to a JSON file for Discord bot integration
+4. Add periodic screenshot capture for bot queries
+5. Include `--discord`/`--log`/`--display` CLI arguments
+6. Add startup/shutdown Discord announcements with username and hostname
 
-### SSH Key-Based Authentication
-The Pis are configured with SSH key-based authentication for passwordless, secure access.
-
-**SSH Key Setup:**
-- Project-specific key name: `id_ed25519_smartobjects`
-- SSH config file configured with host aliases and IP addresses
-- See `INITIAL_SETUP.md` for setup details
-
-**Example SSH config (`~/.ssh/config`):**
+### Config File Polling (Dynamic Reconfiguration)
+The bot can write config changes that detectors pick up without restart:
+```python
+CONFIG_FILE = Path.home() / "oak-projects" / "camera_config.json"
+# In detection loop: periodically read config, update threshold/mode/etc.
 ```
-Host orbit
-    HostName 192.168.x.x
-    User yourusername
-    IdentityFile ~/.ssh/id_ed25519_smartobjects
-
-Host gravity
-    HostName 192.168.x.x
-    User yourusername
-    IdentityFile ~/.ssh/id_ed25519_smartobjects
-
-Host horizon
-    HostName 192.168.x.x
-    User yourusername
-    IdentityFile ~/.ssh/id_ed25519_smartobjects
-```
-
-**To connect from your computer:**
-```bash
-# SSH access (no password needed with keys configured)
-ssh orbit       # Camera: Orbit
-ssh gravity     # Camera: Gravity
-ssh horizon     # Camera: Horizon
-```
-
-**If you need to add your SSH key to the Pi:**
-```bash
-# On your Mac/Linux laptop (if SSH config is set up)
-ssh-copy-id orbit
-
-# Or specify the key explicitly
-ssh-copy-id -i ~/.ssh/id_ed25519_smartobjects.pub orbit
-
-# Or manually copy your public key
-cat ~/.ssh/id_ed25519_smartobjects.pub | ssh orbit "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
-```
-
-**For Windows users without ssh-copy-id:**
-```powershell
-# Copy your public key manually
-type $env:USERPROFILE\.ssh\id_ed25519_smartobjects.pub | ssh orbit "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
-```
-
-### VNC Access
-All three Raspberry Pis have VNC enabled. Connect via RealVNC Viewer using the host name (e.g., `orbit`, `gravity`, or `horizon`).
-
-**Note:** Only one user can hold the VNC desktop seat at a time, but multiple users can SSH in simultaneously.
-
-### WiFi Network Management
-The Pis can be moved between different WiFi networks (e.g., home to classroom).
-
-**Note:** Modern Raspberry Pi OS (Bookworm+) uses **NetworkManager** instead of wpa_supplicant. The `wpa_supplicant.conf` file may not exist.
-
-**Method 1: Using nmtui (Best for pre-configuring networks)**
-Text-based menu interface - perfect for adding networks you're not currently connected to:
-
-```bash
-# Open NetworkManager Text UI
-sudo nmtui
-
-# Navigate with arrow keys, select with Enter
-# "Edit a connection" → "Add" → "Wi-Fi"
-# Enter SSID and password
-# Tab to "OK" and save
-```
-
-**Benefits:** Can add classroom WiFi while at home (doesn't need network in range)
-
-**Method 2: Using nmcli (Command line - requires network in range)**
-```bash
-# List available networks
-nmcli device wifi list
-
-# Connect to a network (saves automatically - network must be in range!)
-sudo nmcli device wifi connect "ClassroomWiFi" password "classpassword"
-
-# List saved connections
-nmcli connection show
-
-# Switch to a saved network
-nmcli connection up "HomeWiFi"
-```
-
-**Method 3: Using raspi-config**
-```bash
-sudo raspi-config
-# Navigate to: System Options → Wireless LAN
-# Enter new SSID and password
-```
-
-**Auto-connection behavior:**
-Once you've saved multiple networks (via nmtui, nmcli, or raspi-config), the Pi will automatically connect to any available saved network.
-
-**Legacy: wpa_supplicant (may not apply to modern Pi OS)**
-If your Pi still uses wpa_supplicant:
-```bash
-sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
-# Add network blocks with priority settings
-```
-
-### Multi-User Access and Coordination
-
-**Critical concept:** Each Pi has ONE camera. Only ONE person should run `person_detector.py` at a time.
-
-**Smart Object Feature:** The camera **automatically announces** who's using it when run with `--discord`:
-- **Startup:** `🎥 **alice** is now running person_detector.py on **orbit**`
-- **Shutdown:** `📴 **alice** stopped person_detector.py on **orbit** - camera is free`
-- **Status file includes:** Username and hostname (`camera_status.json`)
-
-**Collaboration Model:**
-- **One person runs the detector** - Camera auto-announces via Discord (no manual coordination needed)
-- **Everyone else can SSH in** - View/edit code simultaneously via VS Code Remote
-- **Create personal test copies** - `person_detector_alice.py`, `person_detector_bob.py`
-- **Check Discord to see who's using camera** - Or check: `ps aux | grep person_detector.py`
-
-**Implementation Details:**
-The script captures username (`getpass.getuser()`) and hostname (`socket.gethostname()`) at startup and includes them in:
-1. Discord startup/shutdown notifications
-2. Status file (`camera_status.json`) - adds `username` and `hostname` fields
-3. Discord bot can display who's currently running the detector
-
-**Best Practices:**
-- Always run with `--discord` flag so others know when camera is free
-- Check Discord channel before starting to see if camera is in use
-- Use VS Code Remote SSH for individual editing sessions (multiple people can edit different files)
-- Create personal script copies to test later:
-  ```bash
-  cp person_detector.py person_detector_yourname.py
-  ```
-- Use Git branches for feature development (see `GIT_COLLABORATION.md`)
-- Each user should add their SSH key to `~/.ssh/authorized_keys`
-
-**Adding Multiple Users (Optional):**
-```bash
-# Create a new user account
-sudo adduser studentname
-
-# Add to necessary groups
-sudo usermod -aG video,gpio,i2c,spi studentname
-
-# Copy project access
-sudo cp -r /home/pi/oak-projects /home/studentname/
-sudo chown -R studentname:studentname /home/studentname/oak-projects
-```
-
-**Shared Resources (Already Configured):**
-
-The following shared resources have been set up on all three Pis:
-
-1. **Shared Model Cache**: `/opt/depthai-cache`
-   - DepthAI models download once and are accessible to all users
-   - Prevents permission errors when multiple students test their own script copies
-
-2. **Shared Oak Examples**: `/opt/oak-shared/oak-examples/`
-   - Luxonis example code (neural networks, depth, tutorials, etc.)
-   - Symlinked to `~/oak-examples/` in each user's home directory
-
-**For setup details** (instructors only), see `docs/archive/multi-user-setup.md`
-
-### VS Code Remote Development
-Recommended for code editing:
-1. Install "Remote - SSH" extension
-2. **macOS ONLY:** Grant VS Code "Local Network" permission in System Settings → Privacy & Security
-3. `Ctrl+Shift+P` → "Remote-SSH: Connect to Host"
-4. Enter: `orbit`, `gravity`, or `horizon` (should auto-complete from your SSH config)
-5. Open folder: `/home/[username]/oak-projects`
-6. Select Python interpreter: `~/oak-projects/venv/bin/python` (or `/opt/oak-shared/venv/bin/python` for shared venv)
-
-**Common Issue:** On macOS, VS Code will fail with "No route to host" if Local Network permission isn't granted, even though terminal SSH works fine.
-
-Full setup instructions in `README.md` (Appendix A).
 
 ## Common Issues
 
-### depthai 3.x API Errors
-
-#### AttributeError: module 'depthai.node' has no attribute 'XLinkOut' or 'XOut'
-**Problem**: Trying to use `XLinkOut` or `XOut` nodes from older DepthAI versions.
-
-**Solution**: depthai 3.x doesn't use explicit XLinkOut nodes. Create output queues directly from node outputs:
-```python
-# ❌ Old way (doesn't work):
-xout = pipeline.create(dai.node.XLinkOut)
-xout.setStreamName("preview")
-cam.preview.link(xout.input)
-q = pipeline.createOutputQueue("preview")
-
-# ✅ New way (depthai 3.x):
-q = cam.preview.createOutputQueue(maxSize=4, blocking=False)
-```
-
-#### AttributeError: 'Camera' object has no attribute 'setPreviewSize'
-**Problem**: The new `dai.node.Camera` has a completely different API than `ColorCamera`.
-
-**Solution**: Use `ColorCamera` for now (it's deprecated but still works):
-```python
-# ✅ Use ColorCamera (works with familiar API):
-cam = pipeline.create(dai.node.ColorCamera)
-cam.setPreviewSize(512, 288)
-cam.setInterleaved(False)
-cam.setFps(15)
-
-# ⚠️ New Camera node API is different (not documented well yet)
-# Stick with ColorCamera until Camera API is stable
-```
-
-#### DeprecationWarning: Use getDeviceId() instead
-**Problem**: `getMxId()` is deprecated.
-
-**Solution**: Use `getDeviceId()` instead:
-```python
-# ❌ Old: device.getMxId()
-# ✅ New: device.getDeviceId()
-device_id = device.getDeviceId()
-```
-
 ### Camera Not Found
 ```bash
-# Check USB device
-lsusb | grep Myriad
-# Should show: Intel Movidius MyriadX (ID 03e7:2485)
-
-# If not found:
-# - Try different USB port (use USB 3.0)
-# - Check cable connection
-# - Use powered USB hub
-# - Verify udev rules are installed
+lsusb | grep Myriad  # Should show Intel Movidius MyriadX
+# Try: different USB 3.0 port, powered hub, reload udev rules:
+sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
 
 ### Import Errors
-If getting `ModuleNotFoundError: No module named 'depthai'` or `'depthai_nodes'`:
-- Ensure shared virtual environment is activated: `activate-oak` (alias for `source /opt/oak-shared/venv/bin/activate`)
-- Prompt should show `(venv)` prefix when activated
-- Verify installation: `pip list | grep depthai` should show both `depthai` and `depthai-nodes`
+Activate the shared venv first: `activate-oak` (alias for `source /opt/oak-shared/venv/bin/activate`)
+
+### depthai 3.x API Errors
+```python
+# ❌ XLinkOut doesn't exist in 3.x:
+xout = pipeline.create(dai.node.XLinkOut)
+# ✅ Create queues directly:
+q = cam.preview.createOutputQueue(maxSize=4, blocking=False)
+
+# ❌ Camera node has different API:
+cam = pipeline.create(dai.node.Camera)
+cam.setPreviewSize(...)  # AttributeError
+# ✅ Use ColorCamera (deprecated but works):
+cam = pipeline.create(dai.node.ColorCamera)
+```
 
 ### Display Issues
-When using `--display` flag:
-- Requires X11 display server
-- Works when connected via VNC
-- For SSH-only access, requires X forwarding: `ssh -X orbit`
-- Press 'q' in OpenCV window to exit (in addition to Ctrl+C)
+`--display` requires X11. Works via VNC; for SSH use `ssh -X orbit`. Press 'q' to exit the OpenCV window.
 
-### Performance Problems
-- Check CPU usage: `htop`
-- Check memory: `free -h`
-- Lower frame rate or resolution if needed
-- Ensure adequate power supply (27W official Pi 5 adapter)
-- Check for thermal throttling: `vcgencmd get_throttled`
+### Discord Issues
+Test webhook: `python3 discord_notifier.py "test message"`. Check `~/oak-projects/.env` exists with valid URLs/tokens.
 
-### Discord Notification Issues
-If Discord notifications aren't working:
+## Extending This Template — Next Frontiers
 
-```bash
-# Test the notifier directly
-python3 discord_notifier.py
+The template already implements config polling (`!set-confidence`, `!set-fps`), whiteboard OCR, per-camera routing, and screenshot capture. These are the next directions for students to explore:
 
-# Check .env file exists and has webhook URL
-cat ~/oak-projects/.env
+### Cross-Detector Intelligence
 
-# Verify internet connectivity
-ping discord.com
+Combine multiple detectors for richer insights instead of running them in isolation.
 
-# Check for missing dependencies
-pip install requests aiohttp python-dotenv
-```
-
-Common Discord errors:
-- **"DISCORD_WEBHOOK_URL not set"**: Create `.env` file with webhook URL
-- **"404 Not Found"**: Webhook was deleted or URL is incorrect
-- **"Timeout"**: Network connectivity issue
-
-See `README.md` Appendix B for complete troubleshooting guide.
-
-## Extending This Template - Interactive Smart Objects
-
-### Philosophy: Cameras as Conversational Agents
-
-The key concept is treating cameras as **responsive team members** you can command and reconfigure in real-time through Discord, not just passive sensors you configure once via SSH.
-
-**Interactive Control Patterns:**
-
-**1. Dynamic Reconfiguration (no restart required):**
+**Fusion via status files** (simplest — no code changes to existing detectors):
 ```python
-# Example: Add !set-threshold command
-@bot.command(name='set-threshold')
-async def set_threshold(ctx, value: float):
-    # Write new threshold to config file
-    # person_detector.py reads config file periodically
-    # Threshold changes without restarting camera
+# A new "attention_monitor.py" that reads multiple status files
+fatigue = json.loads(FATIGUE_STATUS.read_text())
+gaze = json.loads(GAZE_STATUS.read_text())
+
+if fatigue['fatigue_detected'] and gaze['gaze_direction'] != 'center':
+    send_notification("⚠️ Student appears fatigued AND not looking at board")
 ```
 
-**2. Mode Switching:**
+**Fusion within a single pipeline** (advanced — multi-model on one camera):
 ```python
-# Switch what the camera detects on the fly
-@bot.command(name='detect-mode')
-async def detect_mode(ctx, mode: str):
-    # mode = "person" | "car" | "all"
-    # Update filter in real-time
-    # Camera responds: "Now detecting: cars"
+# Chain models: face detection → landmarks + gaze in parallel
+# Use GatherData node to synchronize outputs from multiple NNs
+# See fatigue_detector.py and gaze_detector.py for multi-stage patterns
 ```
 
-**3. Physical Coordination:**
+**Example bot commands:**
+- `!attention` — Combined fatigue + gaze + person count summary
+- `!alert-rules add "fatigue AND gaze!=center"` — Custom compound triggers
+- `!compare detectors` — Side-by-side status from all running detectors
+
+### Depth Features (Untapped OAK-D Hardware)
+
+The OAK-D's stereo cameras are currently unused. Depth opens up physical-space awareness.
+
+**Adding stereo depth to the pipeline:**
 ```python
-# Request physical camera repositioning
-@bot.command(name='request-move')
-async def request_move(ctx, direction: str):
-    await ctx.send(f"📍 Please reposition camera: {direction}")
-    await ctx.send("Reply with !confirm-moved when done")
+# Create mono cameras and stereo depth node
+left = pipeline.create(dai.node.MonoCamera)
+right = pipeline.create(dai.node.MonoCamera)
+stereo = pipeline.create(dai.node.StereoDepth)
+
+left.setResolution(dai.MonoCameraProperties.SensorResolution.THE_400_P)
+right.setResolution(dai.MonoCameraProperties.SensorResolution.THE_400_P)
+
+left.out.link(stereo.left)
+right.out.link(stereo.right)
+
+# Get depth map
+q_depth = stereo.depth.createOutputQueue(maxSize=4, blocking=False)
 ```
 
-**4. Multi-Camera Orchestration:**
+**Student project ideas:**
+- **Proximity zones:** "Alert if someone is within 1 meter of the whiteboard"
+- **Occupancy heatmaps:** Track where people spend time (depth + position over time)
+- **Distance measurement:** Report how far detected people are from the camera
+- **Spatial detection:** Combine YOLO detections with depth for 3D bounding boxes
+- `!zone add "whiteboard" 0.5 2.0` — Define distance-based alert zones via Discord
+
+**Resources:** Check `/opt/oak-shared/oak-examples/` for stereo depth examples. See https://docs.luxonis.com/software-v3/depthai/ for spatial detection documentation.
+
+### Multi-Camera Coordination
+
+Three Pis, three cameras — make them work together as a network.
+
+**Shared state via network** (simplest approach):
 ```python
-# Coordinate multiple cameras dynamically
-@bot.command(name='coordinate-all')
-async def coordinate_all(ctx, command: str):
-    # Send command to all cameras simultaneously
-    # Each camera responds with acknowledgment
-    # Cameras work together on shared task
+# Each detector already writes status files. Share them across Pis:
+# Option 1: Periodic SCP/rsync of status files between Pis
+# Option 2: Simple HTTP server on each Pi serving status JSON
+# Option 3: Shared MQTT broker for real-time pub/sub
+
+# Example: lightweight Flask endpoint on each Pi
+from flask import Flask, jsonify
+app = Flask(__name__)
+
+@app.route('/status')
+def status():
+    return jsonify(json.loads(STATUS_FILE.read_text()))
 ```
 
-### Example Student Extensions
-
-**Real-Time Configuration Commands:**
-- `!set-threshold <value>` - Adjust sensitivity without restart
-- `!set-fps <value>` - Change frame rate on the fly
-- `!toggle-notifications` - Enable/disable alerts
-- `!use-model <model_name>` - Switch detection models
-- `!enable-zones` / `!disable-zones` - Toggle zone detection
-
-**Physical Interaction:**
-- `!camera-location <name>` - Track where camera is pointed
-- `!request-move <description>` - Ask for camera repositioning
-- `!confirm-moved` - Acknowledge camera has been repositioned
-- `!request-adjustment "tilt up"` - Fine-tune camera angle
-
-**Multi-Camera Control:**
-- `!camera1 <command>` - Send command to specific camera
-- `!all-cameras <command>` - Broadcast to all cameras
-- `!status-all` - Query status of all cameras
-- `!coordinate detect-person` - All cameras switch to person detection
-
-**Live Experimentation:**
-- `!a-b-test camera1 threshold=0.5 camera2 threshold=0.7` - Compare configurations
-- `!show-config` - Display current camera settings
-- `!reset-to-default` - Return to template configuration
-
-**Rich Communication & Data:**
-- Create custom Discord embeds with rich formatting (status cards, progress bars)
-- Add database logging (SQLite/PostgreSQL) for detection history
-- Implement scheduled reports: `!daily-summary`, `!weekly-stats`, `!top-detections`
-- Video recording on demand: `!record 30` (capture 30 second clip)
-- Automatic video clips triggered by detection events
-- Export data: `!export-csv today`, `!export-json last-week`
-
-### Implementation Pattern: Config File Polling
-
-For real-time reconfiguration without restart:
-
+**Camera-triggered actions:**
 ```python
-# In person_detector.py - add config file monitoring
-CONFIG_FILE = Path.home() / "oak-projects" / "camera_config.json"
-last_config_check = 0
-CONFIG_CHECK_INTERVAL = 2  # Check every 2 seconds
+# orbit detects person → gravity starts recording → horizon watches the door
+# Implement via Discord bot commands or direct HTTP calls between Pis
 
-# In detection loop:
-if time.time() - last_config_check >= CONFIG_CHECK_INTERVAL:
-    # Read config file (written by Discord bot)
-    config = json.loads(CONFIG_FILE.read_text())
-    threshold = config.get('threshold', 0.5)
-    detect_mode = config.get('mode', 'person')
-    notifications_enabled = config.get('notifications', True)
-    last_config_check = time.time()
+@bot.command(name='coordinate')
+async def coordinate(ctx, action: str):
+    """Send a command to all cameras via their status endpoints."""
+    for pi in ['orbit', 'gravity', 'horizon']:
+        requests.post(f'http://{pi}:5000/command', json={'action': action})
+    await ctx.send(f"📡 Sent '{action}' to all cameras")
 ```
 
-### Implementation Hints
+**Student project ideas:**
+- **Distributed occupancy:** Combine person counts from all cameras for room-wide tracking
+- **Handoff tracking:** Person leaves camera 1's view, appears in camera 2's
+- **Synchronized snapshots:** `!snapshot-all` — get images from all three cameras at once
+- **Cross-camera alerts:** "Orbit sees a person but Gravity doesn't — they went left"
+- **Camera mesh status:** `!mesh-status` — single embed showing all three cameras' state
+- **Consensus detection:** Only alert if 2+ cameras agree something is happening
 
-**Discord Embeds (Rich Formatting):**
-```python
-import discord
+### Combining All Three
 
-@bot.command(name='status-rich')
-async def status_rich(ctx):
-    embed = discord.Embed(
-        title="📸 Camera Status",
-        description="Real-time detection status",
-        color=discord.Color.green()
-    )
-    embed.add_field(name="Status", value="🟢 Online", inline=True)
-    embed.add_field(name="Detections", value="2 people", inline=True)
-    embed.add_field(name="FPS", value="15", inline=True)
-    embed.set_thumbnail(url="attachment://latest_frame.jpg")
+The most ambitious projects combine these directions:
 
-    await ctx.send(embed=embed, file=discord.File(SCREENSHOT_FILE))
-```
+- **3D room mapping:** Depth from all cameras → reconstructed room model
+- **Attention analytics dashboard:** Cross-detector fusion across cameras → "Classroom engagement: 72%"
+- **Smart room automation:** Multi-camera coordination triggers real-world actions (lights, displays)
+- **Adaptive detection:** Cameras dynamically adjust thresholds based on what other cameras see
 
-**Video Recording (Using DepthAI VideoEncoder):**
-```python
-# In person_detector.py - add video encoder node
-video_enc = pipeline.create(dai.node.VideoEncoder)
-video_enc.setDefaultProfilePreset(15, dai.VideoEncoderProperties.Profile.H264_MAIN)
-cam_rgb.video.link(video_enc.input)
+### Implementation Pattern: Shared Config + Status
 
-# Record when commanded via config file
-if config.get('recording', False):
-    # Save video frames
-    # Stop after duration specified in config
-```
+All extensions should follow the established pattern:
+1. **Detector writes** a JSON status file (for bot queries)
+2. **Bot reads** status files and responds to commands
+3. **Config file polling** lets the bot reconfigure detectors without restart
+4. **Discord announces** state changes with username and hostname
+5. **Screenshots** are captured periodically for visual queries
 
-**Database Logging (SQLite example):**
-```python
-import sqlite3
-from datetime import datetime
+## Key Documentation
 
-def log_detection(detected, count):
-    conn = sqlite3.connect('detections.db')
-    c = conn.cursor()
-    c.execute('''INSERT INTO detections (timestamp, detected, count)
-                 VALUES (?, ?, ?)''', (datetime.now(), detected, count))
-    conn.commit()
-    conn.close()
+| Document | Purpose |
+|----------|---------|
+| `docs/STUDENT_QUICKSTART.md` | Getting started fast (includes Claude Code setup) |
+| `docs/WORKFLOW.md` | File copying workflow (laptop → Pi) |
+| `docs/CHEATSHEET.md` | Command quick reference |
+| `docs/WORKING_VERSIONS.md` | Package version compatibility (critical!) |
+| `docs/DISCORD_BOT_PLAN.md` | Full bot setup guide |
+| `docs/discord-integration.md` | Webhook setup (simpler, one-way) |
+| `docs/GIT_COLLABORATION.md` | Git workflow for teams |
+| `docs/NEXT_IDEAS.md` | 5 project extension ideas with code |
+| `docs/EQUIPMENT_LIST.md` | Hardware reference and pricing |
+| `docs/INITIAL_SETUP.md` | Instructor: Pi setup from scratch |
+| `docs/multi-user-access.md` | Multi-user coordination |
+| `docs/wifi-management.md` | WiFi network switching |
+| `WHITEBOARD_READER.md` | OCR feature documentation |
 
-# In detection loop:
-if person_detected != last_status:
-    log_detection(person_detected, person_count)
-```
+**Slides:** Most docs have [slide versions](https://kandizzy.github.io/smart-objects-cameras/) for quick reference.
 
-**Scheduled Reports (Discord scheduled tasks):**
-```python
-from discord.ext import tasks
+## External Resources
 
-@tasks.loop(hours=24)
-async def daily_summary():
-    # Query database for daily statistics
-    # Generate summary embed
-    # Send to channel
-    channel = bot.get_channel(CHANNEL_ID)
-    await channel.send(embed=summary_embed)
-
-@bot.event
-async def on_ready():
-    daily_summary.start()  # Start scheduled task
-```
-
-### The Collaborative Sensing Concept
-
-**Instead of:** Configuring cameras once via SSH and letting them run passively
-
-**Think:** Having a live conversation with your cameras:
-- "Hey Camera 1, can you watch the door instead?"
-- "All cameras, switch to high sensitivity mode"
-- "Camera 2, what do you see right now?"
-- "Everyone, let me know if you detect any cars"
-
-This makes experimentation **fast, collaborative, and interactive** - perfect for learning and iterating on smart object systems.
-
-## Additional Resources
-
-### Documentation (This Repository)
-- Student guide: `README.md` (for using pre-configured Pis)
-- Instructor setup guide: `INITIAL_SETUP.md` (for setting up new Pis from scratch)
-- Discord bot setup: `DISCORD_BOT_PLAN.md` (step-by-step bot configuration)
-- Quick reference: `CHEATSHEET.md`
-- VS Code setup: `README.md` (Appendix A)
-- Discord webhooks: `README.md` (Appendix B)
-
-### DepthAI 3.x Resources
-- **DepthAI 3.x Documentation**: https://docs.luxonis.com/software-v3/depthai/
-- **depthai-nodes GitHub**: https://github.com/luxonis/depthai-nodes (high-level parsing nodes)
-- **Luxonis Hub Models**: https://models.luxonis.com (browse available models)
-- **OAK Examples & Experiments**: https://github.com/luxonis/depthai-experiments
-- **depthai-python Examples**: https://github.com/luxonis/depthai-python/tree/main/examples
-- **API Reference**: https://docs.luxonis.com/api/
-
-### Other Resources
-- **Raspberry Pi Documentation**: https://www.raspberrypi.com/documentation/
-- **VS Code Remote SSH**: https://code.visualstudio.com/docs/remote/ssh
-- **discord.py Documentation**: https://discordpy.readthedocs.io/
+- **DepthAI 3.x docs:** https://docs.luxonis.com/software-v3/depthai/
+- **depthai-nodes:** https://github.com/luxonis/depthai-nodes
+- **Luxonis Hub models:** https://models.luxonis.com
+- **discord.py:** https://discordpy.readthedocs.io/
+- **Oak examples on Pi:** `/opt/oak-shared/oak-examples/` (symlinked to `~/oak-examples/`)

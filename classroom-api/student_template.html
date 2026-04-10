@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Classroom — Student Template</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            padding: 2rem;
+        }
+        h1 { margin-bottom: 0.5rem; }
+        .subtitle { color: #888; margin-bottom: 2rem; }
+
+        .status-bar {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #16213e;
+            border-radius: 8px;
+        }
+        .status-item { text-align: center; }
+        .status-label { font-size: 0.75rem; color: #888; text-transform: uppercase; }
+        .status-value { font-size: 1.5rem; font-weight: bold; margin-top: 0.25rem; }
+        .status-value.connected { color: #4ecca3; }
+        .status-value.disconnected { color: #e74c3c; }
+
+        .mode-display {
+            font-size: 3rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+        .mode-solo         { background: #f39c12; color: #000; }
+        .mode-duo          { background: #8e6e4e; color: #fff; }
+        .mode-group        { background: #27ae60; color: #fff; }
+        .mode-focus        { background: #2c3e50; color: #fff; }
+        .mode-presentation { background: #2c3e50; color: #e74c3c; }
+        .mode-empty        { background: #1a1a2e; color: #444; border: 1px solid #333; }
+        .mode-unknown      { background: #1a1a2e; color: #444; border: 1px solid #333; }
+
+        .cameras {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .camera-card {
+            background: #16213e;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        .camera-name { font-weight: bold; margin-bottom: 0.5rem; }
+        .camera-detail { font-size: 0.85rem; color: #aaa; }
+
+        .event-log {
+            background: #0f0f23;
+            padding: 1rem;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.8rem;
+            line-height: 1.6;
+        }
+        .event-log .event { color: #4ecca3; }
+        .event-log .time { color: #666; }
+    </style>
+</head>
+<body>
+
+<h1>Smart Classroom</h1>
+<p class="subtitle">Student Project Template — edit onStateChange() below</p>
+
+<!-- Status bar -->
+<div class="status-bar">
+    <div class="status-item">
+        <div class="status-label">Connection</div>
+        <div class="status-value" id="connection">...</div>
+    </div>
+    <div class="status-item">
+        <div class="status-label">People</div>
+        <div class="status-value" id="persons">-</div>
+    </div>
+    <div class="status-item">
+        <div class="status-label">Whiteboard</div>
+        <div class="status-value" id="whiteboard">-</div>
+    </div>
+</div>
+
+<!-- Room mode -->
+<div class="mode-display mode-unknown" id="modeDisplay">
+    waiting...
+</div>
+
+<!-- Per-camera cards -->
+<div class="cameras" id="cameras"></div>
+
+<!-- Event log -->
+<h3 style="margin-bottom: 0.5rem;">Event Log</h3>
+<div class="event-log" id="eventLog"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// CONFIG — CHANGE THESE
+// ═══════════════════════════════════════════════════════════════════════════
+
+const API_BASE = 'http://localhost:8766';     // Classroom API address
+const PROJECT_ID = 'your-project-id';          // Your project ID
+const API_KEY = 'your-api-key';                // Your project API key
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CLASSROOM API HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
+
+async function getState() {
+    const res = await fetch(`${API_BASE}/state`);
+    return res.json();
+}
+
+async function getRoomMode() {
+    const res = await fetch(`${API_BASE}/mode`);
+    return res.json();
+}
+
+async function getEvents(eventType = null, limit = 20) {
+    const params = new URLSearchParams({ limit });
+    if (eventType) params.set('event_type', eventType);
+    const res = await fetch(`${API_BASE}/events?${params}`);
+    return res.json();
+}
+
+async function publishEvent(eventType, payload = {}) {
+    const res = await fetch(`${API_BASE}/projects/${PROJECT_ID}/events`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': API_KEY,
+        },
+        body: JSON.stringify({ event_type: eventType, payload }),
+    });
+    return res.json();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// REAL-TIME SUBSCRIPTION (SSE)
+// ═══════════════════════════════════════════════════════════════════════════
+
+let evtSource = null;
+
+function connectSSE() {
+    evtSource = new EventSource(`${API_BASE}/subscribe/state`);
+
+    evtSource.addEventListener('state', (event) => {
+        const state = JSON.parse(event.data);
+        updateUI(state);
+        onStateChange(state);
+    });
+
+    evtSource.addEventListener('open', () => {
+        document.getElementById('connection').textContent = 'Live';
+        document.getElementById('connection').className = 'status-value connected';
+    });
+
+    evtSource.onerror = () => {
+        document.getElementById('connection').textContent = 'Offline';
+        document.getElementById('connection').className = 'status-value disconnected';
+        // EventSource auto-reconnects
+    };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// UI UPDATES (you can customize or remove this)
+// ═══════════════════════════════════════════════════════════════════════════
+
+function updateUI(state) {
+    const mode = state.room_mode || 'unknown';
+    const persons = state.total_persons || 0;
+    const whiteboard = state.whiteboard_active ? 'Active' : 'Idle';
+
+    // Mode display
+    const modeEl = document.getElementById('modeDisplay');
+    modeEl.textContent = mode.toUpperCase();
+    modeEl.className = `mode-display mode-${mode}`;
+
+    // Status bar
+    document.getElementById('persons').textContent = persons;
+    document.getElementById('whiteboard').textContent = whiteboard;
+
+    // Camera cards
+    const cameras = state.cameras || {};
+    const container = document.getElementById('cameras');
+    container.innerHTML = '';
+    for (const [camId, cam] of Object.entries(cameras)) {
+        const card = document.createElement('div');
+        card.className = 'camera-card';
+        card.innerHTML = `
+            <div class="camera-name">${camId}</div>
+            <div class="camera-detail">People: ${cam.person_count || 0}</div>
+            <div class="camera-detail">Probe: ${cam.predicted_class || '?'} (${Math.round((cam.prediction_confidence || 0) * 100)}%)</div>
+            <div class="camera-detail">Mode: ${cam.room_mode || '?'}</div>
+        `;
+        container.appendChild(card);
+    }
+
+    // Event log
+    logEvent(`state update — mode: ${mode}, people: ${persons}`);
+}
+
+function logEvent(msg) {
+    const log = document.getElementById('eventLog');
+    const time = new Date().toLocaleTimeString();
+    log.innerHTML = `<div><span class="time">${time}</span> <span class="event">${msg}</span></div>` + log.innerHTML;
+    // Keep last 50
+    while (log.children.length > 50) log.removeChild(log.lastChild);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// YOUR PROJECT LOGIC — IMPLEMENT THIS
+// ═══════════════════════════════════════════════════════════════════════════
+
+function onStateChange(state) {
+    // state.room_mode       → "solo" | "duo" | "group" | "focus" | "presentation" | "empty"
+    // state.total_persons   → number
+    // state.whiteboard_active → boolean
+    // state.cameras         → { orbit: {...}, gravity: {...}, horizon: {...} }
+
+    // Example: Gesture Timer shows different defaults based on mode
+    //
+    // if (state.room_mode === 'group') {
+    //     setDefaultTimer(5);  // 5-minute group work timer
+    // } else if (state.room_mode === 'presentation') {
+    //     setDefaultTimer(15); // 15-minute presentation timer
+    // }
+
+    // Example: Publish an event when something happens in your project
+    //
+    // publishEvent('timer_started', { minutes: 5 });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Try SSE first, fall back to polling
+try {
+    connectSSE();
+} catch (e) {
+    console.warn('SSE not available, falling back to polling');
+    setInterval(async () => {
+        try {
+            const state = await getState();
+            updateUI(state);
+            onStateChange(state);
+        } catch (e) {
+            document.getElementById('connection').textContent = 'Offline';
+            document.getElementById('connection').className = 'status-value disconnected';
+        }
+    }, 3000);
+}
+
+// Also get initial state immediately
+getState().then(state => {
+    document.getElementById('connection').textContent = 'Live';
+    document.getElementById('connection').className = 'status-value connected';
+    updateUI(state);
+}).catch(() => {
+    document.getElementById('connection').textContent = 'Offline';
+    document.getElementById('connection').className = 'status-value disconnected';
+});
+</script>
+
+</body>
+</html>

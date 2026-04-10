@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Development Workflow — Smart Objects Cameras</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.min.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/github.min.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --font-heading: "Instrument Serif", Georgia, "Times New Roman", serif;
+      --font-sans: "Inter", "Helvetica Neue", -apple-system, system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-muted: #a8a29e;
+      --text-faint: #c8c4bf;
+      --bg-page: #fafaf9;
+      --bg-card: #ffffff;
+      --border-subtle: #e7e5e4;
+      --green-accent: #16a34a;
+      --green-bg: #f0fdf4;
+      --green-border: #bbf7d0;
+      --red-accent: #dc2626;
+      --red-bg: #fef2f2;
+      --red-border: #fecaca;
+      --blue-accent: #2563eb;
+      --blue-bg: #eff6ff;
+      --blue-border: #bfdbfe;
+    }
+
+    .reveal, .reveal .slide-background { background: var(--bg-page); }
+
+    .reveal {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 22px;
+      color: var(--text-secondary);
+      text-align: left;
+    }
+    .reveal .slides section { text-align: left; }
+
+    .reveal h1 {
+      font-family: var(--font-heading);
+      font-size: 2.2em; font-weight: 400; font-style: italic;
+      letter-spacing: -0.02em;
+      color: var(--text-primary); margin-bottom: 0.6em;
+    }
+    .reveal h2 {
+      font-family: var(--font-heading);
+      font-size: 1.5em; font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--text-primary); margin-bottom: 0.5em;
+    }
+    .reveal h3 {
+      font-family: var(--font-sans);
+      font-size: 0.65em; font-weight: 600; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.5em;
+    }
+    .reveal p, .reveal li {
+      font-size: 0.95em; line-height: 1.65; color: var(--text-secondary);
+    }
+    .reveal strong { font-weight: 600; color: var(--text-primary); }
+
+    .reveal pre {
+      font-family: var(--font-mono); font-size: 0.7em; line-height: 1.55;
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: 8px; padding: 0.8em 1.1em; box-shadow: none;
+      width: 100%; margin: 0.6em 0;
+    }
+    .reveal code { font-family: var(--font-mono); }
+    .reveal p code, .reveal li code, .reveal td code {
+      background: #f5f5f4; border: 1px solid var(--border-subtle);
+      border-radius: 4px; padding: 0.1em 0.4em; font-size: 0.85em;
+      color: var(--green-accent);
+    }
+
+    .command-card {
+      background: #f5f5f4; border: 1px solid var(--border-subtle);
+      border-radius: 6px; padding: 0.7em 1em;
+      font-family: var(--font-mono); font-size: 0.78em;
+      color: var(--green-accent); margin: 0.5em 0;
+    }
+    .troubleshoot-card {
+      background: var(--red-bg); border: 1px solid var(--red-border);
+      border-radius: 6px; padding: 0.7em 1em; font-size: 0.82em; margin: 0.4em 0;
+    }
+    .troubleshoot-card strong { color: var(--red-accent); }
+    .info-card {
+      background: var(--blue-bg); border: 1px solid var(--blue-border);
+      border-radius: 6px; padding: 0.7em 1em; font-size: 0.85em; margin: 0.5em 0;
+    }
+    .two-col {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.8em; align-items: start;
+      text-align: left;
+    }
+    .step-number {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 1.6em; height: 1.6em; border-radius: 50%;
+      background: var(--green-bg); border: 1px solid var(--green-border);
+      color: var(--green-accent); font-size: 0.85em; font-weight: 500;
+      flex-shrink: 0;
+    }
+    .step-row {
+      display: flex; align-items: baseline; gap: 0.7em;
+      padding: 0.35em 0; border-bottom: 1px solid var(--border-subtle);
+    }
+    .warn-badge {
+      display: inline-block; font-size: 0.6em; font-weight: 600;
+      letter-spacing: 0.12em; padding: 0.15em 0.5em; border-radius: 3px;
+      background: #fffbeb; color: #d97706;
+      border: 1px solid #fde68a; vertical-align: middle;
+    }
+    .pi-badge {
+      display: inline-block; font-size: 0.6em; font-weight: 600;
+      letter-spacing: 0.12em; padding: 0.15em 0.5em; border-radius: 3px;
+      background: var(--blue-bg); color: var(--blue-accent);
+      border: 1px solid var(--blue-border); vertical-align: middle;
+    }
+    .local-badge {
+      display: inline-block; font-size: 0.6em; font-weight: 600;
+      letter-spacing: 0.12em; padding: 0.15em 0.5em; border-radius: 3px;
+      background: var(--green-bg); color: var(--green-accent);
+      border: 1px solid var(--green-border); vertical-align: middle;
+    }
+    .checklist { list-style: none; padding: 0; margin: 0; }
+    .checklist li {
+      position: relative; padding: 0.4em 0 0.4em 1.5em;
+      border-bottom: 1px solid var(--border-subtle);
+      list-style: none;
+    }
+    .checklist li::before {
+      content: "\2713"; color: var(--green-accent); font-size: 0.85em;
+      position: absolute; left: 0;
+    }
+
+    .reveal table { width: 100%; border-collapse: collapse; font-size: 0.78em; margin-top: 0.6em; }
+    .reveal table th {
+      text-align: left; font-weight: 600; color: var(--text-primary);
+      border-bottom: 2px solid var(--border-subtle); padding: 0.45em 0.7em;
+    }
+    .reveal table td {
+      padding: 0.4em 0.7em; border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .reveal .slide-number {
+      font-family: var(--font-mono); font-size: 0.7em; color: var(--text-muted);
+      background: none; bottom: 1em; left: 50%; transform: translateX(-50%); right: auto;
+    }
+    .reveal .progress span { background: var(--border-subtle); }
+
+    .read-more {
+      font-size: 0.6em !important; color: var(--text-muted) !important;
+      font-family: var(--font-mono); text-align: center;
+      margin-top: 1em !important;
+    }
+    .read-more a {
+      color: var(--text-muted) !important; border-bottom: 1px solid var(--border-subtle);
+      transition: color 0.15s;
+    }
+    .read-more a:hover { color: var(--text-secondary) !important; }
+  </style>
+</head>
+<body>
+
+<div class="reveal">
+  <div class="slides">
+
+    <!-- SLIDE 1: TITLE -->
+
+    <section>
+      <h3>SMART OBJECTS: THE SMART CLASSROOM</h3>
+      <h1 style="font-size: 2.6em; font-weight: 400;">Development Workflow</h1>
+      <p style="font-size: 1em; color: var(--text-muted);">
+        Smart Objects Cameras
+      </p>
+      <p style="font-size: 0.75em; color: var(--text-faint); margin-top: 2.5em;">
+        SVA MFA Interaction Design &middot; Winter 2026<br>
+        <span style="opacity: 0.6;">Edit locally &rarr; Copy to Pi &rarr; Run on Pi</span>
+      </p>
+    </section>
+
+    <!-- SLIDE 2: ARCHITECTURE OVERVIEW -->
+
+    <section>
+      <h3>ARCHITECTURE</h3>
+      <h2>Two Machines, One Workflow &nbsp;<span class="warn-badge">KEY CONCEPT</span></h2>
+      <div class="two-col" style="margin-top: 0.8em;">
+        <div style="border: 2px solid var(--green-border); border-radius: 10px; padding: 1em; background: var(--green-bg);">
+          <p style="font-weight: 600; color: var(--green-accent); font-size: 0.85em; margin-bottom: 0.6em;">YOUR LOCAL COMPUTER &nbsp;<span class="local-badge">LOCAL</span></p>
+          <pre style="margin: 0; font-size: 0.8em; background: var(--bg-card);"><code class="language-text">smart-objects-cameras/
+  ├── person_detector.py
+  ├── fatigue_detector.py
+  ├── gaze_detector.py
+  ├── discord_bot.py
+  ├── utils/
+  └── README.md</code></pre>
+          <ul style="list-style: none; padding: 0; margin: 0.6em 0 0 0; font-size: 0.82em;">
+            <li style="padding: 0.2em 0;">Edit code here</li>
+            <li style="padding: 0.2em 0;">Test logic here</li>
+            <li style="padding: 0.2em 0;">Commit to GitHub here</li>
+          </ul>
+        </div>
+        <div style="border: 2px solid var(--blue-border); border-radius: 10px; padding: 1em; background: var(--blue-bg);">
+          <p style="font-weight: 600; color: var(--blue-accent); font-size: 0.85em; margin-bottom: 0.6em;">RASPBERRY PI &nbsp;<span class="pi-badge">REMOTE</span></p>
+          <pre style="margin: 0; font-size: 0.8em; background: var(--bg-card);"><code class="language-text">~/oak-projects/
+  ├── person_detector.py
+  ├── discord_notifier.py
+  ├── .env          ← never in GitHub!
+  ├── latest_frame.jpg
+  └── camera_status.json</code></pre>
+          <ul style="list-style: none; padding: 0; margin: 0.6em 0 0 0; font-size: 0.82em;">
+            <li style="padding: 0.2em 0;">Run code here</li>
+            <li style="padding: 0.2em 0;">Camera connected here</li>
+            <li style="padding: 0.2em 0;">Only files you need</li>
+          </ul>
+        </div>
+      </div>
+      <div style="text-align: center; margin-top: 0.8em;">
+        <span style="font-family: var(--font-mono); font-size: 0.85em; color: var(--text-muted);">LOCAL</span>
+        <span style="font-size: 1.3em; color: var(--text-muted); margin: 0 0.5em;">&xrarr;</span>
+        <span style="font-family: var(--font-mono); font-size: 0.85em; color: var(--green-accent); font-weight: 500;">scp (copy files)</span>
+        <span style="font-size: 1.3em; color: var(--text-muted); margin: 0 0.5em;">&xrarr;</span>
+        <span style="font-family: var(--font-mono); font-size: 0.85em; color: var(--text-muted);">PI</span>
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/WORKFLOW.md" target="_blank">Full guide &rarr;</a></p>
+    </section>
+
+    <!-- SLIDE 3: INITIAL SETUP -->
+
+    <section>
+      <h3>INITIAL SETUP</h3>
+      <h2>Step 1: Clone Locally, Create Folder on Pi</h2>
+      <div class="two-col" style="margin-top: 1em;">
+        <div>
+          <p style="font-weight: 500; font-size: 0.9em;">On your local computer &nbsp;<span class="local-badge">LOCAL</span></p>
+          <div class="step-row"><span class="step-number">1</span> <span>Clone the GitHub repository</span></div>
+          <pre><code class="language-bash"># Clone the repository
+git clone https://github.com/[your-org]/smart-objects-cameras.git
+cd smart-objects-cameras</code></pre>
+        </div>
+        <div>
+          <p style="font-weight: 500; font-size: 0.9em;">On the Raspberry Pi &nbsp;<span class="pi-badge">REMOTE</span></p>
+          <div class="step-row"><span class="step-number">2</span> <span>SSH in and create the project directory</span></div>
+          <pre><code class="language-bash"># SSH into Pi
+ssh orbit   # or gravity, or horizon
+
+# Create project directory
+mkdir -p ~/oak-projects</code></pre>
+        </div>
+      </div>
+      <div class="info-card" style="margin-top: 1em;">
+        <strong>One-time setup.</strong> You only need to do this once per computer and once per Pi.
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/WORKFLOW.md" target="_blank">Full guide &rarr;</a></p>
+    </section>
+
+    <!-- SLIDE 4: COPY FILES TO PI -->
+
+    <section>
+      <h3>COPY FILES</h3>
+      <h2>Step 2: Copy Files to Pi &nbsp;<span class="local-badge">LOCAL</span></h2>
+      <p>Run these commands <strong>from your local computer</strong> (not on the Pi!):</p>
+      <pre><code class="language-bash"># Navigate to your local repo
+cd ~/path/to/smart-objects-cameras
+
+# Copy the files you need
+scp person_detector_with_display.py orbit:~/oak-projects/
+scp discord_notifier.py orbit:~/oak-projects/
+
+# For fatigue/gaze, also copy the utils folder
+scp -r utils orbit:~/oak-projects/</code></pre>
+      <div class="info-card" style="margin-top: 0.8em;">
+        <strong>Replace <code>orbit</code></strong> with <code>gravity</code> or <code>horizon</code> for other Pis.
+      </div>
+      <div style="margin-top: 0.8em;">
+        <p style="font-size: 0.85em; font-weight: 500;">More scp patterns:</p>
+        <div class="command-card">scp file.py orbit:~/oak-projects/<span style="color: var(--text-muted);"> &emsp;# single file</span></div>
+        <div class="command-card">scp -r utils orbit:~/oak-projects/<span style="color: var(--text-muted);"> &emsp;# entire folder</span></div>
+        <div class="command-card">scp file1.py file2.py orbit:~/oak-projects/<span style="color: var(--text-muted);"> &emsp;# multiple files</span></div>
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/WORKFLOW.md" target="_blank">Full guide &rarr;</a></p>
+    </section>
+
+    <!-- SLIDE 5: CREATE .ENV FILE -->
+
+    <section>
+      <h3>ENVIRONMENT</h3>
+      <h2>Step 3: Create .env File &nbsp;<span class="pi-badge">ON THE PI</span></h2>
+      <div class="two-col" style="margin-top: 0.8em;">
+        <div>
+          <p style="color: var(--green-accent); font-weight: 500; font-size: 0.9em; margin-bottom: 0.6em;">Already configured (DO NOT MODIFY)</p>
+          <pre><code class="language-bash"># These are set on each Pi:
+DISCORD_WEBHOOK_URL=...
+DISCORD_APPLICATION_ID=...
+DISCORD_PUBLIC_KEY=...
+DISCORD_BOT_TOKEN=...
+# (OrbitBot / GravityBot / HorizonBot)</code></pre>
+          <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 0.5em;">Check with: <code>ls ~/oak-projects/.env</code></p>
+        </div>
+        <div>
+          <p style="color: var(--blue-accent); font-weight: 500; font-size: 0.9em; margin-bottom: 0.6em;">What you add (optional)</p>
+          <pre><code class="language-bash"># Edit the existing .env:
+nano ~/oak-projects/.env
+
+# Add at the bottom:
+DISCORD_USER_ID=your_discord_user_id
+DISCORD_DM_BOT_TOKEN=your_dm_bot_token</code></pre>
+          <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 0.5em;">Then secure: <code>chmod 600 ~/oak-projects/.env</code></p>
+        </div>
+      </div>
+      <p style="font-size: 0.82em; color: var(--red-accent); margin-top: 0.8em;">
+        <strong>NEVER commit .env to GitHub!</strong> It contains secret tokens.
+      </p>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/WORKFLOW.md" target="_blank">Full guide &rarr;</a></p>
+    </section>
+
+    <!-- SLIDE 6: RUN YOUR CODE -->
+
+    <section>
+      <h3>RUN</h3>
+      <h2>Step 4: Run Your Code &nbsp;<span class="pi-badge">ON THE PI</span></h2>
+      <p>Every time you want to run a script on the Pi:</p>
+      <div class="command-card">$ ssh orbit</div>
+      <div class="command-card">$ activate-oak</div>
+      <div class="command-card">$ cd ~/oak-projects</div>
+      <div class="command-card">$ python3 person_detector_with_display.py --display</div>
+      <div class="info-card" style="margin-top: 1em;">
+        <strong>Remember:</strong> Always run <code>activate-oak</code> first to load the shared Python environment. You should see <code>(venv)</code> appear before your prompt.
+      </div>
+      <p style="font-size: 0.85em; color: var(--text-muted); margin-top: 0.8em;">
+        <strong style="color: var(--text-secondary);">Tip:</strong> Use <code>hostname</code> to verify you are on the Pi (shows <code>orbit</code>, <code>gravity</code>, or <code>horizon</code>).
+      </p>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/WORKFLOW.md" target="_blank">Full guide &rarr;</a></p>
+    </section>
+
+    <!-- SLIDE 7: MAKING CHANGES -->
+
+    <section>
+      <h3>DEVELOPMENT CYCLE</h3>
+      <h2>Step 5: Making Changes</h2>
+      <p>The edit-copy-run loop you will repeat every time you change code:</p>
+      <div style="max-width: 700px; margin-top: 1em;">
+        <div class="step-row">
+          <span class="step-number">1</span>
+          <span><strong>Edit code on your laptop</strong> &nbsp;<span class="local-badge">LOCAL</span></span>
+        </div>
+        <div class="command-card" style="margin-left: 2.3em;">nano person_detector_with_display.py &emsp;<span style="color: var(--text-muted);"># or use VS Code</span></div>
+        <div class="step-row">
+          <span class="step-number">2</span>
+          <span><strong>Copy updated file to Pi</strong> &nbsp;<span class="local-badge">LOCAL</span></span>
+        </div>
+        <div class="command-card" style="margin-left: 2.3em;">scp person_detector_with_display.py orbit:~/oak-projects/</div>
+        <div class="step-row">
+          <span class="step-number">3</span>
+          <span><strong>Run updated code on Pi</strong> &nbsp;<span class="pi-badge">ON THE PI</span></span>
+        </div>
+        <div class="command-card" style="margin-left: 2.3em;">activate-oak && cd ~/oak-projects && python3 person_detector_with_display.py --display</div>
+        <div class="step-row" style="border-bottom: none;">
+          <span style="font-size: 1.3em; color: var(--text-muted); margin-left: 0.3em;">&circlearrowleft;</span>
+          <span style="color: var(--text-muted);"><em>Repeat from Step 1</em></span>
+        </div>
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/WORKFLOW.md" target="_blank">Full guide &rarr;</a></p>
+    </section>
+
+    <!-- SLIDE 8: FILE DEPENDENCIES -->
+
+    <section>
+      <h3>FILE DEPENDENCIES</h3>
+      <h2>Which Files to Copy</h2>
+      <p>Each detector needs specific files on the Pi. Copy only what you need:</p>
+      <table>
+        <thead>
+          <tr><th>Detector</th><th>Files to Copy</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Person Detection</strong></td>
+            <td><code>person_detector_with_display.py</code><br><code>discord_notifier.py</code></td>
+            <td>Notifier only if using <code>--discord</code></td>
+          </tr>
+          <tr>
+            <td><strong>Fatigue Detection</strong></td>
+            <td><code>fatigue_detector.py</code><br><code>utils/</code> folder<br><code>discord_notifier.py</code></td>
+            <td>Copy <code>utils/</code> with <code>scp -r</code></td>
+          </tr>
+          <tr>
+            <td><strong>Gaze Estimation</strong></td>
+            <td><code>gaze_detector.py</code><br><code>utils/</code> folder<br><code>discord_notifier.py</code></td>
+            <td>Copy <code>utils/</code> with <code>scp -r</code></td>
+          </tr>
+          <tr>
+            <td><strong>Discord Bots</strong></td>
+            <td><code>discord_bot.py</code><br><code>discord_dm_notifier.py</code></td>
+            <td>Public bot + personal DM bot</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="info-card" style="margin-top: 0.8em;">
+        <strong>Shared dependency:</strong> Fatigue and Gaze both need <code>utils/</code>. Copy it once and both detectors can use it.
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/WORKFLOW.md" target="_blank">Full guide &rarr;</a></p>
+    </section>
+
+    <!-- SLIDE 9: COMMON MISTAKES -->
+
+    <section>
+      <h3>COMMON MISTAKES</h3>
+      <h2>What Not to Do &nbsp;<span class="warn-badge">WATCH OUT</span></h2>
+      <div class="troubleshoot-card">
+        <strong>Cloning the repo on the Pi</strong><br>
+        <span>Don't run <code>git clone</code> on the Pi. It creates unnecessary files and risks accidentally committing <code>.env</code> to GitHub. The repo belongs on your <strong>local computer only</strong>.</span>
+      </div>
+      <div class="troubleshoot-card">
+        <strong>Forgetting to copy updated files</strong><br>
+        <span>You edit on your laptop but forget to <code>scp</code> to the Pi. The Pi still runs the <strong>old version</strong>! Always run <code>scp</code> after every edit before re-running on the Pi.</span>
+      </div>
+      <div class="troubleshoot-card">
+        <strong>Committing .env to GitHub</strong><br>
+        <span>Never run <code>git add .env</code>. The <code>.env</code> file contains secret tokens (Discord bot tokens, webhook URLs) that would be <strong>publicly visible</strong> on GitHub.</span>
+      </div>
+      <div class="info-card" style="margin-top: 0.8em;">
+        <strong>Golden rule:</strong> Repo on laptop, <code>.env</code> on Pi, never the other way around.
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/WORKFLOW.md" target="_blank">Full guide &rarr;</a></p>
+    </section>
+
+    <!-- SLIDE 10: QUICK REFERENCE -->
+
+    <section>
+      <h3>QUICK REFERENCE</h3>
+      <h2>Summary</h2>
+      <table>
+        <thead>
+          <tr><th>Action</th><th>Where</th><th>Command</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Clone repo</td>
+            <td><span class="local-badge">LOCAL</span></td>
+            <td><code>git clone ...</code></td>
+          </tr>
+          <tr>
+            <td>Edit code</td>
+            <td><span class="local-badge">LOCAL</span></td>
+            <td>Use your favorite editor</td>
+          </tr>
+          <tr>
+            <td>Copy files</td>
+            <td><span class="local-badge">LOCAL</span></td>
+            <td><code>scp file.py orbit:~/oak-projects/</code></td>
+          </tr>
+          <tr>
+            <td>Create .env</td>
+            <td><span class="pi-badge">PI</span></td>
+            <td><code>nano ~/oak-projects/.env</code></td>
+          </tr>
+          <tr>
+            <td>Run scripts</td>
+            <td><span class="pi-badge">PI</span></td>
+            <td><code>activate-oak && python3 script.py</code></td>
+          </tr>
+          <tr>
+            <td>Commit changes</td>
+            <td><span class="local-badge">LOCAL</span></td>
+            <td><code>git add</code>, <code>git commit</code>, <code>git push</code></td>
+          </tr>
+          <tr>
+            <td>Check which machine</td>
+            <td><em>Either</em></td>
+            <td><code>hostname</code></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="info-card" style="margin-top: 0.8em;">
+        <strong>VS Code Remote SSH alternative:</strong> Install the "Remote - SSH" extension, connect to <code>orbit</code>, and edit files directly on the Pi. No <code>scp</code> needed &mdash; drag and drop between local and remote windows works too.
+      </div>
+      <p style="font-size: 0.85em; color: var(--text-muted); margin-top: 0.6em; text-align: center;">
+        <strong style="color: var(--text-secondary);">Remember:</strong> Repo on laptop, files on Pi, run on Pi!
+      </p>
+    </section>
+
+  </div><!-- /.slides -->
+</div><!-- /.reveal -->
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.min.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: true,
+    plugins: [RevealHighlight],
+    width: 1280,
+    height: 720,
+    margin: 0.1,
+    transition: 'none',
+    backgroundTransition: 'none',
+    center: false,
+  });
+</script>
+</body>
+</html>

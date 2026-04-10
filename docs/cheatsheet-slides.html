@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cheat Sheet — Smart Objects Cameras</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.min.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/github.min.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --font-heading: "Instrument Serif", Georgia, "Times New Roman", serif;
+      --font-sans: "Inter", "Helvetica Neue", -apple-system, system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-muted: #a8a29e;
+      --text-faint: #c8c4bf;
+      --bg-page: #fafaf9;
+      --bg-card: #ffffff;
+      --border-subtle: #e7e5e4;
+      --green-accent: #16a34a;
+      --green-bg: #f0fdf4;
+      --green-border: #bbf7d0;
+      --red-accent: #dc2626;
+      --red-bg: #fef2f2;
+      --red-border: #fecaca;
+      --blue-accent: #2563eb;
+      --blue-bg: #eff6ff;
+      --blue-border: #bfdbfe;
+    }
+
+    .reveal, .reveal .slide-background { background: var(--bg-page); }
+
+    .reveal {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 22px;
+      color: var(--text-secondary);
+      text-align: left;
+    }
+    .reveal .slides section { text-align: left; }
+
+    .reveal h1 {
+      font-family: var(--font-heading);
+      font-size: 2.2em; font-weight: 400; font-style: italic;
+      letter-spacing: -0.02em;
+      color: var(--text-primary); margin-bottom: 0.6em;
+    }
+    .reveal h2 {
+      font-family: var(--font-heading);
+      font-size: 1.5em; font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--text-primary); margin-bottom: 0.5em;
+    }
+    .reveal h3 {
+      font-family: var(--font-sans);
+      font-size: 0.65em; font-weight: 600; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.5em;
+    }
+    .reveal p, .reveal li {
+      font-size: 0.95em; line-height: 1.65; color: var(--text-secondary);
+    }
+    .reveal strong { font-weight: 600; color: var(--text-primary); }
+
+    .reveal pre {
+      font-family: var(--font-mono); font-size: 0.7em; line-height: 1.55;
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: 8px; padding: 0.8em 1.1em; box-shadow: none;
+      width: 100%; margin: 0.6em 0;
+    }
+    .reveal code { font-family: var(--font-mono); }
+    .reveal p code, .reveal li code, .reveal td code {
+      background: #f5f5f4; border: 1px solid var(--border-subtle);
+      border-radius: 4px; padding: 0.1em 0.4em; font-size: 0.85em;
+      color: var(--green-accent);
+    }
+
+    .command-card {
+      background: #f5f5f4; border: 1px solid var(--border-subtle);
+      border-radius: 6px; padding: 0.7em 1em;
+      font-family: var(--font-mono); font-size: 0.78em;
+      color: var(--green-accent); margin: 0.5em 0;
+    }
+    .troubleshoot-card {
+      background: var(--red-bg); border: 1px solid var(--red-border);
+      border-radius: 6px; padding: 0.7em 1em; font-size: 0.82em; margin: 0.4em 0;
+    }
+    .troubleshoot-card strong { color: var(--red-accent); }
+    .info-card {
+      background: var(--blue-bg); border: 1px solid var(--blue-border);
+      border-radius: 6px; padding: 0.7em 1em; font-size: 0.85em; margin: 0.5em 0;
+    }
+    .two-col {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.8em; align-items: start;
+      text-align: left;
+    }
+    .checklist { list-style: none; padding: 0; margin: 0; }
+    .checklist li {
+      position: relative; padding: 0.4em 0 0.4em 1.5em;
+      border-bottom: 1px solid var(--border-subtle);
+      list-style: none;
+    }
+    .checklist li::before {
+      content: "\2713"; color: var(--green-accent); font-size: 0.85em;
+      position: absolute; left: 0;
+    }
+
+    .reveal table { width: 100%; border-collapse: collapse; font-size: 0.78em; margin-top: 0.6em; }
+    .reveal table th {
+      text-align: left; font-weight: 600; color: var(--text-primary);
+      border-bottom: 2px solid var(--border-subtle); padding: 0.45em 0.7em;
+    }
+    .reveal table td {
+      padding: 0.4em 0.7em; border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .reveal .slide-number {
+      font-family: var(--font-mono); font-size: 0.7em; color: var(--text-muted);
+      background: none; bottom: 1em; left: 50%; transform: translateX(-50%); right: auto;
+    }
+    .reveal .progress span { background: var(--border-subtle); }
+
+    .read-more {
+      font-size: 0.6em !important; color: var(--text-muted) !important;
+      font-family: var(--font-mono); text-align: center;
+      margin-top: 1em !important;
+    }
+    .read-more a {
+      color: var(--text-muted) !important; border-bottom: 1px solid var(--border-subtle);
+      transition: color 0.15s;
+    }
+    .read-more a:hover { color: var(--text-secondary) !important; }
+  </style>
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+  <!-- ========== SLIDE 1 — Title ========== -->
+  <section>
+    <h3>SMART OBJECTS CAMERAS</h3>
+    <h1>Quick Start Cheat Sheet</h1>
+    <p style="font-size: 1.1em; color: var(--text-muted); margin-top: 0.5em;">
+      OAK-D + Raspberry Pi 5
+    </p>
+    <div class="info-card" style="margin-top: 2em;">
+      Everything you need to connect, test, and run detectors on the classroom Pis.
+      <br>Print this or keep it open on your laptop during lab time.
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 2 — Network Info ========== -->
+  <section>
+    <h3>NETWORK</h3>
+    <h2>Network Info</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Camera</th>
+          <th>Hostname</th>
+          <th>SSH Command</th>
+          <th>Access</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Orbit</strong></td>
+          <td><code>orbit</code></td>
+          <td><code>ssh orbit</code></td>
+          <td>SSH (key-based) + VNC</td>
+        </tr>
+        <tr>
+          <td><strong>Gravity</strong></td>
+          <td><code>gravity</code></td>
+          <td><code>ssh gravity</code></td>
+          <td>SSH (key-based) + VNC</td>
+        </tr>
+        <tr>
+          <td><strong>Horizon</strong></td>
+          <td><code>horizon</code></td>
+          <td><code>ssh horizon</code></td>
+          <td>SSH (key-based) + VNC</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="info-card" style="margin-top: 1em;">
+      <strong>Authentication:</strong> SSH key-based via SSH config (no password needed if configured).
+      <br><strong>Note:</strong> All three Pis have VNC, but only one user can hold the VNC desktop seat at a time.
+    </div>
+
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/CHEATSHEET.md" target="_blank">Full cheatsheet &rarr;</a></p>
+  </section>
+
+  <!-- ========== SLIDE 3 — Connect to Pi ========== -->
+  <section>
+    <h3>CONNECT</h3>
+    <h2>Connect to Pi</h2>
+
+    <div class="two-col">
+      <div>
+        <p><strong>SSH (Terminal Access)</strong></p>
+        <div class="command-card">
+          ssh orbit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Camera: Orbit<br>
+          ssh gravity&nbsp;&nbsp;&nbsp;# Camera: Gravity<br>
+          ssh horizon&nbsp;&nbsp;&nbsp;# Camera: Horizon
+        </div>
+        <p style="font-size: 0.8em; color: var(--text-muted);">No password needed with SSH keys configured.</p>
+
+        <p style="margin-top: 1em;"><strong>VNC (Desktop Access)</strong></p>
+        <ul class="checklist">
+          <li>Open RealVNC Viewer</li>
+          <li>Connect to: <code>orbit</code>, <code>gravity</code>, or <code>horizon</code></li>
+          <li>Login with your username and password</li>
+        </ul>
+      </div>
+
+      <div>
+        <p><strong>VS Code Remote (Recommended)</strong></p>
+        <ul class="checklist">
+          <li><strong>Mac users:</strong> Grant VS Code "Local Network" permission first</li>
+          <li><code>Ctrl+Shift+P</code> &rarr; "Remote-SSH: Connect to Host"</li>
+          <li>Select: <code>orbit</code>, <code>gravity</code>, or <code>horizon</code></li>
+          <li>Open folder: <code>/home/[username]/oak-projects</code></li>
+        </ul>
+
+        <div class="troubleshoot-card" style="margin-top: 1em;">
+          <strong>Mac tip:</strong> System Settings &rarr; Privacy &amp; Security &rarr; Local Network &rarr; VS Code
+        </div>
+      </div>
+    </div>
+
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/CHEATSHEET.md" target="_blank">Full cheatsheet &rarr;</a></p>
+  </section>
+
+  <!-- ========== SLIDE 4 — Python Environment ========== -->
+  <section>
+    <h3>PYTHON</h3>
+    <h2>Python Environment</h2>
+
+    <p><strong>Always activate the shared virtual environment first:</strong></p>
+
+    <div class="command-card" style="font-size: 0.9em;">
+      cd ~/oak-projects<br>
+      activate-oak
+    </div>
+
+    <p style="margin-top: 1em;">Your prompt should change to show <code>(venv)</code>:</p>
+
+    <pre><code>(venv) carrie@orbit:~/oak-projects $</code></pre>
+
+    <div class="info-card" style="margin-top: 1em;">
+      <strong>What is <code>activate-oak</code>?</strong>
+      It is a shell alias for <code>source /opt/oak-shared/venv/bin/activate</code>.
+      This loads the shared Python environment with DepthAI and all dependencies pre-installed.
+    </div>
+
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/CHEATSHEET.md" target="_blank">Full cheatsheet &rarr;</a></p>
+  </section>
+
+  <!-- ========== SLIDE 5 — Camera Test ========== -->
+  <section>
+    <h3>CAMERA</h3>
+    <h2>Quick Camera Test</h2>
+
+    <p><strong>Check if the OAK-D camera is connected:</strong></p>
+
+    <div class="command-card" style="font-size: 0.85em;">
+      python3 -c "import depthai as dai; devices = dai.Device.getAllAvailableDevices(); print(f'Found {len(devices)} camera(s)')"
+    </div>
+
+    <p style="margin-top: 1em;"><strong>Expected output:</strong></p>
+
+    <pre><code>Found 1 camera(s)</code></pre>
+
+    <div class="troubleshoot-card" style="margin-top: 1em;">
+      <strong>No output or error?</strong> Check USB connection, try a different port, or use a powered USB hub.
+    </div>
+
+    <div class="info-card" style="margin-top: 0.6em;">
+      <strong>Project files live at:</strong> <code>~/oak-projects/</code> &mdash; contains <code>venv/</code>, <code>person_detector.py</code>, and log files.
+    </div>
+
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/CHEATSHEET.md" target="_blank">Full cheatsheet &rarr;</a></p>
+  </section>
+
+  <!-- ========== SLIDE 6 — Run Detectors ========== -->
+  <section>
+    <h3>DETECTION</h3>
+    <h2>Run Person Detector</h2>
+
+    <div class="command-card">python3 person_detector.py</div>
+    <p style="font-size: 0.85em; color: var(--text-muted); margin: 0.2em 0 0.8em;">Basic &mdash; console output only</p>
+
+    <div class="command-card">python3 person_detector.py --display</div>
+    <p style="font-size: 0.85em; color: var(--text-muted); margin: 0.2em 0 0.8em;">With video display (requires VNC desktop)</p>
+
+    <div class="command-card">python3 person_detector.py --log</div>
+    <p style="font-size: 0.85em; color: var(--text-muted); margin: 0.2em 0 0.8em;">With logging to file</p>
+
+    <div class="command-card">python3 person_detector.py --threshold 0.7</div>
+    <p style="font-size: 0.85em; color: var(--text-muted); margin: 0.2em 0 0.8em;">Adjust sensitivity (0.0 &ndash; 1.0, default 0.5)</p>
+
+    <div class="info-card" style="margin-top: 0.5em;">
+      <strong>Stop any running script:</strong> <code>Ctrl+C</code>
+    </div>
+
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/CHEATSHEET.md" target="_blank">Full cheatsheet &rarr;</a></p>
+  </section>
+
+  <!-- ========== SLIDE 7 — Common Commands ========== -->
+  <section>
+    <h3>COMMANDS</h3>
+    <h2>Common Commands</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th>Command</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Update system</td>
+          <td><code>sudo apt update && sudo apt upgrade -y</code></td>
+        </tr>
+        <tr>
+          <td>Check memory</td>
+          <td><code>free -h</code></td>
+        </tr>
+        <tr>
+          <td>Check CPU / processes</td>
+          <td><code>htop</code></td>
+        </tr>
+        <tr>
+          <td>Check camera</td>
+          <td><code>python3 -c "import depthai as dai; ..."</code></td>
+        </tr>
+        <tr>
+          <td>List USB devices</td>
+          <td><code>lsusb</code></td>
+        </tr>
+        <tr>
+          <td>Reboot</td>
+          <td><code>sudo reboot</code></td>
+        </tr>
+        <tr>
+          <td>Shutdown</td>
+          <td><code>sudo shutdown -h now</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/CHEATSHEET.md" target="_blank">Full cheatsheet &rarr;</a></p>
+  </section>
+
+  <!-- ========== SLIDE 8 — Troubleshooting ========== -->
+  <section>
+    <h3>TROUBLESHOOTING</h3>
+    <h2>Common Errors &amp; Fixes</h2>
+
+    <div class="two-col">
+      <div>
+        <div class="troubleshoot-card">
+          <strong>"No module named depthai"</strong><br>
+          Run <code>activate-oak</code> to load the virtual environment.
+        </div>
+        <div class="troubleshoot-card">
+          <strong>Camera not found</strong><br>
+          Check USB connection. Try a different port or a powered USB hub.
+        </div>
+        <div class="troubleshoot-card">
+          <strong>Permission denied (USB)</strong><br>
+          <code>sudo udevadm control --reload-rules && sudo udevadm trigger</code>
+        </div>
+      </div>
+      <div>
+        <div class="troubleshoot-card">
+          <strong>VNC black screen</strong><br>
+          Set resolution in <code>raspi-config</code> &rarr; Display Options.
+        </div>
+        <div class="troubleshoot-card">
+          <strong>VS Code "No route to host" (Mac)</strong><br>
+          Grant Local Network permission: Settings &rarr; Privacy &rarr; Local Network &rarr; VS Code
+        </div>
+        <div class="troubleshoot-card">
+          <strong>Script won't start</strong><br>
+          Check logs: <code>journalctl -u person-detector -n 20</code>
+        </div>
+        <div class="troubleshoot-card">
+          <strong>Can't ping Pi</strong><br>
+          Check network, try IP address instead of hostname.
+        </div>
+      </div>
+    </div>
+
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/CHEATSHEET.md" target="_blank">Full cheatsheet &rarr;</a></p>
+  </section>
+
+  <!-- ========== SLIDE 9 — Keyboard Shortcuts ========== -->
+  <section>
+    <h3>SHORTCUTS</h3>
+    <h2>Keyboard Shortcuts</h2>
+
+    <div class="two-col">
+      <div>
+        <p><strong>Terminal (SSH)</strong></p>
+        <table>
+          <thead>
+            <tr><th>Action</th><th>Keys</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Cancel running program</td><td><code>Ctrl+C</code></td></tr>
+            <tr><td>Clear screen</td><td><code>Ctrl+L</code> or <code>clear</code></td></tr>
+            <tr><td>Previous command</td><td><code>&uarr;</code> arrow</td></tr>
+            <tr><td>Search history</td><td><code>Ctrl+R</code></td></tr>
+            <tr><td>Logout</td><td><code>exit</code> or <code>Ctrl+D</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <p><strong>VS Code</strong></p>
+        <table>
+          <thead>
+            <tr><th>Action</th><th>Keys</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Command Palette</td><td><code>Ctrl+Shift+P</code></td></tr>
+            <tr><td>Open Terminal</td><td><code>Ctrl+`</code></td></tr>
+            <tr><td>Run Code</td><td><code>F5</code></td></tr>
+            <tr><td>Save</td><td><code>Ctrl+S</code></td></tr>
+            <tr><td>Find</td><td><code>Ctrl+F</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/CHEATSHEET.md" target="_blank">Full cheatsheet &rarr;</a></p>
+  </section>
+
+  <!-- ========== SLIDE 10 — Making Changes ========== -->
+  <section>
+    <h3>EDITING</h3>
+    <h2>Making Changes</h2>
+
+    <div class="two-col">
+      <div>
+        <p><strong>1. Edit with VS Code (Recommended)</strong></p>
+        <ul class="checklist">
+          <li>Connect via Remote SSH</li>
+          <li>Edit <code>person_detector.py</code></li>
+          <li>Save (<code>Ctrl+S</code>)</li>
+          <li>Run in terminal</li>
+        </ul>
+
+        <p style="margin-top: 1.2em;"><strong>2. Edit on Pi directly (nano)</strong></p>
+        <div class="command-card">
+          nano person_detector.py
+        </div>
+        <p style="font-size: 0.8em; color: var(--text-muted);">
+          <code>Ctrl+O</code>, Enter to save &mdash; <code>Ctrl+X</code> to exit
+        </p>
+      </div>
+
+      <div>
+        <p><strong>3. Create your own copy first</strong></p>
+        <div class="command-card">
+          cp person_detector.py person_detector_myname.py<br>
+          nano person_detector_myname.py
+        </div>
+
+        <div class="info-card" style="margin-top: 1em;">
+          <strong>Best practice:</strong> Always make a personal copy before editing shared scripts.
+          This avoids conflicts when multiple students use the same Pi.
+        </div>
+
+        <div class="info-card" style="margin-top: 0.6em;">
+          <strong>Coordinate</strong> with your teammates before editing shared files.
+          Each person should add their SSH key with <code>ssh-copy-id orbit</code>.
+        </div>
+      </div>
+    </div>
+
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/CHEATSHEET.md" target="_blank">Full cheatsheet &rarr;</a></p>
+  </section>
+
+</div><!-- /slides -->
+</div><!-- /reveal -->
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.min.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: true,
+    plugins: [RevealHighlight],
+    width: 1280,
+    height: 720,
+    margin: 0.1,
+    transition: 'none',
+    backgroundTransition: 'none',
+    center: false,
+  });
+</script>
+</body>
+</html>

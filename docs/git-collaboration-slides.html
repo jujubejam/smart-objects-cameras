@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git Collaboration — Smart Objects Cameras</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.min.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/github.min.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --font-heading: "Instrument Serif", Georgia, "Times New Roman", serif;
+      --font-sans: "Inter", "Helvetica Neue", -apple-system, system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-muted: #a8a29e;
+      --text-faint: #c8c4bf;
+      --bg-page: #fafaf9;
+      --bg-card: #ffffff;
+      --border-subtle: #e7e5e4;
+      --green-accent: #16a34a;
+      --green-bg: #f0fdf4;
+      --green-border: #bbf7d0;
+      --red-accent: #dc2626;
+      --red-bg: #fef2f2;
+      --red-border: #fecaca;
+      --blue-accent: #2563eb;
+      --blue-bg: #eff6ff;
+      --blue-border: #bfdbfe;
+    }
+
+    .reveal, .reveal .slide-background { background: var(--bg-page); }
+
+    .reveal {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 22px;
+      color: var(--text-secondary);
+      text-align: left;
+    }
+    .reveal .slides section { text-align: left; }
+
+    .reveal h1 {
+      font-family: var(--font-heading);
+      font-size: 2.2em; font-weight: 400; font-style: italic;
+      letter-spacing: -0.02em;
+      color: var(--text-primary); margin-bottom: 0.6em;
+    }
+    .reveal h2 {
+      font-family: var(--font-heading);
+      font-size: 1.5em; font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--text-primary); margin-bottom: 0.5em;
+    }
+    .reveal h3 {
+      font-family: var(--font-sans);
+      font-size: 0.65em; font-weight: 600; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.5em;
+    }
+    .reveal p, .reveal li {
+      font-size: 0.95em; line-height: 1.65; color: var(--text-secondary);
+    }
+    .reveal strong { font-weight: 600; color: var(--text-primary); }
+
+    .reveal pre {
+      font-family: var(--font-mono); font-size: 0.7em; line-height: 1.55;
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: 8px; padding: 0.8em 1.1em; box-shadow: none;
+      width: 100%; margin: 0.6em 0;
+    }
+    .reveal code { font-family: var(--font-mono); }
+    .reveal p code, .reveal li code, .reveal td code {
+      background: #f5f5f4; border: 1px solid var(--border-subtle);
+      border-radius: 4px; padding: 0.1em 0.4em; font-size: 0.85em;
+      color: var(--green-accent);
+    }
+
+    .command-card {
+      background: #f5f5f4; border: 1px solid var(--border-subtle);
+      border-radius: 6px; padding: 0.7em 1em;
+      font-family: var(--font-mono); font-size: 0.78em;
+      color: var(--green-accent); margin: 0.5em 0;
+    }
+    .troubleshoot-card {
+      background: var(--red-bg); border: 1px solid var(--red-border);
+      border-radius: 6px; padding: 0.7em 1em; font-size: 0.82em; margin: 0.4em 0;
+    }
+    .troubleshoot-card strong { color: var(--red-accent); }
+    .info-card {
+      background: var(--blue-bg); border: 1px solid var(--blue-border);
+      border-radius: 6px; padding: 0.7em 1em; font-size: 0.85em; margin: 0.5em 0;
+    }
+    .two-col {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.8em; align-items: start;
+      text-align: left;
+    }
+    .three-col {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5em; align-items: start;
+    }
+    .step-number {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 1.6em; height: 1.6em; border-radius: 50%;
+      background: var(--green-bg); border: 1px solid var(--green-border);
+      color: var(--green-accent); font-size: 0.85em; font-weight: 500;
+      flex-shrink: 0;
+    }
+    .step-row {
+      display: flex; align-items: baseline; gap: 0.7em;
+      padding: 0.35em 0; border-bottom: 1px solid var(--border-subtle);
+    }
+    .warn-badge {
+      display: inline-block; font-size: 0.6em; font-weight: 600;
+      letter-spacing: 0.12em; padding: 0.15em 0.5em; border-radius: 3px;
+      background: #fffbeb; color: #d97706;
+      border: 1px solid #fde68a; vertical-align: middle;
+    }
+    .local-badge {
+      display: inline-block; font-size: 0.6em; font-weight: 600;
+      letter-spacing: 0.12em; padding: 0.15em 0.5em; border-radius: 3px;
+      background: var(--green-bg); color: var(--green-accent);
+      border: 1px solid var(--green-border); vertical-align: middle;
+    }
+
+    .reveal table { width: 100%; border-collapse: collapse; font-size: 0.78em; margin-top: 0.6em; }
+    .reveal table th {
+      text-align: left; font-weight: 600; color: var(--text-primary);
+      border-bottom: 2px solid var(--border-subtle); padding: 0.45em 0.7em;
+    }
+    .reveal table td {
+      padding: 0.4em 0.7em; border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .reveal .slide-number {
+      font-family: var(--font-mono); font-size: 0.7em; color: var(--text-muted);
+      background: none; bottom: 1em; left: 50%; transform: translateX(-50%); right: auto;
+    }
+    .reveal .progress span { background: var(--border-subtle); }
+
+    .read-more {
+      font-size: 0.6em !important; color: var(--text-muted) !important;
+      font-family: var(--font-mono); text-align: center;
+      margin-top: 1em !important;
+    }
+    .read-more a {
+      color: var(--text-muted) !important; border-bottom: 1px solid var(--border-subtle);
+      transition: color 0.15s;
+    }
+    .read-more a:hover { color: var(--text-secondary) !important; }
+  </style>
+</head>
+<body>
+
+<div class="reveal">
+  <div class="slides">
+
+    <!-- SLIDE 1: TITLE -->
+
+    <section>
+      <h3>SMART OBJECTS: THE SMART CLASSROOM</h3>
+      <h1 style="font-size: 2.6em; font-weight: 400;">Git Collaboration</h1>
+      <p style="font-size: 1em; color: var(--text-muted);">
+        Strategies for Student Contributions
+      </p>
+      <p style="font-size: 0.75em; color: var(--text-faint); margin-top: 2.5em;">
+        SVA MFA Interaction Design &middot; Winter 2026<br>
+        <span style="opacity: 0.6;">Branches &middot; Forks &middot; Direct Collaboration</span>
+      </p>
+    </section>
+
+    <!-- SLIDE 2: CURRENT WORKFLOW -->
+
+    <section>
+      <h3>CURRENT WORKFLOW</h3>
+      <h2>How Code Gets to the Pis Today</h2>
+      <p>The instructor controls the entire pipeline from development to deployment:</p>
+      <div style="margin-top: 1.2em;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 0.6em; flex-wrap: wrap;">
+          <div style="border: 2px solid var(--green-border); border-radius: 10px; padding: 0.8em 1.2em; background: var(--green-bg); text-align: center;">
+            <p style="font-weight: 600; color: var(--green-accent); font-size: 0.8em; margin: 0;">LOCAL MACHINE</p>
+            <p style="font-size: 0.75em; color: var(--text-muted); margin: 0.3em 0 0 0;">Edit &amp; test code</p>
+          </div>
+          <span style="font-size: 1.5em; color: var(--text-muted);">&xrarr;</span>
+          <div style="border: 2px solid var(--border-subtle); border-radius: 10px; padding: 0.8em 1.2em; background: var(--bg-card); text-align: center;">
+            <p style="font-weight: 600; color: var(--text-primary); font-size: 0.8em; margin: 0;">GIT COMMITS</p>
+            <p style="font-size: 0.75em; color: var(--text-muted); margin: 0.3em 0 0 0;"><code>git add</code>, <code>git commit</code>, <code>git push</code></p>
+          </div>
+          <span style="font-size: 1.5em; color: var(--text-muted);">&xrarr;</span>
+          <div style="border: 2px solid var(--border-subtle); border-radius: 10px; padding: 0.8em 1.2em; background: var(--bg-card); text-align: center;">
+            <p style="font-weight: 600; color: var(--text-primary); font-size: 0.8em; margin: 0;">GITHUB MAIN</p>
+            <p style="font-size: 0.75em; color: var(--text-muted); margin: 0.3em 0 0 0;">Stable, working code</p>
+          </div>
+          <span style="font-size: 1.5em; color: var(--text-muted);">&xrarr;</span>
+          <div style="border: 2px solid var(--blue-border); border-radius: 10px; padding: 0.8em 1.2em; background: var(--blue-bg); text-align: center;">
+            <p style="font-weight: 600; color: var(--blue-accent); font-size: 0.8em; margin: 0;">RASPBERRY PIS</p>
+            <p style="font-size: 0.75em; color: var(--text-muted); margin: 0.3em 0 0 0;"><code>scp</code> deploy tested code</p>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top: 1.4em;">
+        <p style="font-weight: 500; font-size: 0.9em; margin-bottom: 0.4em;">Key points:</p>
+        <ul style="margin: 0; padding-left: 1.2em;">
+          <li>Develop and test locally when possible</li>
+          <li>Commit to <code>main</code> branch &mdash; instructor controls stability</li>
+          <li>Deploy to Pis using <code>scp</code> for testing</li>
+          <li><strong>Main branch stays clean and working</strong></li>
+        </ul>
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/GIT_COLLABORATION.md" target="_blank">Full guide &rarr;</a></p>
+    </section>
+
+    <!-- SLIDE 3: STRATEGY 1 — STUDENT BRANCHES -->
+
+    <section>
+      <h3>STRATEGY 1</h3>
+      <h2>Student Branches &nbsp;<span class="local-badge">RECOMMENDED</span></h2>
+      <div class="two-col" style="margin-top: 0.6em;">
+        <div>
+          <p style="font-weight: 500; font-size: 0.9em; margin-bottom: 0.5em;">Instructor creates branches:</p>
+          <pre><code class="language-bash"># Create a branch for each student
+git checkout -b students/alice
+git push -u origin students/alice
+
+git checkout -b students/bob
+git push -u origin students/bob
+
+git checkout main  # Return to main</code></pre>
+          <p style="font-weight: 500; font-size: 0.9em; margin-top: 0.8em; margin-bottom: 0.5em;">Student workflow:</p>
+          <pre><code class="language-bash"># Clone and switch to their branch
+git clone https://github.com/you/smart-objects-cameras.git
+cd smart-objects-cameras
+git checkout students/alice
+
+# Make changes, commit, push
+git add person_detector.py
+git commit -m "Add zone detection feature"
+git push origin students/alice</code></pre>
+        </div>
+        <div>
+          <p style="font-weight: 500; font-size: 0.9em; margin-bottom: 0.5em;">Review &amp; merge:</p>
+          <pre><code class="language-bash"># Review student work
+git checkout students/alice
+git pull
+
+# If good, merge to main
+git checkout main
+git merge students/alice
+git push origin main</code></pre>
+          <div style="margin-top: 1em;">
+            <p style="font-size: 0.85em; color: var(--green-accent); font-weight: 500; margin-bottom: 0.3em;">Pros</p>
+            <ul style="margin: 0; padding-left: 1.2em; font-size: 0.82em;">
+              <li>Simple for students to learn</li>
+              <li>Easy to track individual work</li>
+              <li>Instructor controls what goes to main</li>
+              <li>Works with VS Code Remote SSH</li>
+            </ul>
+          </div>
+          <div style="margin-top: 0.6em;">
+            <p style="font-size: 0.85em; color: var(--red-accent); font-weight: 500; margin-bottom: 0.3em;">Cons</p>
+            <ul style="margin: 0; padding-left: 1.2em; font-size: 0.82em;">
+              <li>Students can see each other's work</li>
+              <li>Requires basic Git knowledge</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/GIT_COLLABORATION.md" target="_blank">Full guide &rarr;</a></p>
+    </section>
+
+    <!-- SLIDE 4: STRATEGY 2 — FORK MODEL -->
+
+    <section>
+      <h3>STRATEGY 2</h3>
+      <h2>Fork Model</h2>
+      <div class="two-col" style="margin-top: 0.6em;">
+        <div>
+          <p style="font-weight: 500; font-size: 0.9em; margin-bottom: 0.5em;">Setup:</p>
+          <div class="step-row"><span class="step-number">1</span> <span>Student clicks <strong>"Fork"</strong> on GitHub</span></div>
+          <div class="step-row"><span class="step-number">2</span> <span>Gets their own copy: <code>github.com/alice/smart-objects-cameras</code></span></div>
+          <div class="step-row" style="border-bottom: none;"><span class="step-number">3</span> <span>Works entirely on their fork</span></div>
+
+          <p style="font-weight: 500; font-size: 0.9em; margin-top: 0.8em; margin-bottom: 0.5em;">Student workflow:</p>
+          <pre><code class="language-bash"># Clone their own fork
+git clone https://github.com/alice/smart-objects-cameras.git
+
+# Make changes on their fork
+git add .
+git commit -m "My custom feature"
+git push origin main  # Pushes to THEIR fork
+
+# Submit Pull Request via GitHub UI</code></pre>
+        </div>
+        <div>
+          <p style="font-weight: 500; font-size: 0.9em; margin-bottom: 0.5em;">Review &amp; merge:</p>
+          <ul style="margin: 0; padding-left: 1.2em; font-size: 0.88em;">
+            <li>Students submit a <strong>Pull Request</strong> from their fork to your main repo</li>
+            <li>You review the changes on GitHub</li>
+            <li>Click <strong>"Merge Pull Request"</strong> if approved</li>
+          </ul>
+
+          <p style="font-weight: 500; font-size: 0.9em; margin-top: 0.8em; margin-bottom: 0.5em;">Keeping fork updated:</p>
+          <pre><code class="language-bash"># Sync with instructor's repo
+git remote add upstream https://github.com/you/smart-objects-cameras.git
+git fetch upstream
+git merge upstream/main</code></pre>
+
+          <div style="margin-top: 0.8em;">
+            <p style="font-size: 0.85em; color: var(--green-accent); font-weight: 500; margin-bottom: 0.3em;">Pros</p>
+            <ul style="margin: 0; padding-left: 1.2em; font-size: 0.82em;">
+              <li>Complete independence for students</li>
+              <li>Professional OSS workflow experience</li>
+              <li>Cannot accidentally break main repo</li>
+            </ul>
+          </div>
+          <div style="margin-top: 0.5em;">
+            <p style="font-size: 0.85em; color: var(--red-accent); font-weight: 500; margin-bottom: 0.3em;">Cons</p>
+            <ul style="margin: 0; padding-left: 1.2em; font-size: 0.82em;">
+              <li>More complex for beginners</li>
+              <li>Extra fork management overhead</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/GIT_COLLABORATION.md" target="_blank">Full guide &rarr;</a></p>
+    </section>
+
+    <!-- SLIDE 5: STRATEGY 3 — DIRECT COLLABORATION -->
+
+    <section>
+      <h3>STRATEGY 3</h3>
+      <h2>Direct Collaboration (Simple)</h2>
+      <p><strong>Best for:</strong> Quick prototyping, students working directly on Pis, minimal Git usage</p>
+      <div class="two-col" style="margin-top: 0.8em;">
+        <div>
+          <p style="font-weight: 500; font-size: 0.9em; margin-bottom: 0.5em;">Students work on Pi &mdash; no Git needed:</p>
+          <pre><code class="language-bash"># Each student makes their own copy
+cd ~/oak-projects
+cp person_detector.py person_detector_alice.py
+
+# Edit their personal copy
+nano person_detector_alice.py</code></pre>
+
+          <p style="font-weight: 500; font-size: 0.9em; margin-top: 0.8em; margin-bottom: 0.5em;">Instructor pulls work when ready:</p>
+          <pre><code class="language-bash"># Pull student work from Pi
+scp orbit:~/oak-projects/person_detector_alice.py ./students/
+
+# Commit to their branch
+git checkout -b students/alice
+git add students/person_detector_alice.py
+git commit -m "Alice: Zone detection feature"
+git push origin students/alice</code></pre>
+        </div>
+        <div>
+          <div style="margin-top: 0;">
+            <p style="font-size: 0.85em; color: var(--green-accent); font-weight: 500; margin-bottom: 0.3em;">Pros</p>
+            <ul style="margin: 0; padding-left: 1.2em; font-size: 0.88em;">
+              <li><strong>No Git knowledge required</strong> for students</li>
+              <li>Focus on coding, not version control</li>
+              <li>Works great with VS Code Remote SSH</li>
+              <li>Students experiment freely on Pi</li>
+            </ul>
+          </div>
+          <div style="margin-top: 1em;">
+            <p style="font-size: 0.85em; color: var(--red-accent); font-weight: 500; margin-bottom: 0.3em;">Cons</p>
+            <ul style="margin: 0; padding-left: 1.2em; font-size: 0.88em;">
+              <li>Manual work for instructor to commit</li>
+              <li>Students don't learn Git</li>
+              <li>No version history during development</li>
+            </ul>
+          </div>
+          <div class="info-card" style="margin-top: 1em;">
+            <strong>Best for early weeks</strong> when students are focused on learning camera/CV concepts rather than version control.
+          </div>
+        </div>
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/GIT_COLLABORATION.md" target="_blank">Full guide &rarr;</a></p>
+    </section>
+
+    <!-- SLIDE 6: QUICK DECISION GUIDE -->
+
+    <section>
+      <h3>DECISION GUIDE</h3>
+      <h2>Which Strategy Should You Choose?</h2>
+      <div class="three-col" style="margin-top: 1em;">
+        <div style="border: 2px solid var(--green-border); border-radius: 10px; padding: 1em; background: var(--green-bg);">
+          <p style="font-weight: 600; color: var(--green-accent); font-size: 0.85em; margin: 0 0 0.5em 0;">Student Branches &nbsp;<span class="local-badge">RECOMMENDED</span></p>
+          <p style="font-size: 0.8em; font-weight: 500; color: var(--text-primary); margin-bottom: 0.4em;">Choose when:</p>
+          <ul style="margin: 0; padding-left: 1.1em; font-size: 0.78em;">
+            <li>Students understand basic Git</li>
+            <li>You want to review code before merging</li>
+            <li>Working on shared template collaboratively</li>
+          </ul>
+          <p style="font-size: 0.72em; color: var(--text-muted); margin-top: 0.6em; margin-bottom: 0;">Skill level: <strong style="color: var(--green-accent);">Basic Git</strong></p>
+        </div>
+        <div style="border: 2px solid var(--blue-border); border-radius: 10px; padding: 1em; background: var(--blue-bg);">
+          <p style="font-weight: 600; color: var(--blue-accent); font-size: 0.85em; margin: 0 0 0.5em 0;">Fork Model</p>
+          <p style="font-size: 0.8em; font-weight: 500; color: var(--text-primary); margin-bottom: 0.4em;">Choose when:</p>
+          <ul style="margin: 0; padding-left: 1.1em; font-size: 0.78em;">
+            <li>Teaching professional workflow</li>
+            <li>Students building independent projects</li>
+            <li>Want complete isolation between students</li>
+          </ul>
+          <p style="font-size: 0.72em; color: var(--text-muted); margin-top: 0.6em; margin-bottom: 0;">Skill level: <strong style="color: var(--blue-accent);">Professional</strong></p>
+        </div>
+        <div style="border: 2px solid var(--border-subtle); border-radius: 10px; padding: 1em; background: var(--bg-card);">
+          <p style="font-weight: 600; color: var(--text-primary); font-size: 0.85em; margin: 0 0 0.5em 0;">Direct Collaboration</p>
+          <p style="font-size: 0.8em; font-weight: 500; color: var(--text-primary); margin-bottom: 0.4em;">Choose when:</p>
+          <ul style="margin: 0; padding-left: 1.1em; font-size: 0.78em;">
+            <li>Students are new to Git</li>
+            <li>Focus is on camera/CV learning</li>
+            <li>Quick iteration is priority</li>
+            <li>Can teach Git later</li>
+          </ul>
+          <p style="font-size: 0.72em; color: var(--text-muted); margin-top: 0.6em; margin-bottom: 0;">Skill level: <strong style="color: var(--text-secondary);">New to Git</strong></p>
+        </div>
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/GIT_COLLABORATION.md" target="_blank">Full guide &rarr;</a></p>
+    </section>
+
+    <!-- SLIDE 7: WHAT NOT TO COMMIT -->
+
+    <section>
+      <h3>SECURITY</h3>
+      <h2>What NOT to Commit &nbsp;<span class="warn-badge">IMPORTANT</span></h2>
+      <div class="two-col" style="margin-top: 0.8em;">
+        <div>
+          <p style="font-weight: 500; font-size: 0.9em; margin-bottom: 0.5em;">Required <code>.gitignore</code>:</p>
+          <pre><code class="language-bash"># Secrets
+.env
+*.env
+
+# Generated files
+camera_status.json
+latest_frame.jpg
+*.log
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# OS
+.DS_Store</code></pre>
+        </div>
+        <div>
+          <div class="troubleshoot-card">
+            <strong>Never commit these files:</strong><br>
+            <ul style="margin: 0.4em 0 0 0; padding-left: 1.2em; font-size: 0.92em;">
+              <li><strong>Discord bot tokens</strong> &mdash; anyone can impersonate your bot</li>
+              <li><strong>Webhook URLs</strong> &mdash; anyone can post to your channels</li>
+              <li><strong>SSH keys</strong> &mdash; full access to your servers</li>
+              <li><strong>.env files</strong> &mdash; contain all of the above</li>
+            </ul>
+          </div>
+          <div class="troubleshoot-card" style="margin-top: 0.6em;">
+            <strong>If you accidentally commit a secret:</strong><br>
+            <span>The token is compromised even if you delete it in the next commit. You must <strong>regenerate the token immediately</strong> on Discord/GitHub.</span>
+          </div>
+          <div class="info-card" style="margin-top: 0.6em;">
+            <strong>Rule of thumb:</strong> If it contains a password, token, or key &mdash; it goes in <code>.env</code> on the Pi, never in the repo.
+          </div>
+        </div>
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/GIT_COLLABORATION.md" target="_blank">Full guide &rarr;</a></p>
+    </section>
+
+    <!-- SLIDE 8: HYBRID APPROACH -->
+
+    <section>
+      <h3>RECOMMENDED</h3>
+      <h2>Hybrid Approach for Classrooms</h2>
+      <p>Introduce Git progressively as students build confidence with the tools:</p>
+      <div style="margin-top: 0.8em; max-width: 850px;">
+        <div class="step-row">
+          <span class="step-number">1</span>
+          <span><strong>Week 1&ndash;4: Direct Collaboration</strong> &nbsp;<span style="color: var(--text-muted); font-size: 0.85em;">(no Git for students)</span></span>
+        </div>
+        <div style="margin-left: 2.3em; padding: 0.3em 0 0.5em 0; font-size: 0.88em; color: var(--text-secondary);">
+          Students work on Pis, make personal copies of files. Focus on learning camera/detection/Discord. Instructor commits interesting work to student branches.
+        </div>
+        <div class="step-row">
+          <span class="step-number">2</span>
+          <span><strong>Week 5+: Introduce Branching</strong> &nbsp;<span style="color: var(--text-muted); font-size: 0.85em;">(basic Git commands)</span></span>
+        </div>
+        <div style="margin-left: 2.3em; padding: 0.3em 0 0.5em 0; font-size: 0.88em; color: var(--text-secondary);">
+          Students learn <code>clone</code>, <code>checkout</code>, <code>commit</code>, <code>push</code>. Work on their own branches. Submit work via push.
+        </div>
+        <div class="step-row" style="border-bottom: none;">
+          <span class="step-number">3</span>
+          <span><strong>Advanced Students: Fork Model</strong> &nbsp;<span style="color: var(--text-muted); font-size: 0.85em;">(for final projects)</span></span>
+        </div>
+        <div style="margin-left: 2.3em; padding: 0.3em 0 0.5em 0; font-size: 0.88em; color: var(--text-secondary);">
+          Independent projects with full GitHub PR workflow. Real open-source experience.
+        </div>
+      </div>
+      <div class="info-card" style="margin-top: 1em;">
+        <strong>Key teaching points:</strong>
+        <span style="font-size: 0.92em;">
+          Main branch = stable template &nbsp;&bull;&nbsp;
+          Your branch = your experiments &nbsp;&bull;&nbsp;
+          Commits = save points &nbsp;&bull;&nbsp;
+          Push = share work &nbsp;&bull;&nbsp;
+          Pull = get latest code
+        </span>
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/GIT_COLLABORATION.md" target="_blank">Full guide &rarr;</a></p>
+    </section>
+
+  </div><!-- /.slides -->
+</div><!-- /.reveal -->
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.min.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: true,
+    plugins: [RevealHighlight],
+    width: 1280,
+    height: 720,
+    margin: 0.1,
+    transition: 'none',
+    backgroundTransition: 'none',
+    center: false,
+  });
+</script>
+</body>
+</html>

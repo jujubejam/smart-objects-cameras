@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slide Template — Smart Objects</title>
+
+  <!-- Reveal.js 5.x from CDN (no npm install needed) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.min.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/github.min.css">
+
+  <!-- Google Fonts: Instrument Serif + Inter + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /*
+     * Smart Objects — Light theme
+     * Matches landing page aesthetic: warm off-white, serif headings
+     * Swap content below; keep this <style> block as-is.
+     */
+
+    /* -- Design tokens -------------------------------- */
+    :root {
+      --font-heading: "Instrument Serif", Georgia, "Times New Roman", serif;
+      --font-sans: "Inter", "Helvetica Neue", -apple-system, system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-muted: #a8a29e;
+      --text-faint: #c8c4bf;
+      --bg-page: #fafaf9;
+      --bg-card: #ffffff;
+      --border-subtle: #e7e5e4;
+      --green-accent: #16a34a;
+      --green-bg: #f0fdf4;
+      --green-border: #bbf7d0;
+      --red-accent: #dc2626;
+      --red-bg: #fef2f2;
+      --red-border: #fecaca;
+      --blue-accent: #2563eb;
+      --blue-bg: #eff6ff;
+      --blue-border: #bfdbfe;
+    }
+
+    /* -- Global background ---------------------------- */
+    .reveal, .reveal .slide-background {
+      background: var(--bg-page);
+    }
+
+    /* -- Typography ----------------------------------- */
+    .reveal {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 22px;
+      color: var(--text-secondary);
+    }
+
+    .reveal h1 {
+      font-family: var(--font-heading);
+      font-size: 2.4em;
+      font-weight: 400;
+      font-style: italic;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 0.5em;
+    }
+
+    .reveal h2 {
+      font-family: var(--font-heading);
+      font-size: 1.6em;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      margin-bottom: 0.5em;
+    }
+
+    .reveal h3 {
+      font-family: var(--font-sans);
+      font-size: 0.65em;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1.5em;
+    }
+
+    .reveal p, .reveal li {
+      font-size: 0.95em;
+      line-height: 1.65;
+      color: var(--text-secondary);
+    }
+
+    .reveal strong {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .reveal a {
+      color: var(--blue-accent);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    /* -- Code blocks ---------------------------------- */
+    .reveal pre {
+      font-family: var(--font-mono);
+      font-size: 0.75em;
+      line-height: 1.55;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 1em 1.25em;
+      box-shadow: none;
+      width: 100%;
+      margin: 0.75em 0;
+    }
+
+    .reveal code {
+      font-family: var(--font-mono);
+    }
+
+    .reveal p code, .reveal li code {
+      background: #f5f5f4;
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 0.1em 0.4em;
+      font-size: 0.85em;
+      color: var(--green-accent);
+    }
+
+    /* -- Section label (small uppercase) -------------- */
+    .section-label {
+      font-size: 0.65em !important;
+      letter-spacing: 0.3em !important;
+      color: var(--text-muted) !important;
+      text-transform: uppercase;
+      margin-bottom: 0.5em !important;
+    }
+
+    /* -- Command card (terminal-style) ---------------- */
+    .command-card {
+      background: #f5f5f4;
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 0.8em 1.1em;
+      font-family: var(--font-mono);
+      font-size: 0.8em;
+      color: var(--green-accent);
+      margin: 0.5em 0;
+    }
+
+    /* -- Troubleshoot card ---------------------------- */
+    .troubleshoot-card {
+      background: var(--red-bg);
+      border: 1px solid var(--red-border);
+      border-radius: 6px;
+      padding: 0.8em 1.1em;
+      font-size: 0.85em;
+      margin: 0.5em 0;
+    }
+
+    .troubleshoot-card strong {
+      color: var(--red-accent);
+    }
+
+    /* -- Info card (blue tint) ------------------------ */
+    .info-card {
+      background: var(--blue-bg);
+      border: 1px solid var(--blue-border);
+      border-radius: 6px;
+      padding: 0.8em 1.1em;
+      font-size: 0.85em;
+      margin: 0.5em 0;
+    }
+
+    /* -- Two-column layout ---------------------------- */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2em;
+      align-items: start;
+    }
+
+    /* -- Checklist ------------------------------------ */
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .checklist li {
+      position: relative;
+      padding: 0.4em 0 0.4em 1.5em;
+      border-bottom: 1px solid var(--border-subtle);
+      list-style: none;
+    }
+
+    .checklist li::before {
+      content: "\2713";
+      color: var(--green-accent);
+      font-size: 0.85em;
+      position: absolute;
+      left: 0;
+    }
+
+    /* -- Tables --------------------------------------- */
+    .reveal table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8em;
+      margin-top: 0.75em;
+    }
+
+    .reveal table th {
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-primary);
+      border-bottom: 2px solid var(--border-subtle);
+      padding: 0.5em 0.75em;
+      font-size: 0.9em;
+    }
+
+    .reveal table td {
+      padding: 0.45em 0.75em;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .reveal table td code {
+      color: var(--green-accent);
+    }
+
+    /* -- Slide number --------------------------------- */
+    .reveal .slide-number {
+      font-family: var(--font-mono);
+      font-size: 0.7em;
+      color: var(--text-muted);
+      background: none;
+      left: 50%;
+      transform: translateX(-50%);
+      right: auto;
+      bottom: 1em;
+    }
+
+    /* -- Progress bar --------------------------------- */
+    .reveal .progress span {
+      background: var(--border-subtle);
+    }
+  </style>
+</head>
+<body>
+
+<div class="reveal">
+  <div class="slides">
+
+    <!-- ============================================
+         SLIDE 1 — Title slide
+         ============================================ -->
+    <section>
+      <h3>SMART OBJECTS</h3>
+      <h1>Your Presentation Title</h1>
+      <p>Subtitle or one-line description goes here.</p>
+      <p style="font-size: 0.75em; color: var(--text-muted); margin-top: 2em;">
+        SVA MFA Interaction Design · Winter 2026
+      </p>
+    </section>
+
+    <!-- ============================================
+         SLIDE 2 — Checklist pattern
+         ============================================ -->
+    <section>
+      <h3>GETTING STARTED</h3>
+      <h2>Checklist</h2>
+      <ul class="checklist">
+        <li>First item to check off</li>
+        <li>Second item to check off</li>
+        <li>Third item to check off</li>
+        <li>Fourth item to check off</li>
+      </ul>
+    </section>
+
+    <!-- ============================================
+         SLIDE 3 — Two-column layout
+         ============================================ -->
+    <section>
+      <h3>COMPARISON</h3>
+      <h2>Two-Column Layout</h2>
+      <div class="two-col">
+        <div>
+          <p><strong>Left Column</strong></p>
+          <p>Content for the left side. Great for before/after, local vs remote, do vs don't.</p>
+        </div>
+        <div>
+          <p><strong>Right Column</strong></p>
+          <p>Content for the right side. Pair with code blocks, lists, or diagrams.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 4 — Command card pattern
+         ============================================ -->
+    <section>
+      <h3>TERMINAL</h3>
+      <h2>Command Card</h2>
+      <p>Run this on the Raspberry Pi:</p>
+      <div class="command-card">
+        $ ssh orbit<br>
+        $ activate-oak<br>
+        $ cd ~/oak-projects
+      </div>
+      <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 1em;">
+        Tip: Look at your prompt to confirm you're on the Pi.
+      </p>
+    </section>
+
+    <!-- ============================================
+         SLIDE 5 — Code block with syntax highlighting
+         ============================================ -->
+    <section>
+      <h3>CODE</h3>
+      <h2>Syntax-Highlighted Block</h2>
+      <pre><code class="language-bash"># Copy files to the Pi
+scp fatigue_detector.py orbit:~/oak-projects/
+scp -r utils orbit:~/oak-projects/
+
+# Run the detector
+python3 fatigue_detector.py --display</code></pre>
+    </section>
+
+    <!-- ============================================
+         SLIDE 6 — Table / reference grid
+         ============================================ -->
+    <section>
+      <h3>REFERENCE</h3>
+      <h2>Flag Reference</h2>
+      <table>
+        <thead>
+          <tr><th>Flag</th><th>What It Does</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>--display</code></td><td>Show live video window</td></tr>
+          <tr><td><code>--log</code></td><td>Save events to log file</td></tr>
+          <tr><td><code>--discord</code></td><td>Send class channel notifications</td></tr>
+          <tr><td><code>--threshold</code></td><td>Set detection sensitivity (0.0–1.0)</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ============================================
+         SLIDE 7 — Troubleshooting card
+         ============================================ -->
+    <section>
+      <h3>TROUBLESHOOTING</h3>
+      <h2>Common Errors</h2>
+      <div class="troubleshoot-card">
+        <strong>"No module named 'depthai'"</strong>
+        <p>You forgot to activate the virtual environment. Run <code>activate-oak</code> first.</p>
+      </div>
+      <div class="troubleshoot-card">
+        <strong>"No such file or directory"</strong>
+        <p>Check your path for extra spaces. Paths are one continuous string.</p>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 8 — Info card
+         ============================================ -->
+    <section>
+      <h3>NOTE</h3>
+      <h2>Info Card Pattern</h2>
+      <div class="info-card">
+        <strong>Tip:</strong> Use this card style for helpful context, tips, or non-error callouts.
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 9 — Closing slide
+         ============================================ -->
+    <section>
+      <h3>SMART OBJECTS</h3>
+      <h1>Thank You</h1>
+      <p>Links, resources, or next steps go here.</p>
+    </section>
+
+  </div><!-- /.slides -->
+</div><!-- /.reveal -->
+
+<!-- Reveal.js + plugins from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.min.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: true,
+    plugins: [RevealHighlight],
+    width: 1280,
+    height: 720,
+    margin: 0.1,
+    transition: 'none',
+    backgroundTransition: 'none',
+    center: false,
+  });
+</script>
+</body>
+</html>

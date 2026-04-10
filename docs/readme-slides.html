@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>README Overview — Smart Objects</title>
+
+  <!-- Reveal.js 5.x from CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.min.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/github.min.css">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --font-heading: "Instrument Serif", Georgia, "Times New Roman", serif;
+      --font-sans: "Inter", "Helvetica Neue", -apple-system, system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-muted: #a8a29e;
+      --text-faint: #c8c4bf;
+      --bg-page: #fafaf9;
+      --bg-card: #ffffff;
+      --border-subtle: #e7e5e4;
+      --green-accent: #16a34a;
+      --green-bg: #f0fdf4;
+      --green-border: #bbf7d0;
+      --red-accent: #dc2626;
+      --red-bg: #fef2f2;
+      --red-border: #fecaca;
+      --blue-accent: #2563eb;
+      --blue-bg: #eff6ff;
+      --blue-border: #bfdbfe;
+    }
+
+    .reveal, .reveal .slide-background { background: var(--bg-page); }
+
+    .reveal {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 22px;
+      color: var(--text-secondary);
+    }
+
+    .reveal h1 {
+      font-family: var(--font-heading);
+      font-size: 2.4em;
+      font-weight: 400;
+      font-style: italic;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 0.5em;
+    }
+
+    .reveal h2 {
+      font-family: var(--font-heading);
+      font-size: 1.6em;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      margin-bottom: 0.5em;
+    }
+
+    .reveal h3 {
+      font-family: var(--font-sans);
+      font-size: 0.65em;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1.5em;
+    }
+
+    .reveal p, .reveal li {
+      font-size: 0.95em;
+      line-height: 1.65;
+      color: var(--text-secondary);
+    }
+
+    .reveal strong { font-weight: 600; color: var(--text-primary); }
+
+    .reveal a {
+      color: var(--blue-accent);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .reveal pre {
+      font-family: var(--font-mono);
+      font-size: 0.75em;
+      line-height: 1.55;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 1em 1.25em;
+      box-shadow: none;
+      width: 100%;
+      margin: 0.75em 0;
+    }
+
+    .reveal code { font-family: var(--font-mono); }
+
+    .reveal p code, .reveal li code {
+      background: #f5f5f4;
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 0.1em 0.4em;
+      font-size: 0.85em;
+      color: var(--green-accent);
+    }
+
+    .command-card {
+      background: #f5f5f4;
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 0.8em 1.1em;
+      font-family: var(--font-mono);
+      font-size: 0.8em;
+      color: var(--green-accent);
+      margin: 0.5em 0;
+    }
+
+    .info-card {
+      background: var(--blue-bg);
+      border: 1px solid var(--blue-border);
+      border-radius: 6px;
+      padding: 0.8em 1.1em;
+      font-size: 0.85em;
+      margin: 0.5em 0;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2em;
+      align-items: start;
+    }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .checklist li {
+      position: relative;
+      padding: 0.4em 0 0.4em 1.5em;
+      border-bottom: 1px solid var(--border-subtle);
+      list-style: none;
+    }
+
+    .checklist li::before {
+      content: "\2713";
+      color: var(--green-accent);
+      font-size: 0.85em;
+      position: absolute;
+      left: 0;
+    }
+
+    .reveal table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8em;
+      margin-top: 0.75em;
+    }
+
+    .reveal table th {
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-primary);
+      border-bottom: 2px solid var(--border-subtle);
+      padding: 0.5em 0.75em;
+      font-size: 0.9em;
+    }
+
+    .reveal table td {
+      padding: 0.45em 0.75em;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .reveal table td code { color: var(--green-accent); }
+
+    .reveal .slide-number {
+      font-family: var(--font-mono);
+      font-size: 0.7em;
+      color: var(--text-muted);
+      background: none;
+      left: 50%;
+      transform: translateX(-50%);
+      right: auto;
+      bottom: 1em;
+    }
+
+    .reveal .progress span { background: var(--border-subtle); }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5em 1.5em;
+      font-size: 0.9em;
+    }
+
+    .feature-grid span {
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+    }
+  </style>
+</head>
+<body>
+
+<div class="reveal">
+  <div class="slides">
+
+    <!-- SLIDE 1 — Title -->
+    <section>
+      <h3>SMART OBJECTS</h3>
+      <h1>OAK-D + Raspberry Pi 5</h1>
+      <p>Template for Discord bots with computer vision</p>
+      <p style="font-size: 0.75em; color: var(--text-muted); margin-top: 2em;">
+        SVA MFA Interaction Design · Winter 2026
+      </p>
+    </section>
+
+    <!-- SLIDE 2 — What's Included -->
+    <section>
+      <h3>OVERVIEW</h3>
+      <h2>What's Included</h2>
+      <div class="feature-grid">
+        <span>👁️ Person detection (YOLO)</span>
+        <span>😴 Fatigue detection (EAR)</span>
+        <span>👀 Gaze estimation</span>
+        <span>📝 Whiteboard OCR</span>
+        <span>🤖 Discord bot commands</span>
+        <span>📢 Webhook notifications</span>
+        <span>🎯 Temporal smoothing</span>
+        <span>🖼️ Live screenshots</span>
+      </div>
+      <div class="info-card" style="margin-top: 1.5em;">
+        <strong>Pre-configured:</strong> Your instructor set up the Pis — just connect and start!
+      </div>
+    </section>
+
+    <!-- SLIDE 3 — Hardware -->
+    <section>
+      <h3>HARDWARE</h3>
+      <h2>Three Camera Stations</h2>
+      <table>
+        <thead>
+          <tr><th>Camera</th><th>Hostname</th><th>RAM</th><th>Access</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Orbit</strong></td><td><code>orbit</code></td><td>16GB</td><td>SSH + VNC</td></tr>
+          <tr><td><strong>Gravity</strong></td><td><code>gravity</code></td><td>16GB</td><td>SSH + VNC</td></tr>
+          <tr><td><strong>Horizon</strong></td><td><code>horizon</code></td><td>16GB</td><td>SSH + VNC</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 1em;">
+        VNC: one desktop user at a time · SSH: multiple users OK
+      </p>
+    </section>
+
+    <!-- SLIDE 4 — Key Concept -->
+    <section>
+      <h3>IMPORTANT</h3>
+      <h2>Repo Stays on Your Laptop</h2>
+      <div class="two-col">
+        <div>
+          <p><strong>Your Laptop</strong></p>
+          <ul class="checklist">
+            <li>Clone the GitHub repo</li>
+            <li>Edit code locally</li>
+            <li>Copy files via <code>scp</code></li>
+          </ul>
+        </div>
+        <div>
+          <p><strong>Raspberry Pi</strong></p>
+          <ul class="checklist">
+            <li>Receives Python files</li>
+            <li>Has <code>.env</code> with secrets</li>
+            <li>Runs the detectors</li>
+          </ul>
+        </div>
+      </div>
+      <p style="font-size: 0.8em; margin-top: 1em;">
+        See <a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/WORKFLOW.md">WORKFLOW.md</a> for details.
+      </p>
+    </section>
+
+    <!-- SLIDE 5 — Connecting -->
+    <section>
+      <h3>CONNECTING</h3>
+      <h2>Three Ways to Access</h2>
+      <table>
+        <thead>
+          <tr><th>Method</th><th>Best For</th><th>Command</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>SSH</strong></td><td>Terminal access</td><td><code>ssh orbit</code></td></tr>
+          <tr><td><strong>VNC</strong></td><td>Desktop GUI</td><td>RealVNC Viewer → <code>orbit</code></td></tr>
+          <tr><td><strong>VS Code</strong></td><td>Full dev environment</td><td>Remote-SSH extension</td></tr>
+        </tbody>
+      </table>
+      <div class="info-card" style="margin-top: 1em;">
+        <strong>Recommended:</strong> VS Code Remote-SSH gives you the best editing experience.
+      </div>
+    </section>
+
+    <!-- SLIDE 6 — Running Detectors -->
+    <section>
+      <h3>RUNNING CODE</h3>
+      <h2>Activate Environment First</h2>
+      <div class="command-card">
+        $ ssh orbit<br>
+        $ activate-oak<br>
+        $ cd ~/oak-projects
+      </div>
+      <p>Then run any detector:</p>
+      <pre><code class="language-bash"># Person detection
+python3 person_detector.py --display
+
+# Fatigue detection with DM notifications
+python3 fatigue_detector.py --dm
+
+# Gaze estimation
+python3 gaze_detector.py --display --log</code></pre>
+    </section>
+
+    <!-- SLIDE 7 — Flags -->
+    <section>
+      <h3>OPTIONS</h3>
+      <h2>Common Flags</h2>
+      <table>
+        <thead>
+          <tr><th>Flag</th><th>What It Does</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>--display</code></td><td>Show live video window (VNC/X11)</td></tr>
+          <tr><td><code>--log</code></td><td>Save events to timestamped log file</td></tr>
+          <tr><td><code>--discord</code></td><td>Send notifications to class channel</td></tr>
+          <tr><td><code>--dm</code></td><td>Send personal DM notifications</td></tr>
+          <tr><td><code>--threshold 0.7</code></td><td>Set detection sensitivity (0.0–1.0)</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 1em;">
+        Combine flags: <code>python3 fatigue_detector.py --display --log --dm</code>
+      </p>
+    </section>
+
+    <!-- SLIDE 8 — File Structure -->
+    <section>
+      <h3>PROJECT</h3>
+      <h2>File Structure on Pi</h2>
+      <pre style="font-size: 0.65em;"><code>/opt/oak-shared/
+└── venv/                    # Shared Python environment
+
+~/oak-projects/
+├── person_detector.py       # Person detection (YOLO)
+├── fatigue_detector.py      # Fatigue detection (EAR)
+├── gaze_detector.py         # Gaze estimation
+├── whiteboard_reader.py     # OCR text detection
+├── discord_bot.py           # Bot for commands
+├── utils/                   # Helper modules
+├── depthai_models/          # Model YAML configs
+├── .env                     # Your Discord tokens
+└── *.log                    # Detection logs</code></pre>
+    </section>
+
+    <!-- SLIDE 9 — Quick Commands -->
+    <section>
+      <h3>REFERENCE</h3>
+      <h2>Quick Commands</h2>
+      <pre><code class="language-bash"># Activate environment
+activate-oak
+
+# Check if camera is connected
+python3 -c "import depthai as dai; \
+  print(dai.Device.getAllAvailableDevices())"
+
+# View logs
+tail -f ~/oak-projects/*.log
+
+# Stop a running script
+Ctrl+C</code></pre>
+    </section>
+
+    <!-- SLIDE 10 — VS Code Setup -->
+    <section>
+      <h3>VS CODE</h3>
+      <h2>Remote SSH Setup</h2>
+      <ol style="font-size: 0.85em;">
+        <li>Install VS Code + "Remote - SSH" extension</li>
+        <li><strong>macOS:</strong> Grant Local Network permission in System Settings</li>
+        <li><code>Ctrl+Shift+P</code> → "Remote-SSH: Connect to Host"</li>
+        <li>Select <code>orbit</code> (or <code>gravity</code>, <code>horizon</code>)</li>
+        <li>Open folder: <code>/home/[username]/oak-projects</code></li>
+        <li>Select Python interpreter: <code>/opt/oak-shared/venv/bin/python</code></li>
+      </ol>
+    </section>
+
+    <!-- SLIDE 11 — Discord -->
+    <section>
+      <h3>DISCORD</h3>
+      <h2>Two Integration Options</h2>
+      <div class="two-col">
+        <div>
+          <p><strong>Webhooks (Simple)</strong></p>
+          <p style="font-size: 0.85em;">One-way notifications. Run with <code>--discord</code> flag.</p>
+          <p style="font-size: 0.8em; color: var(--text-muted);">
+            → <a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/discord-integration.md">discord-integration.md</a>
+          </p>
+        </div>
+        <div>
+          <p><strong>Bot (Advanced)</strong></p>
+          <p style="font-size: 0.85em;">Two-way commands: <code>!status</code>, <code>!screenshot</code>, etc.</p>
+          <p style="font-size: 0.8em; color: var(--text-muted);">
+            → <a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/DISCORD_BOT_PLAN.md">DISCORD_BOT_PLAN.md</a>
+          </p>
+        </div>
+      </div>
+      <div class="info-card" style="margin-top: 1.5em;">
+        <strong>Camera bots already configured!</strong> OrbitBot, GravityBot, HorizonBot are ready to use.
+      </div>
+    </section>
+
+    <!-- SLIDE 12 — Next Steps -->
+    <section>
+      <h3>EXTEND</h3>
+      <h2>Next Steps</h2>
+      <ul style="font-size: 0.9em;">
+        <li><strong>Different models</strong> — Browse <a href="https://models.luxonis.com">models.luxonis.com</a></li>
+        <li><strong>Depth features</strong> — Use the OAK-D's stereo cameras</li>
+        <li><strong>Multi-camera</strong> — Coordinate all three Pis</li>
+        <li><strong>Cross-detector fusion</strong> — Combine fatigue + gaze + person count</li>
+      </ul>
+      <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 1em;">
+        See <a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/NEXT_IDEAS.md">NEXT_IDEAS.md</a> for detailed project ideas.
+      </p>
+    </section>
+
+    <!-- SLIDE 13 — Resources -->
+    <section>
+      <h3>RESOURCES</h3>
+      <h2>Learn More</h2>
+      <table style="font-size: 0.85em;">
+        <tbody>
+          <tr><td><strong>Quick Start</strong></td><td><a href="student-quickstart-slides.html">Student Quickstart Slides</a></td></tr>
+          <tr><td><strong>Commands</strong></td><td><a href="cheatsheet-slides.html">Cheatsheet Slides</a></td></tr>
+          <tr><td><strong>Versions</strong></td><td><a href="working-versions-slides.html">Working Versions</a></td></tr>
+          <tr><td><strong>DepthAI Docs</strong></td><td><a href="https://docs.luxonis.com/software-v3/depthai/">docs.luxonis.com</a></td></tr>
+          <tr><td><strong>GitHub Repo</strong></td><td><a href="https://github.com/kandizzy/smart-objects-cameras">kandizzy/smart-objects-cameras</a></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- SLIDE 14 — Closing -->
+    <section>
+      <h3>SMART OBJECTS</h3>
+      <h1>Start Building!</h1>
+      <p>Clone the repo, connect to a Pi, and run your first detector.</p>
+      <div class="command-card" style="margin-top: 1.5em;">
+        $ ssh orbit && activate-oak && python3 person_detector.py --display
+      </div>
+    </section>
+
+  </div><!-- /.slides -->
+</div><!-- /.reveal -->
+
+<!-- Reveal.js + plugins from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.min.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: true,
+    plugins: [RevealHighlight],
+    width: 1280,
+    height: 720,
+    margin: 0.1,
+    transition: 'none',
+    backgroundTransition: 'none',
+    center: false,
+  });
+</script>
+</body>
+</html>

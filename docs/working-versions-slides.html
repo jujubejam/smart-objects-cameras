@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Working Versions — Smart Objects Cameras</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.min.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/github.min.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --font-heading: "Instrument Serif", Georgia, "Times New Roman", serif;
+      --font-sans: "Inter", "Helvetica Neue", -apple-system, system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-muted: #a8a29e;
+      --text-faint: #c8c4bf;
+      --bg-page: #fafaf9;
+      --bg-card: #ffffff;
+      --border-subtle: #e7e5e4;
+      --green-accent: #16a34a;
+      --green-bg: #f0fdf4;
+      --green-border: #bbf7d0;
+      --red-accent: #dc2626;
+      --red-bg: #fef2f2;
+      --red-border: #fecaca;
+      --blue-accent: #2563eb;
+      --blue-bg: #eff6ff;
+      --blue-border: #bfdbfe;
+    }
+
+    .reveal, .reveal .slide-background { background: var(--bg-page); }
+
+    .reveal {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 22px;
+      color: var(--text-secondary);
+      text-align: left;
+    }
+    .reveal .slides section { text-align: left; }
+
+    .reveal h1 {
+      font-family: var(--font-heading);
+      font-size: 2.2em; font-weight: 400; font-style: italic;
+      letter-spacing: -0.02em;
+      color: var(--text-primary); margin-bottom: 0.6em;
+    }
+    .reveal h2 {
+      font-family: var(--font-heading);
+      font-size: 1.5em; font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--text-primary); margin-bottom: 0.5em;
+    }
+    .reveal h3 {
+      font-family: var(--font-sans);
+      font-size: 0.65em; font-weight: 600; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.5em;
+    }
+    .reveal p, .reveal li {
+      font-size: 0.95em; line-height: 1.65; color: var(--text-secondary);
+    }
+    .reveal strong { font-weight: 600; color: var(--text-primary); }
+
+    .reveal pre {
+      font-family: var(--font-mono); font-size: 0.7em; line-height: 1.55;
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: 8px; padding: 0.8em 1.1em; box-shadow: none;
+      width: 100%; margin: 0.6em 0;
+    }
+    .reveal code { font-family: var(--font-mono); }
+    .reveal p code, .reveal li code, .reveal td code {
+      background: #f5f5f4; border: 1px solid var(--border-subtle);
+      border-radius: 4px; padding: 0.1em 0.4em; font-size: 0.85em;
+      color: var(--green-accent);
+    }
+
+    .command-card {
+      background: #f5f5f4; border: 1px solid var(--border-subtle);
+      border-radius: 6px; padding: 0.7em 1em;
+      font-family: var(--font-mono); font-size: 0.78em;
+      color: var(--green-accent); margin: 0.5em 0;
+    }
+    .troubleshoot-card {
+      background: var(--red-bg); border: 1px solid var(--red-border);
+      border-radius: 6px; padding: 0.7em 1em; font-size: 0.82em; margin: 0.4em 0;
+    }
+    .troubleshoot-card strong { color: var(--red-accent); }
+    .info-card {
+      background: var(--blue-bg); border: 1px solid var(--blue-border);
+      border-radius: 6px; padding: 0.7em 1em; font-size: 0.85em; margin: 0.5em 0;
+    }
+    .two-col {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.8em; align-items: start;
+      text-align: left;
+    }
+    .checklist { list-style: none; padding: 0; margin: 0; }
+    .checklist li {
+      position: relative; padding: 0.4em 0 0.4em 1.5em;
+      border-bottom: 1px solid var(--border-subtle);
+      list-style: none;
+    }
+    .checklist li::before {
+      content: "\2713"; color: var(--green-accent); font-size: 0.85em;
+      position: absolute; left: 0;
+    }
+
+    .reveal table { width: 100%; border-collapse: collapse; font-size: 0.78em; margin-top: 0.6em; }
+    .reveal table th {
+      text-align: left; font-weight: 600; color: var(--text-primary);
+      border-bottom: 2px solid var(--border-subtle); padding: 0.45em 0.7em;
+    }
+    .reveal table td {
+      padding: 0.4em 0.7em; border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .reveal .slide-number {
+      font-family: var(--font-mono); font-size: 0.7em; color: var(--text-muted);
+      background: none; bottom: 1em; left: 50%; transform: translateX(-50%); right: auto;
+    }
+    .reveal .progress span { background: var(--border-subtle); }
+
+    .read-more {
+      font-size: 0.6em !important; color: var(--text-muted) !important;
+      font-family: var(--font-mono); text-align: center;
+      margin-top: 1em !important;
+    }
+    .read-more a {
+      color: var(--text-muted) !important; border-bottom: 1px solid var(--border-subtle);
+      transition: color 0.15s;
+    }
+    .read-more a:hover { color: var(--text-secondary) !important; }
+  </style>
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 1 — Title                                              -->
+  <!-- ============================================================ -->
+  <section>
+    <h3>SMART OBJECTS CAMERAS</h3>
+    <h1>Working Package Versions</h1>
+    <p style="font-size: 1.1em; color: var(--text-secondary); margin-top: 0.4em;">
+      OAK-D Camera Setup &mdash; Raspberry Pi 5
+    </p>
+    <p style="font-size: 0.75em; color: var(--text-muted); margin-top: 2em;">
+      Last updated: February 2026
+    </p>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 2 — Platform Info                                      -->
+  <!-- ============================================================ -->
+  <section>
+    <h3>PLATFORM</h3>
+    <h2>System Environment</h2>
+
+    <div class="info-card">
+      <strong>Hardware:</strong> Raspberry Pi 5 &mdash; 16 GB RAM
+    </div>
+    <div class="info-card">
+      <strong>Operating System:</strong> Debian GNU/Linux 13 (trixie) &mdash; aarch64
+    </div>
+    <div class="info-card">
+      <strong>Python:</strong> 3.13.5
+    </div>
+    <div class="info-card">
+      <strong>Virtual Environment:</strong> <code>/opt/oak-shared/venv/</code> (shared, read-only for students)
+    </div>
+    <div class="info-card">
+      <strong>Model Cache:</strong> <code>/opt/depthai-cache/</code> (777 permissions, all users can write)
+    </div>
+
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/WORKING_VERSIONS.md" target="_blank">Full reference &rarr;</a></p>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 3 — Critical Packages                                  -->
+  <!-- ============================================================ -->
+  <section>
+    <h3>DEPENDENCIES</h3>
+    <h2>Critical Package Versions</h2>
+
+    <p>These versions are <strong>confirmed working</strong> together for OAK-D camera detection with GUI display on Raspberry Pi 5.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Package</th>
+          <th>Version</th>
+          <th>Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>depthai</code></td>
+          <td><strong>3.3.0</strong></td>
+          <td>OAK-D camera SDK (v3 API)</td>
+        </tr>
+        <tr>
+          <td><code>depthai-nodes</code></td>
+          <td><strong>0.3.7</strong></td>
+          <td>Neural network parsing nodes</td>
+        </tr>
+        <tr>
+          <td><code>opencv-contrib-python</code></td>
+          <td><strong>4.10.0.84</strong></td>
+          <td>Computer vision + GUI support</td>
+        </tr>
+        <tr>
+          <td><code>numpy</code></td>
+          <td><strong>1.26.4</strong></td>
+          <td>Array math (must be &lt; 2.0)</td>
+        </tr>
+        <tr>
+          <td><code>scipy</code></td>
+          <td><strong>1.17.0</strong></td>
+          <td>Scientific computing</td>
+        </tr>
+        <tr>
+          <td><code>matplotlib</code></td>
+          <td><strong>3.10.8</strong></td>
+          <td>Plotting &amp; visualization</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/WORKING_VERSIONS.md" target="_blank">Full reference &rarr;</a></p>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 4 — What Works vs What Doesn't                        -->
+  <!-- ============================================================ -->
+  <section>
+    <h3>COMPATIBILITY</h3>
+    <h2>What Works vs. What Doesn't</h2>
+
+    <div class="two-col">
+      <div>
+        <p style="color: var(--green-accent); font-weight: 600; margin-bottom: 0.5em;">Works</p>
+        <ul class="checklist">
+          <li><strong>opencv-contrib-python 4.10</strong> &mdash; GUI support, all attributes (COLORMAP_JET, imshow)</li>
+          <li><strong>depthai 3.3.0</strong> + <strong>depthai-nodes 0.3.7</strong> &mdash; v3 API with ParsingNeuralNetwork</li>
+          <li><strong>numpy 1.26.4</strong> &mdash; compatible (&lt; 2.0 required by depthai)</li>
+        </ul>
+      </div>
+      <div>
+        <p style="color: var(--red-accent); font-weight: 600; margin-bottom: 0.5em;">Doesn't Work</p>
+        <div class="troubleshoot-card">
+          <strong>opencv-python-headless</strong> &mdash; Missing GUI functions (no cv2.namedWindow, cv2.imshow)
+        </div>
+        <div class="troubleshoot-card">
+          <strong>opencv 4.5.5.62</strong> &mdash; Has GUI but missing cv2.COLORMAP_JET; causes AttributeError
+        </div>
+        <div class="troubleshoot-card">
+          <strong>depthai 2.30.0</strong> &mdash; Incompatible with depthai-nodes 0.3.7; missing dai.Color
+        </div>
+        <div class="troubleshoot-card">
+          <strong>No system GTK libs</strong> &mdash; OpenCV requires libgtk-3-dev and libgtk2.0-dev via apt
+        </div>
+      </div>
+    </div>
+
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/WORKING_VERSIONS.md" target="_blank">Full reference &rarr;</a></p>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 5 — Installation                                       -->
+  <!-- ============================================================ -->
+  <section>
+    <h3>INSTALLATION</h3>
+    <h2>Setup from Scratch</h2>
+
+    <div class="two-col">
+      <div>
+        <p style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.4em;">1. System Dependencies</p>
+        <div class="command-card">sudo apt-get update</div>
+        <div class="command-card">sudo apt-get install -y libgtk-3-dev libgtk2.0-dev pkg-config</div>
+
+        <p style="font-weight: 600; color: var(--text-primary); margin-top: 1em; margin-bottom: 0.4em;">2. Create Virtual Environment</p>
+        <div class="command-card">sudo mkdir -p /opt/oak-shared</div>
+        <div class="command-card">sudo python3 -m venv /opt/oak-shared/venv</div>
+        <div class="command-card">sudo /opt/oak-shared/venv/bin/pip install --upgrade pip</div>
+      </div>
+      <div>
+        <p style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.4em;">3. Install Packages (order matters!)</p>
+        <div class="command-card">pip install numpy==1.26.4</div>
+        <div class="command-card">pip install opencv-contrib-python==4.10.0.84</div>
+        <div class="command-card">pip install depthai==3.3.0</div>
+        <div class="command-card">pip install depthai-nodes==0.3.7</div>
+        <div class="command-card">pip install scipy==1.17.0</div>
+        <div class="command-card">pip install matplotlib==3.10.8</div>
+
+        <div class="info-card" style="margin-top: 0.8em;">
+          <strong>Tip:</strong> Install numpy first &mdash; depthai requires numpy &lt; 2.0.
+        </div>
+      </div>
+    </div>
+
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/WORKING_VERSIONS.md" target="_blank">Full reference &rarr;</a></p>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 6 — Known Issues                                       -->
+  <!-- ============================================================ -->
+  <section>
+    <h3>TROUBLESHOOTING</h3>
+    <h2>Known Issues &amp; Solutions</h2>
+
+    <div class="two-col">
+      <div>
+        <div class="troubleshoot-card">
+          <strong>COLORMAP_JET error</strong><br>
+          <code style="font-size: 0.85em;">module 'cv2' has no attribute 'COLORMAP_JET'</code><br>
+          Fix: Upgrade to <code>opencv-contrib-python==4.10.0.84</code> (not 4.5.5)
+        </div>
+
+        <div class="troubleshoot-card">
+          <strong>GTK rebuild error</strong><br>
+          <code style="font-size: 0.85em;">Rebuild the library with GTK+ 2.x support</code><br>
+          Fix: <code>sudo apt-get install -y libgtk-3-dev libgtk2.0-dev pkg-config</code>
+        </div>
+      </div>
+      <div>
+        <div class="troubleshoot-card">
+          <strong>depthai Color error</strong><br>
+          <code style="font-size: 0.85em;">module 'depthai' has no attribute 'Color'</code><br>
+          Fix: Upgrade to <code>depthai==3.3.0</code> (not 2.30.0)
+        </div>
+
+        <div class="troubleshoot-card">
+          <strong>Qt platform warning</strong><br>
+          <code style="font-size: 0.85em;">Could not find the Qt platform plugin "wayland"</code><br>
+          Impact: Harmless &mdash; GUI still works. OpenCV falls back to X11.
+        </div>
+      </div>
+    </div>
+
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/WORKING_VERSIONS.md" target="_blank">Full reference &rarr;</a></p>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 7 — Testing the Setup                                  -->
+  <!-- ============================================================ -->
+  <section>
+    <h3>VERIFICATION</h3>
+    <h2>Testing the Setup</h2>
+
+    <p style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.3em;">1. Verify OpenCV GUI Support</p>
+    <pre><code class="language-bash">source /opt/oak-shared/venv/bin/activate
+python3 -c "import cv2; cv2.namedWindow('test'); cv2.destroyWindow('test'); print('GUI works')"</code></pre>
+    <p style="font-size: 0.8em; color: var(--text-muted); margin-top: -0.2em;">Expected: <code>GUI works</code> (no errors)</p>
+
+    <p style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.3em; margin-top: 0.8em;">2. Verify DepthAI Camera Connection</p>
+    <pre><code class="language-bash">source /opt/oak-shared/venv/bin/activate
+python3 -c "import depthai as dai; print(dai.Device.getAllAvailableDevices())"</code></pre>
+    <p style="font-size: 0.8em; color: var(--text-muted); margin-top: -0.2em;">Expected: Device info with mxid (camera serial number)</p>
+
+    <p style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.3em; margin-top: 0.8em;">3. Test Detection with Display</p>
+    <pre><code class="language-bash">source /opt/oak-shared/venv/bin/activate
+cd ~/oak-projects
+python3 person_detector_with_display.py --display</code></pre>
+    <p style="font-size: 0.8em; color: var(--text-muted); margin-top: -0.2em;">Expected: Live camera window with green bounding boxes around detected people. Press <code>q</code> to quit.</p>
+
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/WORKING_VERSIONS.md" target="_blank">Full reference &rarr;</a></p>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 8 — Hardware Configuration                             -->
+  <!-- ============================================================ -->
+  <section>
+    <h3>HARDWARE</h3>
+    <h2>Hardware Configuration</h2>
+
+    <div class="two-col">
+      <div>
+        <p style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.4em;">Raspberry Pi 5</p>
+        <table>
+          <tbody>
+            <tr><td><strong>Model</strong></td><td>Raspberry Pi 5 (16 GB RAM)</td></tr>
+            <tr><td><strong>OS</strong></td><td>Raspberry Pi OS (Bookworm) 64-bit</td></tr>
+            <tr><td><strong>USB</strong></td><td>Use USB 3.0 (blue) ports for OAK-D</td></tr>
+            <tr><td><strong>Power</strong></td><td>27 W official adapter or powered USB hub</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <p style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.4em;">OAK-D Camera</p>
+        <table>
+          <tbody>
+            <tr><td><strong>Connection</strong></td><td>USB 3.0 (USB-C on camera side)</td></tr>
+            <tr><td><strong>Platform</strong></td><td>RVC2 (Luxonis Myriad X VPU)</td></tr>
+            <tr><td><strong>Power</strong></td><td>High draw during AI inference &mdash; use quality cable</td></tr>
+          </tbody>
+        </table>
+
+        <p style="font-weight: 600; color: var(--text-primary); margin-top: 1em; margin-bottom: 0.4em;">Display Options</p>
+        <ul style="margin: 0; padding-left: 1.2em;">
+          <li><strong>VNC</strong> &mdash; wayvnc (shows desktop of logged-in user)</li>
+          <li><strong>Physical monitor</strong> &mdash; lightdm + lightdm-gtk-greeter</li>
+          <li><strong>Headless</strong> &mdash; fully supported, no display needed</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/WORKING_VERSIONS.md" target="_blank">Full reference &rarr;</a></p>
+  </section>
+
+</div><!-- .slides -->
+</div><!-- .reveal -->
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.min.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: true,
+    plugins: [RevealHighlight],
+    width: 1280,
+    height: 720,
+    margin: 0.1,
+    transition: 'none',
+    backgroundTransition: 'none',
+    center: false,
+  });
+</script>
+
+</body>
+</html>

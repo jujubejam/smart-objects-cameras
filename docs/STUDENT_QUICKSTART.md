@@ -1,5 +1,7 @@
 # Student Quick Start Guide
 
+> **Prefer slides?** [View the slide version](https://kandizzy.github.io/smart-objects-cameras/student-quickstart-slides.html)
+
 ## 🎯 Quick Start Checklist
 
 Follow these steps in order. Check them off as you complete them!
@@ -1298,29 +1300,52 @@ Your instructor has provided you with access to Claude Code! You can use it in t
 
 First, install Claude Code on your laptop (do this once):
 
-**For Mac users (Recommended):**
+**For Mac/Linux users (Recommended - Native Install):**
 
 ```bash
-# Install using Homebrew (you already have brew from last semester!)
-brew install anthropic-ai/tap/claude-code
+# Install using the native installer (auto-updates!)
+curl -fsSL https://claude.ai/install.sh | bash
 
 # Verify installation:
 claude --version
 ```
 
-**For Mac/Linux users (Alternative - using curl):**
+**For Mac users (Alternative - Homebrew):**
 
 ```bash
-# Install using curl
-curl -fsSL https://cli.anthropic.com/install.sh | sh
+# Install using Homebrew (does NOT auto-update)
+brew install --cask claude-code
 
 # Verify installation:
 claude --version
+
+# To update later: brew upgrade claude-code
 ```
 
 **For Windows users:**
 
-Download the installer from https://cli.anthropic.com or use the curl command in PowerShell if available.
+First, install [Git for Windows](https://git-scm.com/downloads/win) if you don't have it.
+
+Then run one of these commands:
+
+```powershell
+# PowerShell (Recommended):
+irm https://claude.ai/install.ps1 | iex
+
+# Or Command Prompt:
+curl -fsSL https://claude.ai/install.cmd -o install.cmd && install.cmd && del install.cmd
+```
+
+```bash
+# Verify installation:
+claude --version
+```
+
+**Alternative for Windows (WinGet):**
+
+```powershell
+winget install Anthropic.ClaudeCode
+```
 
 **First time setup:**
 When you run `claude` for the first time, it will ask you to authenticate with your Anthropic account (your instructor set this up for you).

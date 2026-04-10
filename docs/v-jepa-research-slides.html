@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World Models &amp; V-JEPA — Smart Objects</title>
+
+  <!-- Reveal.js 5.x from CDN (no npm install needed) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.min.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/github.min.css">
+
+  <!-- Google Fonts: Instrument Serif + Inter + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --font-heading: "Instrument Serif", Georgia, "Times New Roman", serif;
+      --font-sans: "Inter", "Helvetica Neue", -apple-system, system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-muted: #a8a29e;
+      --text-faint: #c8c4bf;
+      --bg-page: #fafaf9;
+      --bg-card: #ffffff;
+      --border-subtle: #e7e5e4;
+      --green-accent: #16a34a;
+      --green-bg: #f0fdf4;
+      --green-border: #bbf7d0;
+      --red-accent: #dc2626;
+      --red-bg: #fef2f2;
+      --red-border: #fecaca;
+      --blue-accent: #2563eb;
+      --blue-bg: #eff6ff;
+      --blue-border: #bfdbfe;
+      --purple-accent: #7c3aed;
+      --purple-bg: #f5f3ff;
+      --purple-border: #ddd6fe;
+      --amber-accent: #d97706;
+      --amber-bg: #fffbeb;
+      --amber-border: #fde68a;
+    }
+
+    .reveal, .reveal .slide-background {
+      background: var(--bg-page);
+    }
+
+    .reveal {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 22px;
+      color: var(--text-secondary);
+      text-align: left;
+    }
+    .reveal .slides section { text-align: left; }
+
+    .reveal h1 {
+      font-family: var(--font-heading);
+      font-size: 2.4em;
+      font-weight: 400;
+      font-style: italic;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 0.5em;
+    }
+
+    .reveal h2 {
+      font-family: var(--font-heading);
+      font-size: 1.6em;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      margin-bottom: 0.5em;
+    }
+
+    .reveal h3 {
+      font-family: var(--font-sans);
+      font-size: 0.65em;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1.5em;
+    }
+
+    .reveal p, .reveal li {
+      font-size: 0.95em;
+      line-height: 1.65;
+      color: var(--text-secondary);
+    }
+
+    .reveal strong {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .reveal a {
+      color: var(--blue-accent);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .reveal pre {
+      font-family: var(--font-mono);
+      font-size: 0.7em;
+      line-height: 1.55;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 1em 1.25em;
+      box-shadow: none;
+      width: 100%;
+      margin: 0.75em 0;
+    }
+
+    .reveal code {
+      font-family: var(--font-mono);
+    }
+
+    .reveal p code, .reveal li code, .reveal td code {
+      background: #f5f5f4;
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 0.1em 0.4em;
+      font-size: 0.85em;
+      color: var(--green-accent);
+    }
+
+    .section-label {
+      font-size: 0.65em !important;
+      letter-spacing: 0.3em !important;
+      color: var(--text-muted) !important;
+      text-transform: uppercase;
+      margin-bottom: 0.5em !important;
+    }
+
+    .command-card {
+      background: #f5f5f4;
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 0.8em 1.1em;
+      font-family: var(--font-mono);
+      font-size: 0.8em;
+      color: var(--green-accent);
+      margin: 0.5em 0;
+    }
+
+    .troubleshoot-card {
+      background: var(--red-bg);
+      border: 1px solid var(--red-border);
+      border-radius: 6px;
+      padding: 0.8em 1.1em;
+      font-size: 0.85em;
+      margin: 0.5em 0;
+    }
+
+    .troubleshoot-card strong {
+      color: var(--red-accent);
+    }
+
+    .info-card {
+      background: var(--blue-bg);
+      border: 1px solid var(--blue-border);
+      border-radius: 6px;
+      padding: 0.8em 1.1em;
+      font-size: 0.85em;
+      margin: 0.5em 0;
+    }
+
+    .idea-card {
+      background: var(--purple-bg);
+      border: 1px solid var(--purple-border);
+      border-radius: 6px;
+      padding: 0.8em 1.1em;
+      font-size: 0.85em;
+      margin: 0.5em 0;
+    }
+
+    .idea-card strong {
+      color: var(--purple-accent);
+    }
+
+    .warn-card {
+      background: var(--amber-bg);
+      border: 1px solid var(--amber-border);
+      border-radius: 6px;
+      padding: 0.8em 1.1em;
+      font-size: 0.85em;
+      margin: 0.5em 0;
+    }
+
+    .warn-card strong {
+      color: var(--amber-accent);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2em;
+      align-items: start;
+    }
+
+    .three-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1.5em;
+      align-items: start;
+    }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .checklist li {
+      position: relative;
+      padding: 0.4em 0 0.4em 1.5em;
+      border-bottom: 1px solid var(--border-subtle);
+      list-style: none;
+    }
+
+    .checklist li::before {
+      content: "\2713";
+      color: var(--green-accent);
+      font-size: 0.85em;
+      position: absolute;
+      left: 0;
+    }
+
+    .reveal table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8em;
+      margin-top: 0.75em;
+    }
+
+    .reveal table th {
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-primary);
+      border-bottom: 2px solid var(--border-subtle);
+      padding: 0.5em 0.75em;
+      font-size: 0.9em;
+    }
+
+    .reveal table td {
+      padding: 0.45em 0.75em;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .reveal table td code {
+      color: var(--green-accent);
+    }
+
+    .pipeline-label {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.7em;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 0.2em 0.6em;
+      color: var(--text-secondary);
+      margin: 0 0.15em;
+    }
+
+    .pipeline-arrow {
+      display: inline-block;
+      color: var(--text-muted);
+      font-size: 0.85em;
+      margin: 0 0.2em;
+    }
+
+    .pipeline-flow {
+      margin: 0.75em 0;
+      line-height: 2.2;
+    }
+
+    .badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.65em;
+      font-weight: 500;
+      padding: 0.15em 0.5em;
+      border-radius: 4px;
+      vertical-align: middle;
+      margin-left: 0.5em;
+    }
+
+    .badge-scale {
+      background: var(--purple-bg);
+      border: 1px solid var(--purple-border);
+      color: var(--purple-accent);
+    }
+
+    .badge-perf {
+      background: var(--green-bg);
+      border: 1px solid var(--green-border);
+      color: var(--green-accent);
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 0.8em;
+      text-align: center;
+    }
+
+    .stat-card .stat-number {
+      font-family: var(--font-heading);
+      font-size: 2em;
+      font-style: italic;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .stat-card .stat-label {
+      font-size: 0.75em;
+      color: var(--text-muted);
+      margin-top: 0.3em;
+    }
+
+    .reveal .slide-number {
+      font-family: var(--font-mono);
+      font-size: 0.7em;
+      color: var(--text-muted);
+      background: none;
+      left: 50%;
+      transform: translateX(-50%);
+      right: auto;
+      bottom: 1em;
+    }
+
+    .reveal .progress span {
+      background: var(--border-subtle);
+    }
+  </style>
+</head>
+<body>
+
+<div class="reveal">
+  <div class="slides">
+
+    <!-- ============================================
+         SLIDE 1 — Title
+         ============================================ -->
+    <section>
+      <h3>SMART OBJECTS</h3>
+      <h1>World Models &amp; V-JEPA</h1>
+      <p>LeCun's bet on non-generative intelligence &mdash;<br>and why it matters for what our cameras can understand.</p>
+      <p style="font-size: 0.75em; color: var(--text-muted); margin-top: 2em;">
+        SVA MFA Interaction Design &middot; Spring 2026
+      </p>
+    </section>
+
+    <!-- ============================================
+         SLIDE 2 — The core insight
+         ============================================ -->
+    <section>
+      <h3>THE BIG IDEA</h3>
+      <h1>Predict meaning, not pixels.</h1>
+      <p>A generative model predicting the next video frame has to reconstruct every blade of grass, every water ripple, every carpet texture &mdash; details that are computationally expensive and fundamentally unpredictable.</p>
+      <p style="margin-top: 0.75em;">A <strong>world model</strong> should instead represent a car approaching a fork in terms of position, velocity, and orientation &mdash; with a latent variable encoding whether it turns left or right.</p>
+      <div class="info-card" style="margin-top: 1em;">
+        <strong>JEPA</strong> (Joint Embedding Predictive Architecture) predicts in abstract representation space. It learns <em>what matters</em> and discards the rest.
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 3 — LeCun's architecture
+         ============================================ -->
+    <section>
+      <h3>LECUN'S VISION</h3>
+      <h2>A Cognitive Architecture for Machines</h2>
+      <p>Yann LeCun's 2022 paper <em>"A Path Towards Autonomous Machine Intelligence"</em> proposes six differentiable modules:</p>
+      <div class="three-col" style="margin-top: 1em;">
+        <div class="stat-card">
+          <p style="font-size: 0.85em;"><strong>Perception</strong></p>
+          <p style="font-size: 0.8em;">Encode the world into representations</p>
+        </div>
+        <div class="stat-card" style="border-color: var(--purple-border);">
+          <p style="font-size: 0.85em;"><strong>World Model</strong></p>
+          <p style="font-size: 0.8em;">Predict future states, estimate missing info</p>
+        </div>
+        <div class="stat-card">
+          <p style="font-size: 0.85em;"><strong>Actor</strong></p>
+          <p style="font-size: 0.8em;">System 1 (reactive) + System 2 (deliberative)</p>
+        </div>
+      </div>
+      <div class="three-col" style="margin-top: 0.75em;">
+        <div class="stat-card">
+          <p style="font-size: 0.85em;"><strong>Cost Module</strong></p>
+          <p style="font-size: 0.8em;">Intrinsic drives + learned critic</p>
+        </div>
+        <div class="stat-card">
+          <p style="font-size: 0.85em;"><strong>Short-Term Memory</strong></p>
+          <p style="font-size: 0.8em;">Maintain state across time</p>
+        </div>
+        <div class="stat-card">
+          <p style="font-size: 0.85em;"><strong>Configurator</strong></p>
+          <p style="font-size: 0.8em;">Executive control over all modules</p>
+        </div>
+      </div>
+      <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 0.75em;">The <strong>world model</strong> sits at the center. V-JEPA is the first concrete implementation of this module.</p>
+    </section>
+
+    <!-- ============================================
+         SLIDE 4 — Energy-based models
+         ============================================ -->
+    <section>
+      <h3>HOW IT WORKS</h3>
+      <h2>Energy, Not Probability</h2>
+      <div class="two-col">
+        <div>
+          <p>Instead of computing P(y|x), an <strong>energy function</strong> F(x, y) assigns:</p>
+          <ul style="padding-left: 1.2em;">
+            <li><strong>Low energy</strong> &rarr; compatible (x, y) pairs</li>
+            <li><strong>High energy</strong> &rarr; incompatible pairs</li>
+          </ul>
+          <p style="margin-top: 0.75em;">The system doesn't <em>predict</em> y from x &mdash; it evaluates whether a proposed y is <em>compatible</em> with x.</p>
+          <p style="margin-top: 0.75em;">For multiple valid futures, a latent variable <strong>z</strong> parameterizes the possibilities:</p>
+          <div class="command-card" style="color: var(--text-primary);">
+            F(x, y) = min<sub>z</sub> E(x, y, z)
+          </div>
+        </div>
+        <div>
+          <p><strong>The collapse problem</strong></p>
+          <p>If the energy function goes flat, it assigns low energy <em>everywhere</em> &mdash; the model learns nothing.</p>
+          <div class="troubleshoot-card" style="margin-top: 0.75em;">
+            <strong>Contrastive fix:</strong> Push energy up on negative samples. Problem: negatives grow exponentially with dimension.
+          </div>
+          <div class="info-card" style="margin-top: 0.5em;">
+            <strong>JEPA's fix:</strong> VICReg regularization &mdash; ensure variance in each embedding dimension, decorrelate components. No negatives needed.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 5 — JEPA vs. everything else
+         ============================================ -->
+    <section>
+      <h3>LANDSCAPE</h3>
+      <h2>JEPA vs. the Alternatives</h2>
+      <table>
+        <thead>
+          <tr><th>Approach</th><th>What It Predicts</th><th>Limitation</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Generative</strong> (MAE, diffusion, autoregressive)</td>
+            <td>Raw pixels or tokens</td>
+            <td>Wastes capacity on irrelevant low-level details</td>
+          </tr>
+          <tr>
+            <td><strong>Contrastive</strong> (SimCLR, CLIP, MoCo)</td>
+            <td>Aligned embeddings via negative pairs</td>
+            <td>Negative samples grow exponentially with dimension</td>
+          </tr>
+          <tr>
+            <td><strong>Joint embedding</strong> (CLIP-style)</td>
+            <td>Matched cross-modal representations</td>
+            <td>Not predictive &mdash; no temporal dynamics</td>
+          </tr>
+          <tr>
+            <td style="color: var(--purple-accent);"><strong>JEPA</strong></td>
+            <td style="color: var(--purple-accent);">Abstract representations of masked regions</td>
+            <td style="color: var(--purple-accent);">New &mdash; still proving scalability</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="two-col" style="margin-top: 1em;">
+        <div class="stat-card">
+          <div class="stat-number" style="color: var(--red-accent);">10,000+</div>
+          <div class="stat-label">GPU-hours for MAE to reach 71.5% ImageNet</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" style="color: var(--green-accent);">~2,500</div>
+          <div class="stat-label">GPU-hours for I-JEPA to reach 73.3% ImageNet</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 6 — JEPA architecture
+         ============================================ -->
+    <section>
+      <h3>ARCHITECTURE</h3>
+      <h2>How JEPA Predicts</h2>
+      <div class="pipeline-flow" style="margin-top: 0.5em; font-size: 1.1em;">
+        <span class="pipeline-label">x-encoder</span>
+        <span class="pipeline-arrow">&rarr;</span>
+        <span class="pipeline-label">s<sub>x</sub></span>
+        <span class="pipeline-arrow">+</span>
+        <span class="pipeline-label">z (latent)</span>
+        <span class="pipeline-arrow">&rarr;</span>
+        <span class="pipeline-label" style="border-color: var(--purple-border);">Predictor</span>
+        <span class="pipeline-arrow">&rarr;</span>
+        <span class="pipeline-label">s&#771;<sub>y</sub> (predicted)</span>
+      </div>
+      <div class="pipeline-flow" style="font-size: 1.1em;">
+        <span class="pipeline-label">y-encoder (EMA)</span>
+        <span class="pipeline-arrow">&rarr;</span>
+        <span class="pipeline-label">s<sub>y</sub> (target)</span>
+        <span class="pipeline-arrow" style="font-size: 1.2em;">&#x21E5;</span>
+        <span style="font-family: var(--font-mono); font-size: 0.7em; color: var(--text-muted);">stop gradient</span>
+      </div>
+      <p style="margin-top: 1em;">The energy is prediction error: <strong>E(x, y, z) = D(s<sub>y</sub>, Pred(s<sub>x</sub>, z))</strong></p>
+      <div class="two-col" style="margin-top: 1em;">
+        <div>
+          <p><strong>Four training criteria:</strong></p>
+          <ul style="padding-left: 1.2em;">
+            <li>Maximize information in encoder outputs</li>
+            <li>Minimize prediction error</li>
+            <li>Minimize information in latent z</li>
+            <li>EMA target encoder prevents collapse</li>
+          </ul>
+        </div>
+        <div>
+          <div class="idea-card">
+            <strong>Key insight:</strong> The encoders sit between raw perception and the prediction objective. This gives the system freedom to represent <em>only what matters</em> &mdash; the core advantage over pixel prediction.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 7 — V-JEPA 1: masking
+         ============================================ -->
+    <section>
+      <h3>V-JEPA 1</h3>
+      <h2>Video + Extreme Masking</h2>
+      <div class="two-col">
+        <div>
+          <p><strong>Tokenization</strong></p>
+          <p>Video is split into <strong>tubelets</strong> of 2&times;16&times;16 (2 frames &times; 16px &times; 16px). These are the "words" the Vision Transformer reads.</p>
+          <p style="margin-top: 1em;"><strong>The masking strategy</strong></p>
+          <p>Not random patches &mdash; those are trivially solvable via interpolation in redundant video. Instead: <strong>large contiguous blocks</strong> repeated across all frames.</p>
+          <ul style="padding-left: 1.2em; margin-top: 0.5em;">
+            <li>Short-range: ~15% per frame (8 blocks)</li>
+            <li>Long-range: ~70% per frame (2 blocks)</li>
+            <li>Overall: <strong>~90% masked</strong></li>
+          </ul>
+        </div>
+        <div>
+          <p><strong>Why 90%?</strong></p>
+          <div class="idea-card">
+            <strong>This extreme masking forces genuine scene understanding.</strong> You can't cheat by interpolating nearby pixels when 90% of the spatiotemporal volume is missing. The model must reason about <em>what</em> is in the scene and <em>how</em> it moves.
+          </div>
+          <p style="margin-top: 1em;"><strong>The predictor</strong></p>
+          <p>A narrow 12-layer transformer (~22M params). Receives visible token embeddings + learnable mask tokens with positional embeddings. Outputs predicted representations for masked positions.</p>
+          <p style="margin-top: 0.75em;"><strong>Loss:</strong> L1 regression (robust to outliers, computes conditional median).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 8 — V-JEPA 1 results
+         ============================================ -->
+    <section>
+      <h3>V-JEPA 1</h3>
+      <h2>Results (Frozen Evaluation)</h2>
+      <p>No encoder fine-tuning &mdash; just attentive probing on top of frozen features:</p>
+      <div class="three-col" style="margin-top: 1em;">
+        <div class="stat-card">
+          <div class="stat-number">81.9%</div>
+          <div class="stat-label">Kinetics-400</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">72.2%</div>
+          <div class="stat-label">Something-Something v2</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">77.9%</div>
+          <div class="stat-label">ImageNet-1K</div>
+        </div>
+      </div>
+      <p style="margin-top: 1em;">Surpasses prior video self-supervised methods by <strong>4&ndash;10 points</strong>.</p>
+      <div class="info-card" style="margin-top: 0.75em;">
+        <strong>Flagship models:</strong> ViT-L/16 (~300M params) and ViT-H/16 (~630M params). Trained on VideoMix2M (~2M videos from HowTo100M, Kinetics, Something-Something v2) with batch size 3072 for 90K iterations.
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 9 — V-JEPA 2: scaling
+         ============================================ -->
+    <section>
+      <h3>V-JEPA 2</h3>
+      <h2>Four Scaling Ingredients</h2>
+      <div class="two-col">
+        <div>
+          <p><strong>1. Data</strong> <span class="badge badge-scale">11&times;</span></p>
+          <p style="font-size: 0.85em;">VideoMix2M &rarr; <strong>VideoMix22M</strong><br>~22M samples, &gt;1 million hours of video</p>
+          <p style="margin-top: 1em;"><strong>2. Model</strong> <span class="badge badge-scale">2&times;</span></p>
+          <p style="font-size: 0.85em;">ViT-H (630M) &rarr; <strong>ViT-g</strong> (~1B params)<br>Full model: <strong>1.2 billion parameters</strong><br>3D Rotary Position Embeddings (3D-RoPE)</p>
+        </div>
+        <div>
+          <p><strong>3. Training duration</strong> <span class="badge badge-scale">2.8&times;</span></p>
+          <p style="font-size: 0.85em;">90K &rarr; <strong>252K iterations</strong></p>
+          <p style="margin-top: 1em;"><strong>4. Resolution</strong> <span class="badge badge-perf">8.4&times; speedup</span></p>
+          <p style="font-size: 0.85em;">Progressive: 16 frames / 256&times;256 &rarr;<br><strong>64 frames / 384&times;384</strong> during cooldown</p>
+        </div>
+      </div>
+      <div class="warn-card" style="margin-top: 1em;">
+        <strong>Cumulative impact:</strong> starting from V-JEPA 1's 84.2% average &rarr; data (+1.0) + model (+1.5) + training (+0.8) + resolution &rarr; <strong>88.2% average</strong> across six benchmarks.
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 10 — V-JEPA 2: benchmarks
+         ============================================ -->
+    <section>
+      <h3>V-JEPA 2</h3>
+      <h2>Benchmark Results</h2>
+      <table>
+        <thead>
+          <tr><th>Benchmark</th><th>Task</th><th>V-JEPA 2</th><th>Context</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Something-Something v2</td>
+            <td>Motion classification</td>
+            <td><strong>77.3%</strong></td>
+            <td>InternVideo: 69.7%</td>
+          </tr>
+          <tr>
+            <td>Epic-Kitchens-100</td>
+            <td>Action anticipation</td>
+            <td><strong>39.7 R@5</strong></td>
+            <td>44% improvement over prior SOTA</td>
+          </tr>
+          <tr>
+            <td>Diving-48</td>
+            <td>Fine-grained motion</td>
+            <td><strong>90.2%</strong></td>
+            <td>Frozen backbone</td>
+          </tr>
+          <tr>
+            <td>PerceptionTest</td>
+            <td>Video QA</td>
+            <td><strong>84.0</strong></td>
+            <td>SOTA at 8B scale</td>
+          </tr>
+          <tr>
+            <td>TempCompass</td>
+            <td>Temporal QA</td>
+            <td><strong>76.9</strong></td>
+            <td>SOTA at 8B scale</td>
+          </tr>
+          <tr>
+            <td>ImageNet-1K</td>
+            <td>Image classification</td>
+            <td><strong>84.6%</strong></td>
+            <td>Competitive with DINOv2</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="idea-card" style="margin-top: 0.75em;">
+        <strong>Pattern:</strong> V-JEPA dominates on <em>temporal and motion</em> understanding. It's competitive (not dominant) on static appearance tasks. The model understands <em>dynamics</em> better than anything else at its scale.
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 11 — Intuitive physics
+         ============================================ -->
+    <section>
+      <h3>INTUITIVE PHYSICS</h3>
+      <h2>The Model Understands Objects</h2>
+      <p>V-JEPA was separately evaluated on intuitive physics &mdash; detecting when things violate physical laws:</p>
+      <div class="two-col" style="margin-top: 1em;">
+        <div>
+          <p><strong>V-JEPA understands:</strong></p>
+          <ul class="checklist">
+            <li>Object permanence (72.1% vs. 52.5% baseline)</li>
+            <li>Continuity</li>
+            <li>Shape constancy</li>
+            <li>Support</li>
+            <li>Inertia</li>
+          </ul>
+        </div>
+        <div>
+          <p><strong>Still struggles with:</strong></p>
+          <div class="troubleshoot-card">
+            <strong>Object-to-object interactions</strong>
+            <p>Collisions, solidity, gravity &mdash; these likely require hierarchical representations LeCun has proposed but not yet built.</p>
+          </div>
+          <div class="warn-card" style="margin-top: 0.5em;">
+            <strong>For reference:</strong> Pixel-prediction models AND multimodal LLMs both perform at <em>near chance</em> on these physics tasks. V-JEPA is the only approach that shows real understanding.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 12 — V-JEPA 2-AC: robotics
+         ============================================ -->
+    <section>
+      <h3>V-JEPA 2-AC</h3>
+      <h2>From Watching to Acting</h2>
+      <p>Turn the passive video model into an active world model for robot control:</p>
+      <div class="pipeline-flow" style="margin-top: 0.5em;">
+        <span class="pipeline-label">Frozen V-JEPA 2 encoder</span>
+        <span class="pipeline-arrow">&rarr;</span>
+        <span class="pipeline-label" style="border-color: var(--purple-border);">Action-Conditioned Predictor (300M)</span>
+        <span class="pipeline-arrow">&rarr;</span>
+        <span class="pipeline-label">Predicted future state</span>
+      </div>
+      <div class="two-col" style="margin-top: 1em;">
+        <div>
+          <p><strong>Three input streams per timestep:</strong></p>
+          <ul style="padding-left: 1.2em;">
+            <li><strong>Visual features</strong> &mdash; 16&times;16&times;1408 from frozen encoder</li>
+            <li><strong>7D actions</strong> &mdash; delta position, orientation, gripper</li>
+            <li><strong>7D proprioception</strong> &mdash; absolute end-effector state</li>
+          </ul>
+          <p style="margin-top: 0.75em;"><strong>Planning:</strong> Model-Predictive Control with CEM. Sample 800 action sequences, pick the one that minimizes L1 distance to goal in representation space.</p>
+        </div>
+        <div>
+          <p><strong>Training data:</strong></p>
+          <div class="stat-card">
+            <div class="stat-number">62 hours</div>
+            <div class="stat-label">of unlabeled robot video (DROID dataset, 23K trajectories)</div>
+          </div>
+          <p style="margin-top: 0.75em;"><strong>Planning speed:</strong></p>
+          <div class="two-col" style="gap: 0.75em;">
+            <div class="stat-card">
+              <div class="stat-number" style="font-size: 1.4em; color: var(--green-accent);">~16s</div>
+              <div class="stat-label">V-JEPA 2-AC</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number" style="font-size: 1.4em; color: var(--red-accent);">~4 min</div>
+              <div class="stat-label">Cosmos (pixel-gen)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 13 — Zero-shot robotics results
+         ============================================ -->
+    <section>
+      <h3>V-JEPA 2-AC</h3>
+      <h2>Zero-Shot Robot Control</h2>
+      <p>Deployed on Franka arms in <strong>two labs never seen during training</strong>, with uncalibrated cameras:</p>
+      <div class="three-col" style="margin-top: 1em;">
+        <div class="stat-card">
+          <div class="stat-number" style="color: var(--green-accent);">65&ndash;80%</div>
+          <div class="stat-label">Pick-and-place</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" style="color: var(--green-accent);">65%</div>
+          <div class="stat-label">Grasping</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" style="color: var(--green-accent);">100%</div>
+          <div class="stat-label">Reaching</div>
+        </div>
+      </div>
+      <p style="margin-top: 1em;"><strong>Compare:</strong></p>
+      <div class="two-col" style="margin-top: 0.5em;">
+        <div class="troubleshoot-card">
+          <strong>Octo</strong> (vision-language-action, 1M+ trajectories): <strong>15%</strong> grasping
+        </div>
+        <div class="troubleshoot-card">
+          <strong>Cosmos</strong> (pixel generation): <strong>0&ndash;30%</strong> manipulation
+        </div>
+      </div>
+      <div class="idea-card" style="margin-top: 1em;">
+        <strong>The takeaway:</strong> 62 hours of unlabeled video &gt; 1M+ labeled trajectories. World models that predict in representation space learn physics that transfers to new environments. No task-specific training, no rewards, no environment data collection.
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 14 — The JEPA family
+         ============================================ -->
+    <section>
+      <h3>ECOSYSTEM</h3>
+      <h2>The Growing JEPA Family</h2>
+      <div class="two-col">
+        <div>
+          <p><strong>Core lineage</strong></p>
+          <table>
+            <thead>
+              <tr><th>Model</th><th>Year</th><th>Domain</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>I-JEPA</strong></td><td>2023</td><td>Images</td></tr>
+              <tr><td><strong>V-JEPA 1</strong></td><td>2024</td><td>Video</td></tr>
+              <tr><td><strong>VL-JEPA</strong></td><td>2024</td><td>Vision-language</td></tr>
+              <tr><td><strong>V-JEPA 2</strong></td><td>2025</td><td>Video (scaled)</td></tr>
+              <tr><td><strong>LeJEPA</strong></td><td>2025</td><td>Theory (math foundations)</td></tr>
+              <tr><td><strong>V-JEPA 2.1</strong></td><td>Mar 2026</td><td>Dense self-supervision</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <p><strong>Community extensions</strong></p>
+          <div style="line-height: 2;">
+            <span class="pipeline-label">A-JEPA</span> Audio (SOTA on AudioSet)<br>
+            <span class="pipeline-label">S-JEPA</span> EEG signals<br>
+            <span class="pipeline-label">Brain-JEPA</span> Neuroscience<br>
+            <span class="pipeline-label">3D-JEPA</span> 3D understanding<br>
+            <span class="pipeline-label">T-JEPA</span> Tabular data<br>
+            <span class="pipeline-label">ACT-JEPA</span> Robotics policy<br>
+            <span class="pipeline-label">UI-JEPA</span> User interfaces
+          </div>
+          <div class="info-card" style="margin-top: 0.75em;">
+            <strong>VL-JEPA:</strong> 1.6B params, outperforms GPT-4o and Gemini-2.0 on world-modeling benchmarks. 50% fewer params, 2.85&times; faster decoding.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 15 — V-JEPA 2.1 results
+         ============================================ -->
+    <section>
+      <h3>V-JEPA 2.1 &mdash; MARCH 2026</h3>
+      <h2>Dense Features Change Everything</h2>
+      <p>Four new ingredients: <strong>dense predictive loss</strong> (all tokens train, not just masked), <strong>deep self-supervision</strong> (loss at intermediate layers), <strong>multi-modal tokenizers</strong>, and continued scaling.</p>
+      <table style="margin-top: 1em;">
+        <thead>
+          <tr><th>Task</th><th>Score</th><th>What This Actually Measures</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Robotic grasping</strong></td>
+            <td style="color: var(--green-accent); font-weight: 600;">+20 pts over V-JEPA 2</td>
+            <td>Can a robot pick up objects it's never seen, in a lab it's never been in? 65% &rarr; ~85% success.</td>
+          </tr>
+          <tr>
+            <td><strong>Ego4D object interaction</strong></td>
+            <td>7.71 mAP</td>
+            <td>First-person video: predict <em>what object you'll interact with next</em> before you touch it. Measures anticipation, not recognition.</td>
+          </tr>
+          <tr>
+            <td><strong>EPIC-KITCHENS</strong></td>
+            <td>40.8 R@5</td>
+            <td>People cooking, filmed from head-mounted cameras. Predict the next action &mdash; "they're reaching for the drawer, they'll grab a knife." Tests temporal intent reasoning.</td>
+          </tr>
+          <tr>
+            <td><strong>Something-Something v2</strong></td>
+            <td>77.7%</td>
+            <td>Short clips of humans doing things with objects &mdash; "pushing something left," "covering something." The model must understand <em>motion dynamics</em>, not just recognize objects.</td>
+          </tr>
+          <tr>
+            <td><strong>Depth estimation</strong></td>
+            <td>0.307 RMSE</td>
+            <td>NYUv2 indoor scenes: estimate how far away every pixel is <em>from a single RGB camera</em>. No stereo needed &mdash; the model learned 3D structure from video alone.</td>
+          </tr>
+          <tr>
+            <td><strong>Robot navigation</strong></td>
+            <td>5.687 ATE</td>
+            <td>TartanDrive: off-road autonomous driving. Predict where you are after a sequence of movements. Tests spatial understanding at room/outdoor scale.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="info-card" style="margin-top: 0.75em;">
+        <strong>The shift from V-JEPA 2 &rarr; 2.1:</strong> V-JEPA 2 understood scenes globally ("this is a kitchen"). V-JEPA 2.1 understands scenes <em>densely</em> ("the mug is on the counter, 1.2m away, and you're about to reach for it"). That's the difference dense features make.
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 16 — Limitations
+         ============================================ -->
+    <section>
+      <h3>OPEN CHALLENGES</h3>
+      <h2>What V-JEPA Can't Do Yet</h2>
+      <div class="two-col">
+        <div>
+          <div class="troubleshoot-card">
+            <strong>Short temporal context</strong>
+            <p>3&ndash;4 second clips (16 frames). Events requiring longer causal reasoning are out of reach.</p>
+          </div>
+          <div class="troubleshoot-card" style="margin-top: 0.5em;">
+            <strong>Long-horizon planning</strong>
+            <p>Autoregressive predictions accumulate error. Robot demos limited to &le;16 seconds. Multi-step tasks need manually specified visual sub-goals.</p>
+          </div>
+          <div class="troubleshoot-card" style="margin-top: 0.5em;">
+            <strong>Camera sensitivity</strong>
+            <p>Action coordinates are implicitly learned. Significant camera angle changes break the system.</p>
+          </div>
+        </div>
+        <div>
+          <p><strong>The big unsolved problems:</strong></p>
+          <ul style="padding-left: 1.2em;">
+            <li><strong>H-JEPA</strong> &mdash; hierarchical predictions at multiple time scales (still theoretical)</li>
+            <li><strong>Multi-modal</strong> &mdash; vision + audio + tactile + proprioception (nascent)</li>
+            <li><strong>Language goals</strong> &mdash; no natural language interface for the planning system yet</li>
+            <li><strong>Physical reasoning</strong> &mdash; ~60% on CausalVQA vs. ~95% human</li>
+          </ul>
+          <div class="warn-card" style="margin-top: 0.75em;">
+            <strong>The central open bet:</strong> Can non-contrastive, non-generative methods match the scaled generative paradigm (GPT-4, Sora, Gemini)?
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 16 — Why this matters for us
+         ============================================ -->
+    <section>
+      <h3>FOR OUR CAMERAS</h3>
+      <h2>Why V-JEPA Matters Here</h2>
+      <div class="idea-card">
+        <strong>Core connection:</strong> V-JEPA understands <em>what's happening</em> in a scene over time &mdash; not just what objects are present. This is exactly what we need to classify classroom <em>modes</em>, not just count people.
+      </div>
+      <div class="three-col" style="margin-top: 1em;">
+        <div class="stat-card">
+          <p style="font-size: 0.85em;"><strong>Solo</strong></p>
+          <p style="font-size: 0.8em;">One person, free movement<br>&rarr; Party mode</p>
+        </div>
+        <div class="stat-card">
+          <p style="font-size: 0.85em;"><strong>Duo / Group</strong></p>
+          <p style="font-size: 0.8em;">Clustered, conversational<br>&rarr; Caf&eacute; / Networking</p>
+        </div>
+        <div class="stat-card">
+          <p style="font-size: 0.85em;"><strong>Presentation</strong></p>
+          <p style="font-size: 0.8em;">One standing, others seated<br>&rarr; Full silence</p>
+        </div>
+      </div>
+      <p style="margin-top: 1em;">YOLO counts bodies. V-JEPA understands the <em>spatial dynamics</em> &mdash; the difference between five people collaborating and five people listening to a lecture.</p>
+      <div class="info-card" style="margin-top: 0.75em;">
+        <strong>The path:</strong> Record short clips of each mode &rarr; extract V-JEPA embeddings &rarr; train a lightweight classifier on top &rarr; wire into Discord bot: <code>!classroom-mode</code>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SLIDE 17 — Closing
+         ============================================ -->
+    <section>
+      <h3>SMART OBJECTS</h3>
+      <h1>The classroom changes all day.<br>The room never does.</h1>
+      <p>V-JEPA's key insight: by placing learned encoders between raw perception and the prediction objective, the system gains the freedom to represent only what matters.</p>
+      <p style="margin-top: 1em;">That's also the design challenge &mdash; decide what matters, and build a camera that understands it.</p>
+      <p style="font-size: 0.75em; color: var(--text-muted); margin-top: 2em;">
+        <a href="https://github.com/kandizzy/smart-objects-cameras" target="_blank">github.com/kandizzy/smart-objects-cameras</a>
+      </p>
+    </section>
+
+  </div><!-- /.slides -->
+</div><!-- /.reveal -->
+
+<!-- Reveal.js + plugins from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.min.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: true,
+    plugins: [RevealHighlight],
+    width: 1280,
+    height: 720,
+    margin: 0.1,
+    transition: 'none',
+    backgroundTransition: 'none',
+    center: false,
+  });
+</script>
+</body>
+</html>

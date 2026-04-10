@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WiFi Management — Smart Objects Cameras</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.min.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/github.min.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --font-heading: "Instrument Serif", Georgia, "Times New Roman", serif;
+      --font-sans: "Inter", "Helvetica Neue", -apple-system, system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-muted: #a8a29e;
+      --text-faint: #c8c4bf;
+      --bg-page: #fafaf9;
+      --bg-card: #ffffff;
+      --border-subtle: #e7e5e4;
+      --green-accent: #16a34a;
+      --green-bg: #f0fdf4;
+      --green-border: #bbf7d0;
+      --red-accent: #dc2626;
+      --red-bg: #fef2f2;
+      --red-border: #fecaca;
+      --blue-accent: #2563eb;
+      --blue-bg: #eff6ff;
+      --blue-border: #bfdbfe;
+    }
+
+    .reveal, .reveal .slide-background { background: var(--bg-page); }
+
+    .reveal {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 22px;
+      color: var(--text-secondary);
+      text-align: left;
+    }
+    .reveal .slides section { text-align: left; }
+
+    .reveal h1 {
+      font-family: var(--font-heading);
+      font-size: 2.2em; font-weight: 400; font-style: italic;
+      letter-spacing: -0.02em;
+      color: var(--text-primary); margin-bottom: 0.6em;
+    }
+    .reveal h2 {
+      font-family: var(--font-heading);
+      font-size: 1.5em; font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--text-primary); margin-bottom: 0.5em;
+    }
+    .reveal h3 {
+      font-family: var(--font-sans);
+      font-size: 0.65em; font-weight: 600; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.5em;
+    }
+    .reveal p, .reveal li {
+      font-size: 0.95em; line-height: 1.65; color: var(--text-secondary);
+    }
+    .reveal strong { font-weight: 600; color: var(--text-primary); }
+
+    .reveal pre {
+      font-family: var(--font-mono); font-size: 0.7em; line-height: 1.55;
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: 8px; padding: 0.8em 1.1em; box-shadow: none;
+      width: 100%; margin: 0.6em 0;
+    }
+    .reveal code { font-family: var(--font-mono); }
+    .reveal p code, .reveal li code, .reveal td code {
+      background: #f5f5f4; border: 1px solid var(--border-subtle);
+      border-radius: 4px; padding: 0.1em 0.4em; font-size: 0.85em;
+      color: var(--green-accent);
+    }
+
+    .command-card {
+      background: #f5f5f4; border: 1px solid var(--border-subtle);
+      border-radius: 6px; padding: 0.7em 1em;
+      font-family: var(--font-mono); font-size: 0.78em;
+      color: var(--green-accent); margin: 0.5em 0;
+    }
+    .troubleshoot-card {
+      background: var(--red-bg); border: 1px solid var(--red-border);
+      border-radius: 6px; padding: 0.7em 1em; font-size: 0.82em; margin: 0.4em 0;
+    }
+    .troubleshoot-card strong { color: var(--red-accent); }
+    .info-card {
+      background: var(--blue-bg); border: 1px solid var(--blue-border);
+      border-radius: 6px; padding: 0.7em 1em; font-size: 0.85em; margin: 0.5em 0;
+    }
+    .two-col {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.8em; align-items: start;
+      text-align: left;
+    }
+    .step-number {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 1.6em; height: 1.6em; border-radius: 50%;
+      background: var(--green-bg); border: 1px solid var(--green-border);
+      color: var(--green-accent); font-size: 0.85em; font-weight: 500;
+      flex-shrink: 0;
+    }
+    .step-row {
+      display: flex; align-items: baseline; gap: 0.7em;
+      padding: 0.35em 0; border-bottom: 1px solid var(--border-subtle);
+    }
+    .warn-badge {
+      display: inline-block; font-size: 0.6em; font-weight: 600;
+      letter-spacing: 0.12em; padding: 0.15em 0.5em; border-radius: 3px;
+      background: #fffbeb; color: #d97706;
+      border: 1px solid #fde68a; vertical-align: middle;
+    }
+
+    .reveal .slide-number {
+      font-family: var(--font-mono); font-size: 0.7em; color: var(--text-muted);
+      background: none; bottom: 1em; left: 50%; transform: translateX(-50%); right: auto;
+    }
+    .reveal .progress span { background: var(--border-subtle); }
+
+    .read-more {
+      font-size: 0.6em !important; color: var(--text-muted) !important;
+      font-family: var(--font-mono); text-align: center;
+      margin-top: 1em !important;
+    }
+    .read-more a {
+      color: var(--text-muted) !important; border-bottom: 1px solid var(--border-subtle);
+      transition: color 0.15s;
+    }
+    .read-more a:hover { color: var(--text-secondary) !important; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- Slide 1 — Title -->
+      <section>
+        <h3>SMART OBJECTS CAMERAS</h3>
+        <h1>WiFi Network Management</h1>
+        <p>Switching networks on Raspberry Pi &mdash; home, classroom, and beyond.</p>
+        <p style="margin-top: 1.5em;">Modern Raspberry Pi OS uses <strong>NetworkManager</strong> for WiFi configuration. Three methods available, plus an emergency fallback.</p>
+      </section>
+
+      <!-- Slide 2 — Method 1: nmtui -->
+      <section>
+        <h3>METHOD 1</h3>
+        <h2>nmtui &mdash; Text Menu Interface <span class="warn-badge">RECOMMENDED</span></h2>
+
+        <div class="command-card">ssh orbit &nbsp;&amp;&amp;&nbsp; sudo nmtui</div>
+
+        <p style="margin: 0.6em 0 0.4em;">You can <strong>add networks you're not currently near</strong> &mdash; perfect for pre-configuring classroom WiFi from home.</p>
+
+        <div class="step-row">
+          <span class="step-number">1</span>
+          <span>Select <strong>"Activate a connection"</strong> to see current networks, or <strong>"Edit a connection"</strong> to add new ones</span>
+        </div>
+        <div class="step-row">
+          <span class="step-number">2</span>
+          <span>Choose <strong>"Add"</strong> &rarr; select <strong>"Wi-Fi"</strong></span>
+        </div>
+        <div class="step-row">
+          <span class="step-number">3</span>
+          <span>Enter SSID (e.g. <code>ClassroomWiFi</code>) and password</span>
+        </div>
+        <div class="step-row">
+          <span class="step-number">4</span>
+          <span>Tab to <strong>"OK"</strong> &rarr; Enter &rarr; Tab to <strong>"Back"</strong> &rarr; Enter &rarr; <strong>"Quit"</strong></span>
+        </div>
+
+        <div class="info-card">
+          <strong>Auto-connect:</strong> You can save as many networks as you want. The Pi will automatically connect to any available saved network.
+        </div>
+
+        <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/wifi-management.md" target="_blank">Full guide &rarr;</a></p>
+      </section>
+
+      <!-- Slide 3 — Method 2: nmcli -->
+      <section>
+        <h3>METHOD 2</h3>
+        <h2>nmcli &mdash; Command Line</h2>
+
+        <pre><code class="language-bash"># List available WiFi networks
+nmcli device wifi list
+
+# Connect to a network (saves automatically)
+sudo nmcli device wifi connect "ClassroomWiFi" password "classpassword"
+
+# List saved connections
+nmcli connection show
+
+# Switch to a previously saved network
+nmcli connection up "ClassroomWiFi"
+
+# Delete a saved network
+sudo nmcli connection delete "OldNetwork"</code></pre>
+
+        <div class="troubleshoot-card">
+          <strong>Note:</strong> <code>nmcli device wifi connect</code> only works if the network is <strong>currently in range</strong>. To add a network you're not near, use <code>nmtui</code> instead.
+        </div>
+
+        <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/wifi-management.md" target="_blank">Full guide &rarr;</a></p>
+      </section>
+
+      <!-- Slide 4 — Method 3: raspi-config + Check Settings -->
+      <section>
+        <h3>METHOD 3 &amp; STATUS</h3>
+        <h2>raspi-config + Check Current WiFi</h2>
+
+        <div class="two-col">
+          <div>
+            <p><strong>raspi-config (Menu Interface)</strong></p>
+            <pre><code class="language-bash">sudo raspi-config
+# Navigate:
+#   System Options
+#     → Wireless LAN
+# Enter new SSID and password
+# Reboot when prompted</code></pre>
+          </div>
+
+          <div>
+            <p><strong>Check Current WiFi Settings</strong></p>
+            <pre><code class="language-bash"># Which network am I on?
+nmcli device wifi
+
+# Detailed active connection info
+nmcli connection show --active
+
+# Show saved WiFi password
+sudo nmcli connection show \
+  "YourNetworkName" | grep psk</code></pre>
+          </div>
+        </div>
+
+        <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/wifi-management.md" target="_blank">Full guide &rarr;</a></p>
+      </section>
+
+      <!-- Slide 5 — Emergency: SD Card Method -->
+      <section>
+        <h3>EMERGENCY FALLBACK</h3>
+        <h2>SD Card Method &mdash; When Completely Locked Out</h2>
+
+        <div class="step-row">
+          <span class="step-number">1</span>
+          <span><strong>Power off</strong> the Pi and <strong>remove the SD card</strong></span>
+        </div>
+        <div class="step-row">
+          <span class="step-number">2</span>
+          <span>Insert the SD card into your computer</span>
+        </div>
+        <div class="step-row">
+          <span class="step-number">3</span>
+          <span>In the <code>boot</code> partition, create <code>wpa_supplicant.conf</code> with the content below</span>
+        </div>
+
+        <pre><code class="language-ini">country=US
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+
+network={
+    ssid="ClassroomWiFi"
+    psk="classpassword"
+}</code></pre>
+
+        <div class="step-row">
+          <span class="step-number">4</span>
+          <span><strong>Save</strong>, eject the SD card, and <strong>boot the Pi</strong></span>
+        </div>
+        <div class="step-row" style="border-bottom: none;">
+          <span class="step-number">5</span>
+          <span>Once connected, the Pi will import this config into NetworkManager automatically</span>
+        </div>
+
+        <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/wifi-management.md" target="_blank">Full guide &rarr;</a></p>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.min.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: true,
+      plugins: [RevealHighlight],
+      width: 1280,
+      height: 720,
+      margin: 0.1,
+      transition: 'none',
+      backgroundTransition: 'none',
+      center: false,
+    });
+  </script>
+</body>
+</html>

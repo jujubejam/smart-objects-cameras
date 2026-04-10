@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Quick Start — Smart Objects Cameras</title>
+
+  <!-- Reveal.js 5.x from CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.min.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/github.min.css">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --font-heading: "Instrument Serif", Georgia, "Times New Roman", serif;
+      --font-sans: "Inter", "Helvetica Neue", -apple-system, system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-muted: #a8a29e;
+      --text-faint: #c8c4bf;
+      --bg-page: #fafaf9;
+      --bg-card: #ffffff;
+      --border-subtle: #e7e5e4;
+      --green-accent: #16a34a;
+      --green-bg: #f0fdf4;
+      --green-border: #bbf7d0;
+      --red-accent: #dc2626;
+      --red-bg: #fef2f2;
+      --red-border: #fecaca;
+      --blue-accent: #2563eb;
+      --blue-bg: #eff6ff;
+      --blue-border: #bfdbfe;
+    }
+
+    .reveal, .reveal .slide-background { background: var(--bg-page); }
+
+    .reveal {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 22px;
+      color: var(--text-secondary);
+      text-align: left;
+    }
+    .reveal .slides section { text-align: left; }
+
+    .reveal h1 {
+      font-family: var(--font-heading);
+      font-size: 2.2em; font-weight: 400; font-style: italic;
+      letter-spacing: -0.02em;
+      color: var(--text-primary); margin-bottom: 0.6em;
+    }
+    .reveal h2 {
+      font-family: var(--font-heading);
+      font-size: 1.5em; font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--text-primary); margin-bottom: 0.5em;
+    }
+    .reveal h3 {
+      font-family: var(--font-sans);
+      font-size: 0.65em; font-weight: 600; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.5em;
+    }
+    .reveal p, .reveal li {
+      font-size: 0.95em; line-height: 1.65; color: var(--text-secondary);
+    }
+    .reveal strong { font-weight: 600; color: var(--text-primary); }
+
+    .reveal pre {
+      font-family: var(--font-mono); font-size: 0.7em; line-height: 1.55;
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: 8px; padding: 0.8em 1.1em; box-shadow: none;
+      width: 100%; margin: 0.6em 0;
+    }
+    .reveal code { font-family: var(--font-mono); }
+    .reveal p code, .reveal li code, .reveal td code {
+      background: #f5f5f4; border: 1px solid var(--border-subtle);
+      border-radius: 4px; padding: 0.1em 0.4em; font-size: 0.85em;
+      color: var(--green-accent);
+    }
+
+    .command-card {
+      background: #f5f5f4; border: 1px solid var(--border-subtle);
+      border-radius: 6px; padding: 0.7em 1em;
+      font-family: var(--font-mono); font-size: 0.78em;
+      color: var(--green-accent); margin: 0.5em 0;
+    }
+    .troubleshoot-card {
+      background: var(--red-bg); border: 1px solid var(--red-border);
+      border-radius: 6px; padding: 0.7em 1em; font-size: 0.82em; margin: 0.4em 0;
+    }
+    .troubleshoot-card strong { color: var(--red-accent); }
+    .info-card {
+      background: var(--blue-bg); border: 1px solid var(--blue-border);
+      border-radius: 6px; padding: 0.7em 1em; font-size: 0.85em; margin: 0.5em 0;
+    }
+    .two-col {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.8em; align-items: start;
+      text-align: left;
+    }
+    .three-col {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5em; align-items: start;
+    }
+    .checklist { list-style: none; padding: 0; margin: 0; }
+    .checklist li {
+      position: relative; padding: 0.4em 0 0.4em 1.5em;
+      border-bottom: 1px solid var(--border-subtle);
+      list-style: none;
+    }
+    .checklist li::before {
+      content: "\2713"; color: var(--green-accent); font-size: 0.85em;
+      position: absolute; left: 0;
+    }
+
+    .reveal table { width: 100%; border-collapse: collapse; font-size: 0.78em; margin-top: 0.6em; }
+    .reveal table th {
+      text-align: left; font-weight: 600; color: var(--text-primary);
+      border-bottom: 2px solid var(--border-subtle); padding: 0.45em 0.7em;
+    }
+    .reveal table td {
+      padding: 0.4em 0.7em; border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .reveal .slide-number {
+      font-family: var(--font-mono); font-size: 0.7em; color: var(--text-muted);
+      background: none; bottom: 1em; left: 50%; transform: translateX(-50%); right: auto;
+    }
+    .reveal .progress span { background: var(--border-subtle); }
+
+    .step-number {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 1.6em; height: 1.6em; border-radius: 50%;
+      background: var(--green-bg); border: 1px solid var(--green-border);
+      color: var(--green-accent); font-size: 0.85em; font-weight: 500;
+      flex-shrink: 0;
+    }
+    .step-row {
+      display: flex; align-items: baseline; gap: 0.7em;
+      padding: 0.35em 0; border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .warn-badge {
+      display: inline-block; font-size: 0.6em; font-weight: 600;
+      letter-spacing: 0.12em; padding: 0.15em 0.5em; border-radius: 3px;
+      background: #fffbeb; color: #d97706;
+      border: 1px solid #fde68a; vertical-align: middle;
+    }
+    .pi-badge {
+      display: inline-block; font-size: 0.6em; font-weight: 600;
+      letter-spacing: 0.12em; padding: 0.15em 0.5em; border-radius: 3px;
+      background: var(--blue-bg); color: var(--blue-accent);
+      border: 1px solid var(--blue-border); vertical-align: middle;
+    }
+    .local-badge {
+      display: inline-block; font-size: 0.6em; font-weight: 600;
+      letter-spacing: 0.12em; padding: 0.15em 0.5em; border-radius: 3px;
+      background: var(--green-bg); color: var(--green-accent);
+      border: 1px solid var(--green-border); vertical-align: middle;
+    }
+
+    .read-more {
+      font-size: 0.6em !important; color: var(--text-muted) !important;
+      font-family: var(--font-mono); text-align: center;
+      margin-top: 1em !important;
+    }
+    .read-more a {
+      color: var(--text-muted) !important; border-bottom: 1px solid var(--border-subtle);
+      transition: color 0.15s;
+    }
+    .read-more a:hover { color: var(--text-secondary) !important; }
+  </style>
+</head>
+<body>
+
+<div class="reveal">
+  <div class="slides">
+
+    <!-- SECTION 1: TITLE + OVERVIEW -->
+
+    <section>
+      <h3>SMART OBJECTS: THE SMART CLASSROOM</h3>
+      <h1 style="font-size: 2.6em; font-weight: 400;">Student Quick Start</h1>
+      <p style="font-size: 1em; color: var(--text-muted);">
+        OAK-D Cameras &middot; Raspberry Pi &middot; Discord Bots
+      </p>
+      <p style="font-size: 0.75em; color: var(--text-faint); margin-top: 2.5em;">
+        SVA MFA Interaction Design &middot; Winter 2026<br>
+        <span style="opacity: 0.6;">~20–30 min first-time setup</span>
+      </p>
+    </section>
+
+    <section>
+      <h3>OVERVIEW</h3>
+      <h2>6-Step Setup Checklist</h2>
+      <div style="max-width: 680px;">
+        <div class="step-row"><span class="step-number">1</span> <span>Clone the GitHub repo <strong>to your laptop</strong></span></div>
+        <div class="step-row"><span class="step-number">2</span> <span>Set up <strong>SSH access</strong> to your Pi</span></div>
+        <div class="step-row"><span class="step-number">3</span> <span>Copy Python files <strong>from laptop to Pi</strong> (scp)</span></div>
+        <div class="step-row"><span class="step-number">4</span> <span>Check / create your <code>.env</code> file <strong>on the Pi</strong></span></div>
+        <div class="step-row"><span class="step-number">5</span> <span>Run your first detector!</span></div>
+        <div class="step-row" style="border-bottom: none;"><span class="step-number">6</span> <span><em style="color: var(--text-muted);">Optional:</em> Set up personal DM bot</span></div>
+      </div>
+      <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 1.2em;">
+        Recommended starting points: <strong>Fatigue Detection</strong> or <strong>Gaze Estimation</strong>
+      </p>
+    </section>
+
+    <!-- SECTION 2: MENTAL MODEL -->
+
+    <section>
+      <h3>MENTAL MODEL</h3>
+      <h2>Where Am I? &nbsp;<span class="warn-badge">IMPORTANT</span></h2>
+      <div class="two-col" style="margin-top: 1em;">
+        <div>
+          <p><strong>Your Laptop</strong> <span class="local-badge">LOCAL</span></p>
+          <div class="command-card">
+            yourname@MacBook-Pro ~ %
+          </div>
+          <p style="font-size: 0.82em;">GitHub repo lives here.<br>Edit code here.</p>
+        </div>
+        <div>
+          <p><strong>Raspberry Pi</strong> <span class="pi-badge">REMOTE</span></p>
+          <div class="command-card">
+            yourname@orbit ~ $
+          </div>
+          <p style="font-size: 0.82em;">Camera + venv live here.<br>Run scripts here.</p>
+        </div>
+      </div>
+      <div class="info-card" style="margin-top: 1em;">
+        <strong>Pro tip:</strong> Type <code>hostname</code> and press Enter to see which machine you're on.
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/STUDENT_QUICKSTART.md#before-you-start-terminal-basics" target="_blank">Full details &rarr;</a></p>
+    </section>
+
+    <section>
+      <h3>MENTAL MODEL</h3>
+      <h2>The Workflow</h2>
+      <div style="display: flex; align-items: center; justify-content: center; gap: 1.2em; margin: 1.5em 0; font-size: 0.95em;">
+        <div style="text-align: center; padding: 0.8em 1.2em; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-card);">
+          <div style="font-size: 1.4em; margin-bottom: 0.3em;">1</div>
+          <strong>Edit code</strong><br>
+          <span style="font-size: 0.8em; color: var(--text-muted);">on your laptop</span>
+        </div>
+        <span style="color: var(--text-muted); font-size: 1.5em;">&rarr;</span>
+        <div style="text-align: center; padding: 0.8em 1.2em; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-card);">
+          <div style="font-size: 1.4em; margin-bottom: 0.3em;">2</div>
+          <strong>scp to Pi</strong><br>
+          <span style="font-size: 0.8em; color: var(--text-muted);">copy changed files</span>
+        </div>
+        <span style="color: var(--text-muted); font-size: 1.5em;">&rarr;</span>
+        <div style="text-align: center; padding: 0.8em 1.2em; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-card);">
+          <div style="font-size: 1.4em; margin-bottom: 0.3em;">3</div>
+          <strong>Run on Pi</strong><br>
+          <span style="font-size: 0.8em; color: var(--text-muted);">python3 script.py</span>
+        </div>
+      </div>
+      <p style="font-size: 0.85em; text-align: center; color: var(--text-muted);">
+        <strong style="color: var(--text-secondary);">Bottom line:</strong> Edit on laptop &rarr; copy to Pi &rarr; run on Pi. Repeat.
+      </p>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/STUDENT_QUICKSTART.md#important-github-repo-location" target="_blank">Full details &rarr;</a></p>
+    </section>
+
+    <section>
+      <h3>MENTAL MODEL</h3>
+      <h2>What's Done vs. What You Do</h2>
+      <div class="two-col" style="margin-top: 0.8em;">
+        <div>
+          <p style="color: var(--green-accent); font-size: 0.85em; font-weight: 500; margin-bottom: 0.6em;">Already configured on each Pi</p>
+          <ul class="checklist">
+            <li>Camera bot tokens (OrbitBot, etc.)</li>
+            <li>Discord webhooks</li>
+            <li>Shared Python venv at <code>/opt/oak-shared/venv/</code></li>
+            <li>All required libraries installed</li>
+          </ul>
+        </div>
+        <div>
+          <p style="color: var(--blue-accent); font-size: 0.85em; font-weight: 500; margin-bottom: 0.6em;">What you need to do</p>
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            <li style="padding: 0.4em 0; border-bottom: 1px solid var(--border-subtle);">
+              <span style="color: var(--blue-accent);">&rsaquo;</span>&ensp;Copy Python files from laptop &rarr; Pi
+            </li>
+            <li style="padding: 0.4em 0; border-bottom: 1px solid var(--border-subtle);">
+              <span style="color: var(--blue-accent);">&rsaquo;</span>&ensp;<em>(Optional)</em> Add your DM bot token to <code>.env</code>
+            </li>
+            <li style="padding: 0.4em 0;">
+              <span style="color: var(--blue-accent);">&rsaquo;</span>&ensp;Run the scripts!
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: SETUP STEPS -->
+
+    <section>
+      <h3>SETUP</h3>
+      <h2>Step 2: SSH Into a Pi &nbsp;<span class="local-badge">LOCAL</span></h2>
+      <p>Test your SSH config from your <strong>local terminal</strong>:</p>
+      <div class="command-card">
+        $ ssh orbit&emsp;&emsp;<span style="color: var(--text-muted);"># or: ssh gravity &nbsp;|&nbsp; ssh horizon</span>
+      </div>
+      <p style="margin-top: 1em;">If it connects, you're good! If not:</p>
+      <div class="troubleshoot-card">
+        <strong>"Host not found"</strong> &mdash; Your SSH config needs the Pi IP addresses (10.1.x.x).
+        See the main README or ask your instructor.
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/STUDENT_QUICKSTART.md#setting-up-ssh-access" target="_blank">Full details &rarr;</a></p>
+    </section>
+
+    <section>
+      <h3>SETUP</h3>
+      <h2>Step 3: Copy Files to Pi &nbsp;<span class="local-badge">LOCAL</span></h2>
+      <p>From your <strong>laptop terminal</strong> (not the Pi!):</p>
+      <pre><code class="language-bash"># Navigate to your local repo
+cd ~/path/to/smart-objects-cameras
+
+# Fatigue detection (recommended)
+scp fatigue_detector.py orbit:~/oak-projects/
+scp -r utils orbit:~/oak-projects/
+scp -r depthai_models orbit:~/oak-projects/
+scp discord_notifier.py orbit:~/oak-projects/
+scp discord_dm_notifier.py orbit:~/oak-projects/</code></pre>
+      <p style="font-size: 0.8em; color: var(--text-muted);">
+        Replace <code>orbit</code> with <code>gravity</code> or <code>horizon</code> as needed.
+      </p>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/STUDENT_QUICKSTART.md#step-1-copy-python-files-from-your-computer-to-the-pi" target="_blank">Full details &rarr;</a></p>
+    </section>
+
+    <section>
+      <h3>SETUP</h3>
+      <h2>Alt: VS Code Remote SSH</h2>
+      <p>If you have VS Code with the <strong>Remote-SSH</strong> extension:</p>
+      <div style="margin-top: 0.8em;">
+        <div class="step-row"><span class="step-number">1</span> <span>Connect to the Pi via Remote SSH</span></div>
+        <div class="step-row"><span class="step-number">2</span> <span>Open your local repo in a <strong>separate</strong> VS Code window</span></div>
+        <div class="step-row"><span class="step-number">3</span> <span><strong>Drag &amp; drop</strong> files from local to remote window</span></div>
+      </div>
+      <div class="info-card" style="margin-top: 1em;">
+        <strong>Advantage:</strong> No scp commands needed. You can also edit files directly on the Pi.
+      </div>
+    </section>
+
+    <section>
+      <h3>SETUP</h3>
+      <h2>Step 4: The .env File &nbsp;<span class="pi-badge">ON THE PI</span></h2>
+      <p>SSH in, then check if <code>.env</code> already exists:</p>
+      <div class="command-card">$ ls ~/oak-projects/.env</div>
+      <div class="two-col" style="margin-top: 1em;">
+        <div style="display: flex; flex-direction: column;">
+          <p style="color: var(--green-accent); font-weight: 500; font-size: 0.9em;">If it exists</p>
+          <p style="font-size: 0.85em;">Camera bot tokens are set. Optionally add your DM bot token:</p>
+          <pre style="margin-top: auto;"><code class="language-bash">nano ~/oak-projects/.env
+# Add at the bottom:
+DISCORD_USER_ID=your_id
+DISCORD_DM_BOT_TOKEN=your_token</code></pre>
+        </div>
+        <div style="display: flex; flex-direction: column;">
+          <p style="color: var(--blue-accent); font-weight: 500; font-size: 0.9em;">If it doesn't exist</p>
+          <p style="font-size: 0.85em;">Your instructor will share tokens via 1Password. Create the file:</p>
+          <pre style="margin-top: auto;"><code class="language-bash">nano ~/oak-projects/.env
+# Paste tokens from instructor
+chmod 600 ~/oak-projects/.env</code></pre>
+        </div>
+      </div>
+      <p style="font-size: 0.78em; color: var(--red-accent); margin-top: 0.6em;">Never commit .env to GitHub!</p>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/STUDENT_QUICKSTART.md#step-2-create-your-environment-file-env" target="_blank">Full details &rarr;</a></p>
+    </section>
+
+    <section>
+      <h3>SETUP</h3>
+      <h2>Step 5: Activate &amp; Run &nbsp;<span class="pi-badge">ON THE PI</span></h2>
+      <p>Every time you start working on the Pi:</p>
+      <pre><code class="language-bash"># Activate the shared virtual environment
+activate-oak
+
+# Navigate to your project folder
+cd ~/oak-projects
+
+# Run a detector!
+python3 fatigue_detector.py --display</code></pre>
+      <div class="info-card" style="margin-top: 0.8em;">
+        You should see <code>(venv)</code> appear before your prompt after <code>activate-oak</code>.
+      </div>
+    </section>
+
+    <!-- SECTION 4: PYTHON FLAGS -->
+
+    <section>
+      <h3>PYTHON FLAGS</h3>
+      <h2>Flag Reference</h2>
+      <p>Flags are <strong>optional settings</strong> that change how scripts run:</p>
+      <table>
+        <thead>
+          <tr><th>Flag</th><th>What It Does</th><th>Example</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>--display</code></td>
+            <td>Show live video window</td>
+            <td style="font-size: 0.85em;"><code>python3 gaze_detector.py --display</code></td>
+          </tr>
+          <tr>
+            <td><code>--log</code></td>
+            <td>Save events to a log file</td>
+            <td style="font-size: 0.85em;"><code>python3 fatigue_detector.py --log</code></td>
+          </tr>
+          <tr>
+            <td><code>--discord</code></td>
+            <td>Post to Discord class channel</td>
+            <td style="font-size: 0.85em;"><code>python3 person_detector*.py --discord</code></td>
+          </tr>
+          <tr>
+            <td><code>--threshold</code></td>
+            <td>Detection sensitivity (0.0–1.0)</td>
+            <td style="font-size: 0.85em;"><code>... --threshold 0.7</code></td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 0.6em;">Combine them: <code>python3 fatigue_detector.py --display --log</code></p>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/STUDENT_QUICKSTART.md#understanding-python-flags" target="_blank">Full details &rarr;</a></p>
+    </section>
+
+    <section>
+      <h3>PYTHON FLAGS</h3>
+      <h2>When to Use <code>--display</code></h2>
+      <div class="two-col" style="margin-top: 1em;">
+        <div>
+          <p style="color: var(--green-accent); font-weight: 500;">Use <code>--display</code> when:</p>
+          <ul style="list-style: none; padding: 0;">
+            <li style="padding: 0.3em 0;">Connected via <strong>VNC</strong></li>
+            <li style="padding: 0.3em 0;">Using a <strong>physical monitor</strong></li>
+            <li style="padding: 0.3em 0;">At the Pi's desktop</li>
+          </ul>
+        </div>
+        <div>
+          <p style="color: var(--red-accent); font-weight: 500;">Don't use when:</p>
+          <ul style="list-style: none; padding: 0;">
+            <li style="padding: 0.3em 0;">SSH'd from terminal only</li>
+            <li style="padding: 0.3em 0;">Running remotely without VNC</li>
+          </ul>
+          <p style="font-size: 0.82em; color: var(--text-muted); margin-top: 0.5em;">
+            Instead: run without <code>--display</code>, use Discord or logs to monitor.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: RUNNING DETECTORS -->
+
+    <section>
+      <h3>RUNNING DETECTORS</h3>
+      <h2>Fatigue Detection &nbsp;<span style="color: var(--green-accent); font-size: 0.5em;">RECOMMENDED</span></h2>
+      <p>Monitors eye aspect ratio (EAR) to detect drowsiness. Uses your <strong>personal DM bot</strong>.</p>
+      <div class="two-col" style="margin-top: 0.8em;">
+        <div>
+          <p style="font-size: 0.85em; font-weight: 500;">With display (VNC/monitor):</p>
+          <pre><code class="language-bash">activate-oak
+cd ~/oak-projects
+python3 fatigue_detector.py --display</code></pre>
+          <p style="font-size: 0.78em; color: var(--text-muted);">Press <strong>'q'</strong> to quit.</p>
+        </div>
+        <div>
+          <p style="font-size: 0.85em; font-weight: 500;">Without display (SSH only):</p>
+          <pre><code class="language-bash">activate-oak
+cd ~/oak-projects
+python3 fatigue_detector.py</code></pre>
+          <p style="font-size: 0.78em; color: var(--text-muted);">Press <strong>Ctrl+C</strong> to stop. Check Discord DMs.</p>
+        </div>
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/STUDENT_QUICKSTART.md#running-fatigue-detection" target="_blank">Full details &rarr;</a></p>
+    </section>
+
+    <section>
+      <h3>RUNNING DETECTORS</h3>
+      <h2>Gaze Estimation &nbsp;<span style="color: var(--green-accent); font-size: 0.5em;">RECOMMENDED</span></h2>
+      <p>Detects where someone is looking. Outputs gaze direction to the terminal.</p>
+      <pre><code class="language-bash">activate-oak
+cd ~/oak-projects
+python3 gaze_detector.py --display        # with video window
+python3 gaze_detector.py                   # terminal only</code></pre>
+      <div class="info-card" style="margin-top: 0.8em;">
+        <strong>Bonus challenge:</strong> Use Claude Code to add Discord notifications to gaze detection!
+        What gaze info is worth sending? How do you avoid spamming?
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/STUDENT_QUICKSTART.md#running-gaze-estimation" target="_blank">Full details &rarr;</a></p>
+    </section>
+
+    <section>
+      <h3>RUNNING DETECTORS</h3>
+      <h2>Person Detection <span style="font-size: 0.6em; color: var(--text-muted);">(optional)</span></h2>
+      <p>Uses the <strong>class camera bots</strong> (OrbitBot, GravityBot, HorizonBot) — not your personal DM bot.</p>
+      <pre><code class="language-bash">activate-oak && cd ~/oak-projects
+
+python3 person_detector_with_display.py --display   # with video
+python3 person_detector_with_display.py             # headless
+python3 person_detector_with_display.py --discord   # + class channel</code></pre>
+      <p style="font-size: 0.85em; margin-top: 0.6em;"><strong>Bot commands in Discord:</strong>
+        <code>!ping</code> &nbsp; <code>!status</code> &nbsp; <code>!screenshot</code> &nbsp; <code>!detect</code>
+      </p>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/STUDENT_QUICKSTART.md#running-person-detection-optional" target="_blank">Full details &rarr;</a></p>
+    </section>
+
+    <section>
+      <h3>RUNNING DETECTORS</h3>
+      <h2>Quick Reference</h2>
+      <table>
+        <thead>
+          <tr><th>What You Want</th><th>Window 1</th><th>Window 2</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Fatigue + personal DMs</strong></td>
+            <td><code>python3 fatigue_detector.py --display</code></td>
+            <td><code>python3 discord_dm_notifier.py</code></td>
+          </tr>
+          <tr>
+            <td><strong>Gaze estimation</strong></td>
+            <td><code>python3 gaze_detector.py --display</code></td>
+            <td style="color: var(--text-muted); font-style: italic;">not needed</td>
+          </tr>
+          <tr>
+            <td><strong>Person + personal DMs</strong></td>
+            <td><code>python3 person_detector*.py</code></td>
+            <td><code>python3 discord_dm_notifier.py</code></td>
+          </tr>
+          <tr>
+            <td><strong>Person + class channel</strong></td>
+            <td><code>python3 person_detector*.py --discord</code></td>
+            <td style="color: var(--text-muted); font-style: italic;">not needed</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- SECTION 6: MULTIPLE WINDOWS -->
+
+    <section>
+      <h3>MULTIPLE WINDOWS</h3>
+      <h2>Why Two Terminal Windows?</h2>
+      <p>A running script <strong>blocks its terminal</strong>. If you need a detector <em>and</em> your DM bot at the same time, you need two windows — each SSH'd into the Pi.</p>
+      <div class="two-col" style="margin-top: 1em;">
+        <div>
+          <p style="font-weight: 500; font-size: 0.9em;">Window 1 — Detector</p>
+          <div class="command-card">
+            $ ssh orbit<br>
+            $ activate-oak<br>
+            $ cd ~/oak-projects<br>
+            $ python3 fatigue_detector.py --display
+          </div>
+        </div>
+        <div>
+          <p style="font-weight: 500; font-size: 0.9em;">Window 2 — DM Bot</p>
+          <div class="command-card">
+            $ ssh orbit<br>
+            $ activate-oak<br>
+            $ cd ~/oak-projects<br>
+            $ python3 discord_dm_notifier.py
+          </div>
+        </div>
+      </div>
+      <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 0.8em;">
+        Stop each with <strong>Ctrl+C</strong> in its own window.
+      </p>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/STUDENT_QUICKSTART.md#running-multiple-things-at-once-important" target="_blank">Full details &rarr;</a></p>
+    </section>
+
+    <section>
+      <h3>MULTIPLE WINDOWS</h3>
+      <h2>How to Open a Second Terminal</h2>
+      <div class="three-col" style="margin-top: 1em;">
+        <div>
+          <p style="font-weight: 500; font-size: 0.9em;">Mac</p>
+          <p style="font-size: 0.82em;"><code>Cmd+T</code> new tab<br><code>Cmd+N</code> new window</p>
+        </div>
+        <div>
+          <p style="font-weight: 500; font-size: 0.9em;">Windows</p>
+          <p style="font-size: 0.82em;">Click <strong>+</strong> for a new tab<br>or open another window</p>
+        </div>
+        <div>
+          <p style="font-weight: 500; font-size: 0.9em;">VS Code</p>
+          <p style="font-size: 0.82em;">Click <strong>+</strong> in terminal panel<br>or click the split icon</p>
+        </div>
+      </div>
+      <div class="info-card" style="margin-top: 1.2em;">
+        <strong>VS Code tip:</strong> Split terminal lets you see both side-by-side — detector on left, bot on right.
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/STUDENT_QUICKSTART.md#how-to-open-multiple-terminal-windows" target="_blank">Full details &rarr;</a></p>
+    </section>
+
+    <!-- SECTION 7: TROUBLESHOOTING -->
+
+    <section>
+      <h3>TROUBLESHOOTING</h3>
+      <h2>Common Errors</h2>
+      <div class="two-col" style="margin-top: 0.5em;">
+        <div>
+          <div class="troubleshoot-card">
+            <strong>"No module named 'depthai'"</strong><br>
+            <span>Run <code>activate-oak</code> first.</span>
+          </div>
+          <div class="troubleshoot-card">
+            <strong>"Command not found: activate-oak"</strong><br>
+            <span>Run <code>source ~/.bashrc</code> then try again.</span>
+          </div>
+          <div class="troubleshoot-card">
+            <strong>"Permission denied"</strong><br>
+            <span>You don't have sudo. Ask instructor.</span>
+          </div>
+        </div>
+        <div>
+          <div class="troubleshoot-card">
+            <strong>Camera not found</strong><br>
+            <span>Check USB 3.0 (blue) port. Unplug/replug. Anyone else using it?</span>
+          </div>
+          <div class="troubleshoot-card">
+            <strong>Black screen in display</strong><br>
+            <span>Wait ~10 sec for frames. If still black, Ctrl+C and retry.</span>
+          </div>
+          <div class="troubleshoot-card">
+            <strong>VNC grey screen</strong><br>
+            <span>Someone else is logged in at the monitor. Use SSH instead.</span>
+          </div>
+        </div>
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/STUDENT_QUICKSTART.md#troubleshooting" target="_blank">Full details &rarr;</a></p>
+    </section>
+
+    <section>
+      <h3>TROUBLESHOOTING</h3>
+      <h2>"File Not Found" Checklist</h2>
+      <div style="max-width: 640px; margin-top: 0.8em;">
+        <div class="step-row"><span class="step-number">1</span> <span>Are you on the <strong>Pi</strong>? (Run <code>hostname</code> to check)</span></div>
+        <div class="step-row"><span class="step-number">2</span> <span>Did you <strong>copy the file</strong>? (<code>ls ~/oak-projects/</code>)</span></div>
+        <div class="step-row"><span class="step-number">3</span> <span>Any <strong>spaces</strong> in your path? Paths have no spaces!</span></div>
+        <div class="step-row"><span class="step-number">4</span> <span>Did you copy the <code>utils/</code> folder? (<code>-r</code> flag for folders)</span></div>
+        <div class="step-row" style="border-bottom: none;"><span class="step-number">5</span> <span>Did you copy <code>depthai_models/</code>?</span></div>
+      </div>
+      <div class="two-col" style="margin-top: 1em;">
+        <div>
+          <p style="color: var(--red-accent); font-size: 0.85em; font-weight: 500;">Wrong</p>
+          <div class="command-card" style="color: var(--red-accent);">cd ~ / oak-projects</div>
+        </div>
+        <div>
+          <p style="color: var(--green-accent); font-size: 0.85em; font-weight: 500;">Correct</p>
+          <div class="command-card">cd ~/oak-projects</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 8: PROJECT DIRECTORY -->
+
+    <section>
+      <h3>PROJECT DIRECTORY</h3>
+      <h2>Fatigue Detection Layout</h2>
+      <p>After copying files, your <code>~/oak-projects/</code> on the Pi:</p>
+      <pre><code class="language-text">~/oak-projects/
+├── fatigue_detector.py            # Main detector script
+├── utils/                         # Helper modules
+│   └── face_landmarks.py
+├── depthai_models/                # Model YAML configs
+│   ├── yunet.RVC2.yaml
+│   └── mediapipe_face_landmarker.RVC2.yaml
+├── discord_notifier.py            # Webhook helper
+├── discord_dm_notifier.py         # Your personal DM bot
+└── .env                           # Your tokens (never commit!)</code></pre>
+      <p style="font-size: 0.82em; color: var(--text-muted);">
+        Python packages live in <code>/opt/oak-shared/venv/</code> (shared by everyone).
+      </p>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/STUDENT_QUICKSTART.md#your-project-directory" target="_blank">Full details &rarr;</a></p>
+    </section>
+
+    <section>
+      <h3>PROJECT DIRECTORY</h3>
+      <h2>What Files Do I Need?</h2>
+      <table>
+        <thead>
+          <tr><th>Detector</th><th>Files to Copy</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Fatigue</strong></td>
+            <td><code>fatigue_detector.py</code>, <code>utils/</code>, <code>depthai_models/</code>,<br><code>discord_notifier.py</code>, <code>discord_dm_notifier.py</code></td>
+            <td style="font-size: 0.85em;">Recommended! Uses DM bot</td>
+          </tr>
+          <tr>
+            <td><strong>Gaze</strong></td>
+            <td><code>gaze_detector.py</code>, <code>utils/</code>, <code>depthai_models/</code></td>
+            <td style="font-size: 0.85em;">Terminal output only</td>
+          </tr>
+          <tr>
+            <td><strong>Person</strong></td>
+            <td><code>person_detector_with_display.py</code>,<br><code>discord_notifier.py</code></td>
+            <td style="font-size: 0.85em;">Uses class camera bots</td>
+          </tr>
+          <tr>
+            <td><strong>DM Bot</strong></td>
+            <td><code>discord_dm_notifier.py</code></td>
+            <td style="font-size: 0.85em;">Add token to <code>.env</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- SECTION 9: DEV TIPS -->
+
+    <section>
+      <h3>DEV TIPS</h3>
+      <h2>The Edit-Copy-Run Loop</h2>
+      <div style="display: flex; align-items: center; justify-content: center; gap: 1em; margin: 1.2em 0; font-size: 0.9em;">
+        <div style="text-align: center; padding: 0.7em 1em; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-card);">
+          <strong>Edit</strong><br>
+          <span style="font-size: 0.8em; color: var(--text-muted);">on your laptop</span>
+        </div>
+        <span style="color: var(--text-muted); font-size: 1.3em;">&rarr;</span>
+        <div style="text-align: center; padding: 0.7em 1em; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-card);">
+          <strong>scp</strong><br>
+          <span style="font-size: 0.8em; color: var(--text-muted);">to the Pi</span>
+        </div>
+        <span style="color: var(--text-muted); font-size: 1.3em;">&rarr;</span>
+        <div style="text-align: center; padding: 0.7em 1em; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-card);">
+          <strong>Run</strong><br>
+          <span style="font-size: 0.8em; color: var(--text-muted);">with --display</span>
+        </div>
+        <span style="color: var(--text-muted); font-size: 1.3em;">&rarr;</span>
+        <div style="text-align: center; padding: 0.7em 1em; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-card);">
+          <strong>Quit</strong><br>
+          <span style="font-size: 0.8em; color: var(--text-muted);">press 'q'</span>
+        </div>
+        <span style="color: var(--text-muted); font-size: 1.3em;">&circlearrowleft;</span>
+      </div>
+      <div class="info-card" style="margin-top: 0.6em;">
+        <strong>Changed a file?</strong> You must <code>scp</code> it to the Pi again! The Pi has the old version until you copy the new one.
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/STUDENT_QUICKSTART.md#tips-for-development" target="_blank">Full details &rarr;</a></p>
+    </section>
+
+    <section>
+      <h3>DEV TIPS</h3>
+      <h2>Adjusting Sensitivity &amp; Logging</h2>
+      <div class="two-col" style="margin-top: 0.8em;">
+        <div>
+          <p style="font-weight: 500; font-size: 0.9em;">Detection threshold</p>
+          <pre><code class="language-bash"># More sensitive (more false positives)
+python3 person_detector*.py --threshold 0.3
+
+# Less sensitive (fewer false positives)
+python3 person_detector*.py --threshold 0.7
+
+# Default is 0.5</code></pre>
+        </div>
+        <div>
+          <p style="font-weight: 500; font-size: 0.9em;">Logging &amp; headless</p>
+          <pre><code class="language-bash"># Save events to a log file
+python3 fatigue_detector.py --log
+
+# Run headless + monitor via Discord
+python3 person_detector*.py --discord
+# Then use !screenshot in Discord</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 10: CLAUDE CODE -->
+
+    <section>
+      <h3>CLAUDE CODE</h3>
+      <h2>Install &amp; Launch &nbsp;<span class="local-badge">LOCAL</span></h2>
+      <p>Install once on your <strong>laptop</strong>:</p>
+      <pre><code class="language-bash"># Install Claude Code
+curl -fsSL https://cli.anthropic.com/install.sh | sh
+
+# Verify
+claude --version</code></pre>
+      <p style="margin-top: 0.8em;">Then use it from your project directory:</p>
+      <div class="command-card">
+        $ cd ~/path/to/smart-objects-cameras<br>
+        $ claude
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/STUDENT_QUICKSTART.md#-using-claude-code-for-help" target="_blank">Full details &rarr;</a></p>
+    </section>
+
+    <section>
+      <h3>CLAUDE CODE</h3>
+      <h2>What It Can Do</h2>
+      <div class="two-col" style="margin-top: 0.8em;">
+        <div>
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            <li style="padding: 0.35em 0; border-bottom: 1px solid var(--border-subtle);">
+              <span style="color: var(--green-accent);">&rsaquo;</span>&ensp;Read &amp; explain your code
+            </li>
+            <li style="padding: 0.35em 0; border-bottom: 1px solid var(--border-subtle);">
+              <span style="color: var(--green-accent);">&rsaquo;</span>&ensp;Propose &amp; apply code changes
+            </li>
+            <li style="padding: 0.35em 0; border-bottom: 1px solid var(--border-subtle);">
+              <span style="color: var(--green-accent);">&rsaquo;</span>&ensp;SSH into Pis &amp; run commands
+            </li>
+            <li style="padding: 0.35em 0; border-bottom: 1px solid var(--border-subtle);">
+              <span style="color: var(--green-accent);">&rsaquo;</span>&ensp;Copy files to/from Pis
+            </li>
+            <li style="padding: 0.35em 0;">
+              <span style="color: var(--green-accent);">&rsaquo;</span>&ensp;Debug errors you paste in
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p style="font-size: 0.85em; font-weight: 500;">Example:</p>
+          <pre><code class="language-text">You: How does the person detection
+     pipeline work?
+
+You: Modify the detector to also
+     detect cars. Create a new file
+     called person_detector_alice.py
+
+You: I'm getting this error: [paste]</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h3>CLAUDE CODE</h3>
+      <h2>Safety Rules &nbsp;<span class="warn-badge">IMPORTANT</span></h2>
+      <div class="two-col" style="margin-top: 0.8em;">
+        <div>
+          <p style="color: var(--green-accent); font-weight: 500; font-size: 0.9em;">Do</p>
+          <ul style="list-style: none; padding: 0;">
+            <li style="padding: 0.3em 0; font-size: 0.88em;">Read proposed changes carefully</li>
+            <li style="padding: 0.3em 0; font-size: 0.88em;">Make sure you understand what it's changing</li>
+            <li style="padding: 0.3em 0; font-size: 0.88em;">Ask it to create <strong>new files</strong> with your name</li>
+            <li style="padding: 0.3em 0; font-size: 0.88em;">Ask questions if unsure</li>
+          </ul>
+        </div>
+        <div>
+          <p style="color: var(--red-accent); font-weight: 500; font-size: 0.9em;">Don't</p>
+          <ul style="list-style: none; padding: 0;">
+            <li style="padding: 0.3em 0; font-size: 0.88em;">Auto-accept everything ("y y y")</li>
+            <li style="padding: 0.3em 0; font-size: 0.88em;">Let it make changes you don't understand</li>
+            <li style="padding: 0.3em 0; font-size: 0.88em;">Accept sudo commands blindly</li>
+            <li style="padding: 0.3em 0; font-size: 0.88em;">Install packages you didn't ask for</li>
+          </ul>
+        </div>
+      </div>
+      <div class="info-card" style="margin-top: 1em;">
+        <strong>Best practice:</strong> Ask Claude to create <code>person_detector_yourname.py</code> instead of editing the original.
+        You can always compare your version to the reference!
+      </div>
+      <p class="read-more"><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/STUDENT_QUICKSTART.md#safety-and-best-practices" target="_blank">Full details &rarr;</a></p>
+    </section>
+
+    <!-- SECTION 11: CLOSING -->
+
+    <section>
+      <h3>SMART OBJECTS</h3>
+      <h1>You're Ready!</h1>
+      <div style="margin-top: 1.5em; max-width: 500px;">
+        <div class="step-row"><span style="color: var(--text-muted);">Full README</span> <span><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/STUDENT_QUICKSTART.md" style="color: var(--blue-accent);">STUDENT_QUICKSTART.md</a></span></div>
+        <div class="step-row"><span style="color: var(--text-muted);">Workflow guide</span> <span><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/WORKFLOW.md" style="color: var(--blue-accent);">WORKFLOW.md</a></span></div>
+        <div class="step-row"><span style="color: var(--text-muted);">Version info</span> <span><a href="https://github.com/kandizzy/smart-objects-cameras/blob/main/docs/WORKING_VERSIONS.md" style="color: var(--blue-accent);">WORKING_VERSIONS.md</a></span></div>
+        <div class="step-row" style="border-bottom: none;"><span style="color: var(--text-muted);">Luxonis docs</span> <span><a href="https://docs.luxonis.com" style="color: var(--blue-accent);">docs.luxonis.com</a></span></div>
+      </div>
+      <p style="font-size: 0.85em; color: var(--text-muted); margin-top: 2em;">
+        Stuck? Ask your instructor or use <code>claude</code> from your project directory.
+      </p>
+    </section>
+
+  </div><!-- /.slides -->
+</div><!-- /.reveal -->
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.min.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: true,
+    plugins: [RevealHighlight],
+    width: 1280,
+    height: 720,
+    margin: 0.1,
+    transition: 'none',
+    backgroundTransition: 'none',
+    center: false,
+  });
+</script>
+</body>
+</html>

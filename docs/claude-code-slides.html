@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Code Workflow — Smart Objects</title>
+
+  <!-- Reveal.js 5.x from CDN (no npm install needed) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.min.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/github.min.css">
+
+  <!-- Google Fonts: Instrument Serif + Inter + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --font-heading: "Instrument Serif", Georgia, "Times New Roman", serif;
+      --font-sans: "Inter", "Helvetica Neue", -apple-system, system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-muted: #a8a29e;
+      --bg-page: #fafaf9;
+      --bg-card: #ffffff;
+      --border-subtle: #e7e5e4;
+      --green-accent: #16a34a;
+      --green-bg: #f0fdf4;
+      --green-border: #bbf7d0;
+      --red-accent: #dc2626;
+      --red-bg: #fef2f2;
+      --red-border: #fecaca;
+      --blue-accent: #2563eb;
+      --blue-bg: #eff6ff;
+      --blue-border: #bfdbfe;
+    }
+    .reveal, .reveal .slide-background { background: var(--bg-page); }
+    .reveal { font-family: var(--font-sans); font-weight: 400; font-size: 22px; color: var(--text-secondary); }
+    .reveal h1 { font-family: var(--font-heading); font-size: 2.4em; font-weight: 400; font-style: italic; letter-spacing: -0.02em; color: var(--text-primary); margin-bottom: 0.5em; }
+    .reveal h2 { font-family: var(--font-heading); font-size: 1.6em; font-weight: 400; letter-spacing: -0.01em; color: var(--text-primary); margin-bottom: 0.5em; }
+    .reveal h3 { font-family: var(--font-sans); font-size: 0.65em; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.5em; }
+    .reveal p, .reveal li { font-size: 0.95em; line-height: 1.65; color: var(--text-secondary); }
+    .reveal strong { font-weight: 600; color: var(--text-primary); }
+    .reveal a { color: var(--blue-accent); text-decoration: none; border-bottom: 1px solid var(--border-subtle); }
+    .reveal pre { font-family: var(--font-mono); font-size: 0.75em; line-height: 1.55; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 1em 1.25em; box-shadow: none; width: 100%; margin: 0.75em 0; }
+    .reveal code { font-family: var(--font-mono); }
+    .reveal p code, .reveal li code { background: #f5f5f4; border: 1px solid var(--border-subtle); border-radius: 4px; padding: 0.1em 0.4em; font-size: 0.85em; color: var(--green-accent); }
+    .command-card { background: #f5f5f4; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0.8em 1.1em; font-family: var(--font-mono); font-size: 0.8em; color: var(--green-accent); margin: 0.5em 0; }
+    .info-card { background: var(--blue-bg); border: 1px solid var(--blue-border); border-radius: 6px; padding: 0.8em 1.1em; font-size: 0.85em; margin: 0.5em 0; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2em; align-items: start; }
+    .checklist { list-style: none; padding: 0; margin: 0; }
+    .checklist li { position: relative; padding: 0.4em 0 0.4em 1.5em; border-bottom: 1px solid var(--border-subtle); list-style: none; }
+    .checklist li::before { content: "\2713"; color: var(--green-accent); font-size: 0.85em; position: absolute; left: 0; }
+    .reveal table { width: 100%; border-collapse: collapse; font-size: 0.8em; margin-top: 0.75em; }
+    .reveal table th { text-align: left; font-weight: 600; color: var(--text-primary); border-bottom: 2px solid var(--border-subtle); padding: 0.5em 0.75em; font-size: 0.9em; }
+    .reveal table td { padding: 0.45em 0.75em; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+    .reveal table td code { color: var(--green-accent); }
+    .reveal .slide-number { font-family: var(--font-mono); font-size: 0.7em; color: var(--text-muted); background: none; left: 50%; transform: translateX(-50%); right: auto; bottom: 1em; }
+    .reveal .progress span { background: var(--border-subtle); }
+  </style>
+</head>
+<body>
+
+<div class="reveal">
+  <div class="slides">
+
+    <!-- SLIDE 1 — Title -->
+    <section>
+      <h3>SMART OBJECTS</h3>
+      <h1>Claude Code Workflow</h1>
+      <p>Using AI-assisted development with task tracking and shared lessons.</p>
+      <p style="font-size: 0.75em; color: var(--text-muted); margin-top: 2em;">
+        SVA MFA Interaction Design · Winter 2026
+      </p>
+    </section>
+
+    <!-- SLIDE 2 — What is Claude Code? -->
+    <section>
+      <h3>OVERVIEW</h3>
+      <h2>What is Claude Code?</h2>
+      <p>An AI coding assistant that runs in your terminal or VS Code.</p>
+      <ul class="checklist">
+        <li>Reads and edits files in your project</li>
+        <li>Runs terminal commands</li>
+        <li>Searches documentation and web</li>
+        <li>Learns from project context (CLAUDE.md)</li>
+      </ul>
+      <div class="info-card" style="margin-top: 1em;">
+        <strong>Key idea:</strong> AI handles tedious debugging; you keep creative control.
+      </div>
+    </section>
+
+    <!-- SLIDE 3 — File Structure -->
+    <section>
+      <h3>PROJECT STRUCTURE</h3>
+      <h2>Key Files</h2>
+      <table>
+        <thead>
+          <tr><th>File</th><th>Purpose</th><th>In Git?</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>CLAUDE.md</code></td><td>Project instructions for AI</td><td>Yes</td></tr>
+          <tr><td><code>.claude/settings.local.json</code></td><td>Your personal AI settings</td><td>No</td></tr>
+          <tr><td><code>tasks/lessons.md</code></td><td>Shared debugging patterns</td><td>Yes</td></tr>
+          <tr><td><code>tasks/todo.md</code></td><td>Your personal task list</td><td>No</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- SLIDE 4 — Tasks Folder -->
+    <section>
+      <h3>TASK MANAGEMENT</h3>
+      <h2>The tasks/ Folder</h2>
+      <div class="two-col">
+        <div>
+          <p><strong>Shared (in git)</strong></p>
+          <p><code>tasks/lessons.md</code></p>
+          <p style="font-size: 0.85em;">Collective knowledge: debugging patterns, gotchas, API changes everyone should know.</p>
+        </div>
+        <div>
+          <p><strong>Personal (gitignored)</strong></p>
+          <p><code>tasks/todo.md</code></p>
+          <p style="font-size: 0.85em;">Your current work-in-progress. Not committed to avoid clutter.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5 — lessons.md Format -->
+    <section>
+      <h3>SHARED KNOWLEDGE</h3>
+      <h2>lessons.md Format</h2>
+      <pre><code class="language-markdown">### USB 2.0 causes OAK camera crashes
+
+- **Pattern**: Camera crashes with heap errors
+- **Rule**: Use USB 3.0 port (blue interior)
+- **Verify**: Run `diagnose.py` — should show SUPER
+- **Date**: 2026-03-14</code></pre>
+      <p style="font-size: 0.85em; margin-top: 0.5em;">When you discover something, add it here so others don't repeat the mistake.</p>
+    </section>
+
+    <!-- SLIDE 6 — Contributing Lessons -->
+    <section>
+      <h3>CONTRIBUTING</h3>
+      <h2>Adding to lessons.md</h2>
+      <p>When you solve a tricky problem:</p>
+      <ol style="font-size: 0.9em;">
+        <li>Open <code>tasks/lessons.md</code></li>
+        <li>Add a new section with Pattern / Rule / Date</li>
+        <li>Commit and push (or PR if you don't have write access)</li>
+      </ol>
+      <div class="info-card" style="margin-top: 1em;">
+        <strong>Example patterns:</strong> API changes, hardware quirks, dependency issues, config gotchas
+      </div>
+    </section>
+
+    <!-- SLIDE 7 — CLAUDE.md -->
+    <section>
+      <h3>PROJECT CONTEXT</h3>
+      <h2>CLAUDE.md</h2>
+      <p>This file tells Claude about the project:</p>
+      <ul class="checklist">
+        <li>Project structure and architecture</li>
+        <li>How to run scripts and tests</li>
+        <li>Common issues and their solutions</li>
+        <li>Coding conventions to follow</li>
+      </ul>
+      <p style="font-size: 0.85em; margin-top: 0.5em;">Claude reads this automatically when you open the project.</p>
+    </section>
+
+    <!-- SLIDE 8 — Local Settings -->
+    <section>
+      <h3>PERSONAL SETUP</h3>
+      <h2>Local Settings</h2>
+      <p>Create <code>.claude/settings.local.json</code> for your preferences:</p>
+      <pre><code class="language-json">{
+  "permissions": {
+    "allow": ["Bash(git *)"],
+    "deny": []
+  }
+}</code></pre>
+      <p style="font-size: 0.85em;">This file is gitignored — your settings don't affect others.</p>
+    </section>
+
+    <!-- SLIDE 9 — Workflow -->
+    <section>
+      <h3>WORKFLOW</h3>
+      <h2>Working with Claude</h2>
+      <ol style="font-size: 0.9em;">
+        <li><strong>Describe the goal</strong> — what you want to build or fix</li>
+        <li><strong>Let Claude explore</strong> — it reads files, runs diagnostics</li>
+        <li><strong>Review changes</strong> — approve or reject edits</li>
+        <li><strong>Capture lessons</strong> — if you learned something, add to lessons.md</li>
+      </ol>
+      <div class="info-card" style="margin-top: 1em;">
+        <strong>Remember:</strong> Your brain does the creative thinking. Claude does the tedious parts.
+      </div>
+    </section>
+
+    <!-- SLIDE 10 — Closing -->
+    <section>
+      <h3>SMART OBJECTS</h3>
+      <h1>Brain + AI</h1>
+      <p>You bring the creative vision.<br>AI handles API docs and dependency struggles.</p>
+      <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 2em;">
+        Questions? Check <code>tasks/lessons.md</code> first — your answer might be there.
+      </p>
+    </section>
+
+  </div><!-- /.slides -->
+</div><!-- /.reveal -->
+
+<!-- Reveal.js + plugins from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.min.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: true,
+    plugins: [RevealHighlight],
+    width: 1280,
+    height: 720,
+    margin: 0.1,
+    transition: 'none',
+    backgroundTransition: 'none',
+    center: false,
+  });
+</script>
+</body>
+</html>

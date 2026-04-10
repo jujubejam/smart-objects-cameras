@@ -30,3 +30,24 @@ __pycache__/
 .depthai/
 *.blob
 *.bin
+
+# PC testing artifacts (local Windows/Mac testing)
+pc-testing/*.jpg
+pc-testing/*.json
+pc-testing/*.log
+pc-testing/models/
+pc-testing/*.pt
+pc-testing/.cache/
+pc-testing/.depthai_cached_models/
+
+# Webcam testing artifacts
+webcam/*.pt
+webcam/__pycache__/
+webcam/.models/
+
+# Claude Code local settings (user-specific)
+.claude/settings.local.json
+
+# Task management (keep lessons.md, gitignore personal todos)
+tasks/todo.md
+tasks/todo-*.md
