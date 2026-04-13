@@ -18,23 +18,23 @@ I wanted the room to show how hard the facilitator and the students having talk 
 
 Two or three bullet points. Be specific — "detected a person 3 meters away reliably" is better than "it worked."
 
+- it worked with the shape and style of the plants. 
 - 
 - 
--
 
 ## What broke
 
 Two or three bullet points. **Be honest.** False positives, weird edge cases, things you'd warn the next student about. This is the most valuable section of your retro — don't skip it.
 
--
--
+- but i would need to differentiate the diverse plants.
+- 
 -
 
 ## One screenshot
 
 Put your screenshot in `docs/whitepaper/artifacts/` using the naming convention `<firstname>-<project>-screenshot.png`, then link to it here:
 
-![](../artifacts/<firstname>-<project>-screenshot.png)
+![](../artifacts/test1.png)
 
 Caption: one sentence describing what we're looking at.
 
