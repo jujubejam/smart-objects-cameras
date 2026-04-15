@@ -811,8 +811,21 @@ Once basic detection is working, you might want to explore:
 
 ## Contributors
 
-- [Your name here]
-- [Student names]
+**Instructors**
+- [Carrie Kengle](https://github.com/kandizzy)
+- [Bruno Kruse](https://github.com/brunokruse)
+
+**Students**
+- [Darren Chia](https://github.com/dchiaSVA)
+- [Feifey Wang](https://github.com/Feifey)
+- [Gordon Cheng](https://github.com/Gordoncheng1125)
+- [JuJu Kim](https://github.com/jujubejam)
+- [Kathy Choi](https://github.com/katcheee)
+- [Ramon Naula](https://github.com/Ramonn18)
+- [Seren Kim](https://github.com/Hye-Seung-Kim)
+- [Shuyang Tian](https://github.com/stian2helloworld)
+- [Sophie Lee](https://github.com/ylee32-ops)
+- [Yuxuan Chen](https://github.com/ychen223-cmd)
 
 ## License
 
