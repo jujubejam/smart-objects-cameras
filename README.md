@@ -821,6 +821,7 @@ Once basic detection is working, you might want to explore:
 - [Gordon Cheng](https://github.com/Gordoncheng1125)
 - [JuJu Kim](https://github.com/jujubejam)
 - [Kathy Choi](https://github.com/katcheee)
+- [Phil Cote](https://github.com/philcodee)
 - [Ramon Naula](https://github.com/Ramonn18)
 - [Seren Kim](https://github.com/Hye-Seung-Kim)
 - [Shuyang Tian](https://github.com/stian2helloworld)
