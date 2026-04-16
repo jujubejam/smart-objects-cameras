@@ -822,10 +822,16 @@ Once basic detection is working, you might want to explore:
 - [JuJu Kim](https://github.com/jujubejam)
 - [Kathy Choi](https://github.com/katcheee)
 - [Ramon Naula](https://github.com/Ramonn18)
-- [Seren Kim](https://github.com/Hye-Seung-Kim)
+- [Phil](https://github.com/Hye-Seung-Kim)
 - [Shuyang Tian](https://github.com/stian2helloworld)
 - [Sophie Lee](https://github.com/ylee32-ops)
 - [Yuxuan Chen](https://github.com/ychen223-cmd)
+
+## Known Issues & Future Recommendations
+
+- **Shuyang Tian GitHub username:** The merged PR came from `stian2world` but the contributor link points to `stian2helloworld`. Verify which is correct and update the link in `README.md` line 826.
+
+---
 
 ## License
 

@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Smart Classroom Heartbeat</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #f6f6f2;
+      color: #1d1d1d;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main {
+      width: min(980px, calc(100vw - 2rem));
+      margin: 0 auto;
+      padding: 1.5rem 0 2rem;
+    }
+    h1 {
+      margin: 0 0 0.4rem;
+      font-size: 1.55rem;
+    }
+    p {
+      color: #626262;
+      line-height: 1.45;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.8rem;
+      margin: 1rem 0;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.25rem;
+      color: #626262;
+      font-size: 0.82rem;
+    }
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid #d0d0ca;
+      border-radius: 8px;
+      padding: 0.65rem 0.72rem;
+      background: #fff;
+      color: #1d1d1d;
+      font: inherit;
+    }
+    textarea {
+      min-height: 4.2rem;
+      resize: vertical;
+    }
+    button {
+      border: 1px solid #1d1d1d;
+      border-radius: 8px;
+      background: #1d1d1d;
+      color: #fff;
+      padding: 0.7rem 0.9rem;
+      cursor: pointer;
+      font: inherit;
+    }
+    button.secondary {
+      background: #fff;
+      color: #1d1d1d;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      align-items: center;
+      margin: 1rem 0;
+    }
+    .status {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.7rem;
+      margin: 1rem 0;
+    }
+    .metric {
+      border: 1px solid #d0d0ca;
+      border-radius: 8px;
+      background: #fff;
+      padding: 0.8rem;
+      min-height: 5rem;
+    }
+    .metric span {
+      display: block;
+      color: #626262;
+      font-size: 0.78rem;
+    }
+    .metric strong {
+      display: block;
+      margin-top: 0.35rem;
+      font-size: 1.25rem;
+      overflow-wrap: anywhere;
+    }
+    pre {
+      border: 1px solid #d0d0ca;
+      border-radius: 8px;
+      background: #fff;
+      min-height: 14rem;
+      max-height: 26rem;
+      overflow: auto;
+      padding: 0.8rem;
+      white-space: pre-wrap;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 0.86rem;
+    }
+    .wide { grid-column: 1 / -1; }
+    .ok { color: #137a4b; }
+    .bad { color: #bd2f2f; }
+    @media (max-width: 720px) {
+      .grid,
+      .status {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Smart Classroom Heartbeat</h1>
+    <p>If the whole project is not ready yet, this still proves the interaction exists: the room can see the project, what it can handle, and when it was last alive.</p>
+
+    <section class="grid">
+      <div>
+        <label for="apiBase">Classroom API</label>
+        <input id="apiBase" value="http://localhost:8766">
+      </div>
+      <div>
+        <label for="apiKey">API key</label>
+        <input id="apiKey" value="testkey">
+      </div>
+      <div>
+        <label for="projectId">Project ID</label>
+        <input id="projectId" value="student-project">
+      </div>
+      <div>
+        <label for="interval">Interval seconds</label>
+        <input id="interval" type="number" min="5" value="30">
+      </div>
+      <div>
+        <label for="capabilities">Capabilities</label>
+        <input id="capabilities" value="student-project">
+      </div>
+      <div>
+        <label for="consumes">Consumes</label>
+        <input id="consumes" value="">
+      </div>
+      <div>
+        <label for="emits">Emits</label>
+        <input id="emits" value="project.heartbeat">
+      </div>
+      <div>
+        <label for="message">Message</label>
+        <input id="message" value="heartbeat running">
+      </div>
+      <div class="wide">
+        <label for="meta">Meta JSON</label>
+        <textarea id="meta">{"client":"student_heartbeat.html"}</textarea>
+      </div>
+    </section>
+
+    <div class="row">
+      <button id="sendOnce">Send Once</button>
+      <button id="start">Start</button>
+      <button class="secondary" id="stop">Stop</button>
+      <button class="secondary" id="openConsole">Open Console</button>
+    </div>
+
+    <section class="status">
+      <div class="metric"><span>Status</span><strong id="status">idle</strong></div>
+      <div class="metric"><span>Last Seen</span><strong id="lastSeen">never</strong></div>
+      <div class="metric"><span>Live</span><strong id="live">false</strong></div>
+      <div class="metric"><span>Count</span><strong id="count">0</strong></div>
+    </section>
+
+    <pre id="log">Ready.</pre>
+  </main>
+
+  <script>
+    const ids = ["apiBase", "apiKey", "projectId", "interval", "capabilities", "consumes", "emits", "message", "meta"];
+    const values = {};
+    let timer = null;
+    let count = 0;
+
+    function $(id) {
+      return document.getElementById(id);
+    }
+
+    function csv(value) {
+      return value.split(",").map((item) => item.trim()).filter(Boolean);
+    }
+
+    function log(message, data) {
+      const line = `[${new Date().toLocaleTimeString()}] ${message}`;
+      $("log").textContent = `${line}${data ? "\n" + JSON.stringify(data, null, 2) : ""}\n\n${$("log").textContent}`;
+    }
+
+    function save() {
+      for (const id of ids) localStorage.setItem(`classroom.heartbeat.${id}`, $(id).value);
+    }
+
+    function load() {
+      for (const id of ids) {
+        const saved = localStorage.getItem(`classroom.heartbeat.${id}`);
+        if (saved !== null) $(id).value = saved;
+        $(id).addEventListener("input", save);
+      }
+    }
+
+    async function sendHeartbeat() {
+      save();
+      const apiBase = $("apiBase").value.replace(/\/$/, "");
+      const projectId = $("projectId").value.trim() || "student-project";
+      let meta = {};
+      try {
+        meta = JSON.parse($("meta").value || "{}");
+      } catch (error) {
+        throw new Error(`Meta JSON is invalid: ${error.message}`);
+      }
+
+      const response = await fetch(`${apiBase}/projects/${encodeURIComponent(projectId)}/heartbeat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": $("apiKey").value,
+        },
+        body: JSON.stringify({
+          status: "online",
+          capabilities: csv($("capabilities").value),
+          consumes: csv($("consumes").value),
+          emits: csv($("emits").value),
+          message: $("message").value,
+          meta,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || `HTTP ${response.status}`);
+      count += 1;
+      $("status").innerHTML = '<span class="ok">online</span>';
+      $("lastSeen").textContent = new Date(data.status.last_seen).toLocaleTimeString();
+      $("live").textContent = String(data.status.is_live);
+      $("count").textContent = String(count);
+      log("heartbeat ok", data.status);
+    }
+
+    async function sendOnce() {
+      try {
+        await sendHeartbeat();
+      } catch (error) {
+        $("status").innerHTML = '<span class="bad">error</span>';
+        log(error.message);
+      }
+    }
+
+    function start() {
+      stop();
+      sendOnce();
+      const interval = Math.max(5, Number($("interval").value) || 30) * 1000;
+      timer = setInterval(sendOnce, interval);
+      log("started heartbeat loop");
+    }
+
+    function stop() {
+      if (timer) clearInterval(timer);
+      timer = null;
+      log("stopped heartbeat loop");
+    }
+
+    load();
+    $("sendOnce").addEventListener("click", sendOnce);
+    $("start").addEventListener("click", start);
+    $("stop").addEventListener("click", stop);
+    $("openConsole").addEventListener("click", () => {
+      const apiBase = $("apiBase").value.replace(/\/$/, "");
+      window.open(`${apiBase}/console`, "_blank");
+    });
+  </script>
+</body>
+</html>

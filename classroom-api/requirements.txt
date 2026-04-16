@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+sse-starlette
+python-dotenv
+requests
+sseclient-py
+supabase

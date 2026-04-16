@@ -1,192 +1,229 @@
-# Smart Classroom API — Live Setup Guide
+# Smart Classroom API
 
-Do these steps in order during class. Each step builds on the last.
-
----
-
-## 1. Create Supabase Project
-
-1. Go to [supabase.com/dashboard](https://supabase.com/dashboard) → **New Project**
-2. Name it `smart-classroom` (or whatever you want)
-3. Set a database password (save it somewhere)
-4. Wait for it to provision (~1 min)
-
-Once ready, grab two things from **Settings → API**:
-- **Project URL** — looks like `https://abc123.supabase.co`
-- **service_role key** (under "Project API keys", the secret one, NOT the anon key)
+The event bus for the multi-agent smart classroom.
+Cameras, detectors, and student projects all connect here.
 
 ---
 
-## 2. Run the Schema SQL
-
-1. Go to **SQL Editor** in the Supabase dashboard
-2. Paste the contents of `supabase_schema.sql`
-3. Click **Run**
-4. Verify: go to **Table Editor** — you should see 4 tables:
-   - `classroom_state` (empty)
-   - `classroom_events` (empty)
-   - `student_projects` (15 rows)
-   - `project_events` (empty)
-
-### Enable Realtime
-
-Go to **Database → Replication** and enable Realtime for:
-- [x] `classroom_state`
-- [x] `classroom_events`
-- [x] `project_events`
-
-### Grab Student API Keys
-
-```sql
-SELECT project_id, display_name, api_key FROM student_projects;
-```
-
-Give each student/group their `api_key`. They'll need it to publish events.
-
----
-
-## 3. Set Environment Variables on Your PC
-
-Add to your `~/oak-projects/.env` (or wherever you run `classroom_api.py`):
+## Instructor quick start
 
 ```bash
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SERVICE_KEY=eyJ...your-service-role-key...
-CLASSROOM_API_KEY=pick-any-shared-secret
-```
+cd classroom-api
+pip install -r requirements.txt
 
-The `CLASSROOM_API_KEY` is a shared secret — Pis use it to authenticate when pushing detector data. Pick anything (e.g. `smart-classroom-2026`).
-
----
-
-## 4. Install Dependencies & Start the API
-
-```bash
-pip install fastapi uvicorn supabase sse-starlette python-dotenv
+# Windows
+set CLASSROOM_API_KEY=testkey
 python classroom_api.py
+
+# Mac / Linux
+CLASSROOM_API_KEY=testkey python classroom_api.py
 ```
 
-You should see:
+No Supabase required. State persists automatically to `.local/classroom-api/snapshot.json`.
+
+> **Network IP note:** When students connect from their own laptops they need your
+> machine's IP, not `localhost`. Find it with `ipconfig` (Windows) or `ifconfig`
+> (Mac) and share it: `http://YOUR_IP:8766`. The server listens on `0.0.0.0`
+> so it is reachable from any machine on the same network.
+
+Open the console:
+
 ```
-13:54:00 [INFO] Supabase connected: https://abc123.supabase.co
-13:54:00 [INFO] Starting Smart Classroom API on port 8766
+http://localhost:8766/console
 ```
 
-### Quick Test
+---
+
+## Browser shortcuts
+
+| URL | Purpose |
+|-----|---------|
+| `/console` | Live room state, phase controls, event bus, mock demo button |
+| `/heartbeat` | Student check-in page — no code required |
+| `/showcase/report` | Evidence report for critique and portfolio |
+| `/showcase/demo-script` | Run-of-show script for Monday |
+| `/projects/readiness` | Which projects are live / stale / missing |
+| `/projects/nudges.md` | Per-project next actions in plain text |
+| `/projects/{id}/packet.md` | One student's full check-in packet |
+| `/projects/roster.csv` | Roster export for grading |
+
+---
+
+## Running the mock demo
+
+Press **Run full script** on the console, or run it from the terminal:
 
 ```bash
-# Health check
-curl http://localhost:8766/health
+CLASSROOM_API_URL=http://localhost:8766 CLASSROOM_API_KEY=testkey python mock_classroom_driver.py --speed 3
+```
 
-# Push a fake state to verify Supabase writes
-curl -X POST http://localhost:8766/push/state \
+The driver walks through arrival → lecture → activity → conclude.
+All student project events are included in the script — you will see them in
+the console event bus and in the showcase report.
+
+---
+
+## Project roster
+
+| Project ID | Student | Connects via | Contract |
+|---|---|---|---|
+| `seren-room` | Yuxuan (Seren) | Python / p5.js | room_mode_change → ambience.changed |
+| `forest-classroom` | Sophie Lee | Python / p5.js | person_change → forest.mood_set |
+| `focus-beam` | Feifey | Python / Pi | probe_classification → beam.pointed |
+| `calmball` | Ramon Naula | Python / hardware | room_mode_change → calm.activated |
+| `echodesk` | Kathy Choi | Python / browser | agent.message → question.displayed |
+| `imprint` | Darren Chia | Python / Pi | whiteboard_change → handwriting.captured |
+| `gesture-timer` | Phil | Python / Pi | timer.offer → timer.started / timer.done |
+| `smart-stage` | Gordon | Python / Pi | fiducial.detected → stage.ready |
+| `assignment-tracker` | Shuyang Tian | Python / Pi | whiteboard_change → assignment.suggested |
+| `gus-mode` | Juju | Python / VIAM | person_change → gus.present / gus.excited |
+| `horizon` | System | Pi camera | fiducial.request → fiducial.detected |
+| `gravity` | System | Pi camera | fiducial.request → fiducial.detected |
+
+Student API key: `testkey` — same for everyone in local mode.
+
+---
+
+## Grading criteria (finals)
+
+The showcase report at `/showcase/report` is the grade sheet.
+Score is calculated automatically (0–5 points per project):
+
+| Points | What it means |
+|--------|---------------|
+| 1 | Project is registered (declared what it listens for) |
+| 2 | Contract exists (declared consumes and emits) |
+| 3 | Heartbeat sent + at least one event in the bus |
+| 4 | Contract + heartbeat + event (demonstrated the loop) |
+| 5 | Live at critique time + contract + event |
+
+**Minimum passing score for finals: 3/5**
+(Heartbeat sent, at least one event proves the interaction happened)
+
+**Full credit: 5/5**
+(Live at critique time with a complete consume → emit loop on the bus)
+
+The bus records evidence even when hardware fails.
+A mock event with the right payload counts the same as real hardware —
+the contract is the project, not the device.
+
+---
+
+## Sending a heartbeat for a student (if their code isn't working)
+
+Open:
+
+```
+http://localhost:8766/heartbeat
+```
+
+Enter their project ID and capabilities. That counts as evidence.
+
+Or run the heartbeat script directly:
+
+```bash
+set CLASSROOM_API=http://localhost:8766
+set PROJECT_ID=seren-room
+set PROJECT_API_KEY=testkey
+set CAPABILITIES=ambience,ambience.changed,room.adapted
+set CONSUMES=person_change,probe_classification,room_mode_change
+set EMITS=ambience.changed,room.adapted
+python student_heartbeat.py
+```
+
+---
+
+## API key
+
+The classroom API key for local demo is `testkey`.
+Any student project that sends `X-API-Key: testkey` will be accepted.
+
+For a real deployment, set `CLASSROOM_API_KEY=your-secret` in the environment
+before starting the API.
+
+---
+
+## Resetting the room between demos
+
+```bash
+curl -X POST http://localhost:8766/mock/reset \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: pick-any-shared-secret" \
-  -d '{"camera_id":"test","person_count":3,"person_detected":true}'
-
-# Read it back
-curl http://localhost:8766/state
-curl http://localhost:8766/mode
+  -H "X-API-Key: testkey" \
+  -d "{}"
 ```
 
-Check Supabase **Table Editor → classroom_state** — you should see the "test" row.
+Or press **Reset room** on the console.
 
 ---
 
-## 5. Set Environment Variables on Each Pi
-
-SSH into each Pi and add to `~/oak-projects/.env`:
+## Checking what the room knows right now
 
 ```bash
-CLASSROOM_API_URL=http://YOUR_PC_IP:8766
-CLASSROOM_API_KEY=pick-any-shared-secret
-```
-
-Replace `YOUR_PC_IP` with your actual PC IP on the network (e.g. `192.168.1.100`).
-
-Now when you run any detector with the updated code, it automatically pushes to Supabase alongside the existing JSON files:
-
-```bash
-python3 person_detector.py --discord
-python3 probe_inference.py --server http://YOUR_PC_IP:8765 --probe ~/oak-projects/classroom_probe.pt --discord
+curl http://localhost:8766/room/context
+curl http://localhost:8766/projects/readiness
+curl http://localhost:8766/capabilities
 ```
 
 ---
 
-## 6. Test the SSE Stream
-
-In a separate terminal:
-
-```bash
-curl -N http://localhost:8766/subscribe/state
-```
-
-This stays open. Now push another state update in a different terminal — you should see the SSE event appear in real time.
-
----
-
-## 7. Give Students Their Templates
-
-Students need:
-- The **PC IP** running classroom_api.py (e.g. `http://192.168.1.100:8766`)
-- Their **project API key** (from the `student_projects` table)
-
-### Python projects (Pi-based)
-
-Copy `templates/student_template.py`, set two env vars, run:
-
-```bash
-export CLASSROOM_API=http://192.168.1.100:8766
-export PROJECT_API_KEY=their-key-here
-python my_project.py
-```
-
-### Browser projects (p5.js, HTML)
-
-Copy `templates/student_template.html`, edit the three config lines at the top:
-
-```js
-const API_BASE = 'http://192.168.1.100:8766';
-const PROJECT_ID = 'gesture-timer';
-const API_KEY = 'their-key-here';
-```
-
-Serve it locally (`python3 -m http.server 8080`) and open in a browser.
-
----
-
-## 8. Discord Commands
-
-Once `CLASSROOM_API_URL` is set in the Pi's `.env`, the Discord bot gets two new commands:
+## File map
 
 ```
-!classroom    — full state from all cameras + room mode
-!mode         — just the current room mode
+classroom-api/
+  classroom_api.py        — the server (FastAPI + orchestrator + contracts)
+  orchestrator.py         — phase state and salience routing logic
+  mock_classroom_driver.py — demo script: runs a full class session
+  student_heartbeat.py    — minimum heartbeat client (Python, no SSE)
+  student_template.py     — full integration template with SSE listener
+  student_heartbeat.html  — minimum heartbeat (browser, no code)
+  student_template.html   — full integration template (browser, p5.js)
+  console.html            — instructor console
+  requirements.txt        — pip dependencies
+  .local/classroom-api/   — local snapshot (auto-created, not committed)
+
+docs/
+  CLASSROOM_CONTRACTS.md  — event envelope spec and per-project contracts
+  STUDENT_BUS_GUIDE.md    — student step-by-step + per-project Claude prompts
 ```
 
 ---
 
-## Quick Reference
+## Endpoints reference
 
-| What | Where |
-|------|-------|
-| API health check | `curl http://localhost:8766/health` |
-| Current room mode | `curl http://localhost:8766/mode` |
-| All camera states | `curl http://localhost:8766/state` |
-| Event history | `curl http://localhost:8766/events?limit=10` |
-| SSE live stream | `curl -N http://localhost:8766/subscribe/state` |
-| Student project list | `curl http://localhost:8766/projects` |
-| Supabase dashboard | `https://supabase.com/dashboard` |
+```
+GET  /health                          service status
+GET  /state                           all camera states + room mode
+GET  /mode                            room mode only
+GET  /phase                           current session phase
+GET  /room/context                    summarized room context for agents
+GET  /contracts                       all project contracts
+GET  /capabilities                    live capability index
 
-| Port | Service |
-|------|---------|
-| 8765 | V-JEPA embedding server (GPU) |
-| 8766 | Classroom API (Supabase bridge) |
+GET  /projects                        project registry
+GET  /projects/readiness              readiness table (use for grading)
+GET  /projects/nudges.md              plain-text next actions per project
+GET  /projects/roster.csv             roster CSV export
+GET  /projects/{id}/packet.md         one student's check-in packet
+GET  /projects/{id}/events            a project's event history
 
-| Env Var | Who needs it | What it is |
-|---------|-------------|------------|
-| `SUPABASE_URL` | PC only | Supabase project URL |
-| `SUPABASE_SERVICE_KEY` | PC only | Supabase service role key |
-| `CLASSROOM_API_KEY` | PC + all Pis | Shared detector secret |
-| `CLASSROOM_API_URL` | All Pis + Discord bot | `http://PC_IP:8766` |
-| `PROJECT_API_KEY` | Each student | Per-project key from student_projects table |
+POST /projects/{id}/heartbeat         project check-in
+POST /projects/{id}/events            project publishes an event
+POST /contracts/validate              validate an event payload
+POST /capabilities/route              resolve a capability to a project
+
+GET  /subscribe/state                 SSE: room state changes
+GET  /subscribe/events?subscriber_id= SSE: routed project events
+
+GET  /showcase/report                 evidence report (Markdown)
+GET  /showcase/demo-script            run-of-show script
+GET  /showcase/report.json            evidence report (JSON)
+
+POST /phase                           set session phase
+POST /push/state                      detector pushes camera state
+POST /mock/scenario                   run a built-in demo script
+POST /mock/reset                      reset room to unknown phase
+POST /labs/import                     import objects.json from labs repo
+
+GET  /console                         instructor console (HTML)
+GET  /heartbeat                       student check-in page (HTML)
+```

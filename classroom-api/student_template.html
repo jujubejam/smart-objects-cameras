@@ -137,14 +137,17 @@ async function getEvents(eventType = null, limit = 20) {
     return res.json();
 }
 
-async function publishEvent(eventType, payload = {}) {
+async function publishEvent(eventType, payload = {}, target = null) {
+    const body = { event_type: eventType, payload };
+    if (target) body.target = target;
+
     const res = await fetch(`${API_BASE}/projects/${PROJECT_ID}/events`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-API-Key': API_KEY,
         },
-        body: JSON.stringify({ event_type: eventType, payload }),
+        body: JSON.stringify(body),
     });
     return res.json();
 }
@@ -153,7 +156,36 @@ async function publishEvent(eventType, payload = {}) {
 // REAL-TIME SUBSCRIPTION (SSE)
 // ═══════════════════════════════════════════════════════════════════════════
 
+async function heartbeat({
+    status = 'online',
+    capabilities = [],
+    consumes = [],
+    emits = [],
+    message = null,
+    meta = {}
+} = {}) {
+    const res = await fetch(`${API_BASE}/projects/${PROJECT_ID}/heartbeat`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': API_KEY,
+        },
+        body: JSON.stringify({ status, capabilities, consumes, emits, message, meta }),
+    });
+    return res.json();
+}
+
+async function routeCapability(capability, neededBy = PROJECT_ID, reason = '') {
+    const res = await fetch(`${API_BASE}/capabilities/route`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ capability, needed_by: neededBy, reason }),
+    });
+    return res.json();
+}
+
 let evtSource = null;
+let eventSource = null;
 
 function connectSSE() {
     evtSource = new EventSource(`${API_BASE}/subscribe/state`);
@@ -174,6 +206,16 @@ function connectSSE() {
         document.getElementById('connection').className = 'status-value disconnected';
         // EventSource auto-reconnects
     };
+
+    eventSource = new EventSource(
+        `${API_BASE}/subscribe/events?subscriber_id=${encodeURIComponent(PROJECT_ID)}`
+    );
+
+    eventSource.addEventListener('classroom_event', (event) => {
+        const data = JSON.parse(event.data);
+        logEvent(`event ${data.event_type}`);
+        onClassroomEvent(data);
+    });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -245,6 +287,23 @@ function onStateChange(state) {
     // publishEvent('timer_started', { minutes: 5 });
 }
 
+function onClassroomEvent(event) {
+    // Receives BROADCAST events plus DIRECTED events whose target is PROJECT_ID.
+    //
+    // Example directed event:
+    // {
+    //   event_type: 'timer.offer',
+    //   target: 'gesture-timer',
+    //   payload: { minutes: 5, reason: 'group activity started' }
+    // }
+
+    // if (event.event_type === 'timer.offer') {
+    //     const minutes = event.payload.minutes || 5;
+    //     startTimer(minutes);
+    //     publishEvent('timer.started', { minutes }, event.project_id);
+    // }
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
@@ -271,6 +330,7 @@ getState().then(state => {
     document.getElementById('connection').textContent = 'Live';
     document.getElementById('connection').className = 'status-value connected';
     updateUI(state);
+    heartbeat({ message: 'student template running' }).catch(console.warn);
 }).catch(() => {
     document.getElementById('connection').textContent = 'Offline';
     document.getElementById('connection').className = 'status-value disconnected';

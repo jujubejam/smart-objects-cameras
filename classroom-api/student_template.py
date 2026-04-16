@@ -6,6 +6,7 @@ Replace PROJECT_ID with your project, then implement on_state_change().
 This template connects your project to the shared classroom system:
   - Read current classroom state (who's here, what's happening)
   - Subscribe to real-time changes (SSE stream)
+  - Subscribe to classroom/project events, including directed requests
   - Publish events from your project back to the classroom
 
 Setup:
@@ -99,7 +100,7 @@ def get_events(event_type: str = None, limit: int = 20) -> list:
 
 # ── Publish your own events ──────────────────────────────────────────────────
 
-def publish_event(event_type: str, payload: dict = None) -> dict:
+def publish_event(event_type: str, payload: dict = None, target=None) -> dict:
     """
     Publish an event from your project.
 
@@ -107,11 +108,16 @@ def publish_event(event_type: str, payload: dict = None) -> dict:
         publish_event("mode_change", {"mode": "party"})
         publish_event("calmball_squeeze", {"intensity": 0.8})
         publish_event("timer_started", {"minutes": 5})
+        publish_event("timer_done", {"minutes": 5}, target="prof-dm")
         publish_event("echodesk_message", {"text": "Can you repeat that?"})
     """
+    body = {"event_type": event_type, "payload": payload or {}}
+    if target:
+        body["target"] = target
+
     r = requests.post(
         f"{API_BASE}/projects/{PROJECT_ID}/events",
-        json={"event_type": event_type, "payload": payload or {}},
+        json=body,
         headers=HEADERS,
         timeout=5,
     )
@@ -120,6 +126,53 @@ def publish_event(event_type: str, payload: dict = None) -> dict:
 
 
 # ── Subscribe to real-time changes (SSE) ─────────────────────────────────────
+
+def heartbeat(
+    status: str = "online",
+    capabilities: list[str] = None,
+    consumes: list[str] = None,
+    emits: list[str] = None,
+    message: str = None,
+    meta: dict = None,
+) -> dict:
+    """
+    Tell the classroom bus that your project is alive.
+
+    This lets the orchestrator route by capability instead of hardcoded target.
+    """
+    r = requests.post(
+        f"{API_BASE}/projects/{PROJECT_ID}/heartbeat",
+        json={
+            "status": status,
+            "capabilities": capabilities or [],
+            "consumes": consumes or [],
+            "emits": emits or [],
+            "message": message,
+            "meta": meta or {},
+        },
+        headers=HEADERS,
+        timeout=5,
+    )
+    r.raise_for_status()
+    return r.json()
+
+
+def route_capability(capability: str, needed_by: str = None, reason: str = None) -> dict:
+    """
+    Ask the bus who should receive a request for a capability.
+
+    Example:
+        provider = route_capability("fiducials", needed_by=PROJECT_ID)
+        publish_event("fiducial.request", {...}, target=provider["target"])
+    """
+    r = requests.post(
+        f"{API_BASE}/capabilities/route",
+        json={"capability": capability, "needed_by": needed_by, "reason": reason},
+        timeout=5,
+    )
+    r.raise_for_status()
+    return r.json()
+
 
 def subscribe_to_state(callback):
     """
@@ -161,6 +214,56 @@ def subscribe_to_state(callback):
                         print(f"SSE parse error: {e}")
             except Exception as e:
                 print(f"SSE connection lost: {e}, reconnecting in 5s...")
+                time.sleep(5)
+
+    thread = threading.Thread(target=_listen, daemon=True)
+    thread.start()
+    return thread
+
+
+def subscribe_to_events(callback, subscriber_id: str = None, event_type: str = None):
+    """
+    Subscribe to classroom/project events via Server-Sent Events.
+
+    Use this for conversation between projects:
+      - BROADCAST events go to everyone.
+      - DIRECTED events arrive only when their target matches subscriber_id.
+
+    Example:
+        subscribe_to_events(on_classroom_event, subscriber_id=PROJECT_ID)
+    """
+    try:
+        import sseclient
+    except ImportError:
+        print("Install sseclient-py for event streams: pip install sseclient-py")
+        return None
+
+    sub_id = subscriber_id or PROJECT_ID
+
+    def _listen():
+        while True:
+            try:
+                params = {"subscriber_id": sub_id}
+                if event_type:
+                    params["event_type"] = event_type
+                response = requests.get(
+                    f"{API_BASE}/subscribe/events",
+                    params=params,
+                    stream=True,
+                    headers={"Accept": "text/event-stream"},
+                    timeout=None,
+                )
+                client = sseclient.SSEClient(response)
+                for event in client.events():
+                    if event.event == "ping":
+                        continue
+                    try:
+                        data = json.loads(event.data)
+                        callback(data)
+                    except Exception as e:
+                        print(f"event SSE parse error: {e}")
+            except Exception as e:
+                print(f"event SSE connection lost: {e}, reconnecting in 5s...")
                 time.sleep(5)
 
     thread = threading.Thread(target=_listen, daemon=True)
@@ -236,6 +339,24 @@ def on_state_change(state: dict):
 
 # ── Main ─────────────────────────────────────────────────────────────────────
 
+def on_classroom_event(event: dict):
+    """
+    Called for events on /subscribe/events.
+
+    This is where your project receives explicit requests from the room or
+    from other projects.
+    """
+    event_type = event.get("event_type")
+    payload = event.get("payload", {})
+    print(f"event: {event_type} {payload}")
+
+    # Example:
+    # if event_type == "timer.offer":
+    #     minutes = payload.get("minutes", 5)
+    #     start_timer(minutes)
+    #     publish_event("timer.started", {"minutes": minutes}, target=event.get("project_id"))
+
+
 def main():
     print(f"=== {PROJECT_ID} ===")
     print(f"API: {API_BASE}")
@@ -253,7 +374,13 @@ def main():
         print()
 
     # 2. Subscribe to real-time changes
+    try:
+        heartbeat(message="student template running")
+    except Exception as e:
+        print(f"Heartbeat failed: {e}")
+
     subscribe_to_state(on_state_change)
+    subscribe_to_events(on_classroom_event, subscriber_id=PROJECT_ID)
     print("Listening for classroom changes...\n")
 
     # 3. Keep running

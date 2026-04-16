@@ -21,6 +21,7 @@ import json
 import logging
 import threading
 import time
+from collections.abc import Iterable as IterableABC
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
@@ -130,6 +131,33 @@ POLICIES: dict[Phase, list[Rule]] = {
 ALWAYS_BROADCAST: frozenset[str] = frozenset({"phase_change"})
 
 
+def _normalize_targets(value) -> tuple[str, ...]:
+    """Normalize a target or target list from an event envelope."""
+    if not value:
+        return ()
+    if isinstance(value, str):
+        return (value,)
+    if isinstance(value, IterableABC) and not isinstance(value, (bytes, dict)):
+        return tuple(str(target) for target in value if target)
+    return ()
+
+
+def _explicit_targets(event: dict) -> tuple[str, ...]:
+    """Return event-level routing targets if the publisher supplied them.
+
+    This is the small "conversation" escape hatch: project/client events can
+    ask for a named subscriber directly, while phase policy still handles the
+    ambient/broadcast defaults for ordinary detector events.
+    """
+    payload = event.get("payload") if isinstance(event.get("payload"), dict) else {}
+    return (
+        _normalize_targets(event.get("targets"))
+        or _normalize_targets(event.get("target"))
+        or _normalize_targets(payload.get("targets"))
+        or _normalize_targets(payload.get("target"))
+    )
+
+
 # ── Routed events container ──────────────────────────────────────────────────
 
 
@@ -192,6 +220,12 @@ def route(events: list[dict], phase: Phase) -> RoutedEvents:
 
         if event_type in ALWAYS_BROADCAST:
             routed.broadcast.append(event)
+            continue
+
+        targets = _explicit_targets(event)
+        if targets:
+            for target in targets:
+                routed.directed.setdefault(target, []).append(event)
             continue
 
         rule = _rule_for_event(event_type, phase)

@@ -170,6 +170,37 @@ def test_for_subscriber_delivers_broadcast_plus_directed():
     assert student_view[0]["event_type"] == "whiteboard_change"
 
 
+def test_event_target_routes_directed_to_named_subscriber():
+    """Any event can carry a target for client-to-client conversation."""
+    event = {
+        "camera_id": "__project__:smart-stage",
+        "event_type": "timer.offer",
+        "target": "gesture-timer",
+        "payload": {"minutes": 5},
+    }
+    routed = orch.route([event], Phase.LECTURE)
+
+    assert routed.broadcast == []
+    assert routed.ambient == []
+    assert "gesture-timer" in routed.directed
+    assert routed.for_subscriber("gesture-timer") == [event]
+    assert routed.for_subscriber("some-other-project") == []
+
+
+def test_payload_targets_route_to_multiple_subscribers():
+    event = ev(
+        "fiducial.request",
+        targets=["horizon", "gravity"],
+        marker_family="tag36h11",
+    )
+    routed = orch.route([event], Phase.ACTIVITY)
+
+    assert routed.broadcast == []
+    assert set(routed.directed.keys()) == {"horizon", "gravity"}
+    assert routed.for_subscriber("horizon") == [event]
+    assert routed.for_subscriber("gravity") == [event]
+
+
 def test_all_for_log_captures_every_event():
     """The durable log gets everything, even ambient."""
     routed = orch.route(

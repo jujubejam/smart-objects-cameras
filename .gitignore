@@ -21,6 +21,10 @@ latest_whiteboard_frame.jpg
 # Python cache
 __pycache__/
 *.pyc
+.venv/
+.tmp/
+.local/
+classroom-api/.codex_tmp/
 
 # OS files
 .DS_Store

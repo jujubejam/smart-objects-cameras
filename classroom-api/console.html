@@ -1,0 +1,1152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Classroom OS Console</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #191919;
+      --muted: #666;
+      --line: #d8d8d8;
+      --paper: #f7f7f5;
+      --panel: #ffffff;
+      --wash: #eef4ef;
+      --green: #137a4b;
+      --teal: #0f766e;
+      --red: #bd2f2f;
+      --yellow: #f1b82d;
+      --pink: #c23a7a;
+      --blue: #2764b5;
+      --black: #111;
+      --shadow: 0 12px 30px rgba(20, 20, 20, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.4;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      background: var(--ink);
+      color: #fff;
+      padding: 0.58rem 0.8rem;
+      cursor: pointer;
+      min-height: 2.4rem;
+    }
+
+    button.secondary {
+      background: #fff;
+      color: var(--ink);
+    }
+
+    button.green {
+      background: var(--green);
+      border-color: var(--green);
+    }
+
+    button.teal {
+      background: var(--teal);
+      border-color: var(--teal);
+    }
+
+    button.yellow {
+      background: var(--yellow);
+      border-color: #9a6d00;
+      color: var(--ink);
+    }
+
+    button.pink {
+      background: var(--pink);
+      border-color: var(--pink);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: wait;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0.6rem 0.7rem;
+      background: #fff;
+      color: var(--ink);
+    }
+
+    textarea {
+      min-height: 7.5rem;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 0.86rem;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: grid;
+      grid-template-columns: 1fr minmax(280px, 580px);
+      gap: 1rem;
+      align-items: center;
+      padding: 1rem clamp(1rem, 3vw, 2rem);
+      background: rgba(247, 247, 245, 0.94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      line-height: 1.1;
+    }
+
+    .brand p {
+      margin: 0.25rem 0 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .auth-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 0.55rem;
+      align-items: end;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 0.25rem;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .shell {
+      padding: 1rem clamp(1rem, 3vw, 2rem) 2rem;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 0.9fr 0.95fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(290px, 0.8fr) minmax(360px, 1.15fr) minmax(320px, 1fr);
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.9rem 1rem;
+      border-bottom: 1px solid var(--line);
+      background: #fbfbfa;
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 0.98rem;
+    }
+
+    .panel-body {
+      padding: 1rem;
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0.7rem;
+    }
+
+    .metric {
+      min-height: 5rem;
+      padding: 0.9rem;
+      background: var(--wash);
+      border: 1px solid #dce8de;
+      border-radius: 8px;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 0.35rem;
+      font-size: 1.5rem;
+      line-height: 1.1;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .phase-buttons,
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .phase-buttons button.active {
+      background: var(--yellow);
+      border-color: #9a6d00;
+      color: var(--ink);
+    }
+
+    .image-strip {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.7rem;
+    }
+
+    .image-tile {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      min-height: 9rem;
+      overflow: hidden;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #ddd;
+    }
+
+    .image-tile span {
+      position: absolute;
+      left: 0.6rem;
+      bottom: 0.6rem;
+      padding: 0.25rem 0.45rem;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.86);
+      color: var(--ink);
+      font-size: 0.78rem;
+    }
+
+    .event-list,
+    .project-list,
+    .camera-list,
+    .policy-list,
+    .conversation-list {
+      display: grid;
+      gap: 0.6rem;
+      max-height: 34rem;
+      overflow: auto;
+      padding-right: 0.15rem;
+    }
+
+    .event,
+    .project,
+    .camera,
+    .policy,
+    .conversation {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0.72rem;
+      background: #fff;
+    }
+
+    .event {
+      border-left: 5px solid var(--blue);
+    }
+
+    .event.project-source {
+      border-left-color: var(--pink);
+    }
+
+    .event.detector-source {
+      border-left-color: var(--green);
+    }
+
+    .event.orchestrator-source {
+      border-left-color: var(--yellow);
+    }
+
+    .event-title,
+    .project-title,
+    .camera-title,
+    .policy-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      margin-bottom: 0.35rem;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .event-meta,
+    .project-meta,
+    .camera-meta,
+    .policy-meta,
+    .small {
+      color: var(--muted);
+      font-size: 0.8rem;
+      overflow-wrap: anywhere;
+    }
+
+    .payload {
+      margin: 0.5rem 0 0;
+      padding: 0.55rem;
+      border-radius: 6px;
+      background: #f4f4f2;
+      color: #333;
+      overflow: auto;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 0.78rem;
+      white-space: pre-wrap;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.55rem;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0.22rem 0.46rem;
+      background: #fff;
+      color: #333;
+      font-size: 0.74rem;
+      min-height: 1.55rem;
+    }
+
+    .chip.green {
+      border-color: #b9d6c5;
+      background: #edf8f1;
+      color: var(--green);
+    }
+
+    .chip.pink {
+      border-color: #e8bfd3;
+      background: #fff0f7;
+      color: var(--pink);
+    }
+
+    .chip.yellow {
+      border-color: #efd889;
+      background: #fff8dd;
+      color: #7a5700;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.7rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .form-grid .wide {
+      grid-column: 1 / -1;
+    }
+
+    .error {
+      color: var(--red);
+    }
+
+    .ok {
+      color: var(--green);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .empty {
+      padding: 1rem;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      color: var(--muted);
+      background: #fafafa;
+    }
+
+    @media (max-width: 1180px) {
+      .status-grid,
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar,
+      .auth-row,
+      .metric-row,
+      .form-grid,
+      .image-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <h1>Classroom OS Console</h1>
+      <p id="connectionText">Connecting to the room bus.</p>
+    </div>
+    <div class="auth-row">
+      <div class="field">
+        <label for="apiKey">API key</label>
+        <input id="apiKey" autocomplete="off" value="testkey">
+      </div>
+      <div class="field">
+        <label for="subscriberId">Listen as</label>
+        <input id="subscriberId" autocomplete="off" value="console">
+      </div>
+      <button id="reconnectBtn" class="secondary">Reconnect</button>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="status-grid">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Room State</h2>
+          <span class="small" id="lastUpdated">waiting</span>
+        </div>
+        <div class="panel-body">
+          <div class="metric-row">
+            <div class="metric"><span>Phase</span><strong id="metricPhase">unknown</strong></div>
+            <div class="metric"><span>Mode</span><strong id="metricMode">unknown</strong></div>
+            <div class="metric"><span>Feeling</span><strong id="metricFeeling">settling</strong></div>
+            <div class="metric"><span>People</span><strong id="metricPeople">0</strong></div>
+            <div class="metric"><span>Whiteboard</span><strong id="metricWhiteboard">idle</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Phase Control</h2>
+          <span class="small">manual baton</span>
+        </div>
+        <div class="panel-body">
+          <div class="phase-buttons" id="phaseButtons"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Camera Context</h2>
+          <span class="small">real classroom assets</span>
+        </div>
+        <div class="panel-body">
+          <div class="image-strip">
+            <div class="image-tile"><img src="/media/horizon_photo.jpg" alt="Horizon camera classroom view"><span>horizon</span></div>
+            <div class="image-tile"><img src="/media/gravity_photo.jpg" alt="Gravity camera classroom view"><span>gravity</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Mock Room</h2>
+          <span class="small">same contracts as hardware</span>
+        </div>
+        <div class="panel-body">
+          <div class="button-row">
+            <button class="green" data-mock="arrival">Arrival</button>
+            <button class="teal" data-mock="lecture">Lecture</button>
+            <button class="pink" data-mock="activity">Activity + contracts</button>
+            <button class="yellow" data-mock="conclude">Conclude</button>
+            <button class="teal" data-mock="labs">Import labs objects</button>
+            <button data-mock="full">Run full script</button>
+            <button class="secondary" data-mock="reset">Reset</button>
+          </div>
+          <p class="small">The mock path writes through the same HTTP endpoints that detectors and projects use.</p>
+        </div>
+        <div class="panel-header">
+          <h2>Manual Event</h2>
+          <span class="small">project to project</span>
+        </div>
+        <div class="panel-body">
+          <div class="form-grid">
+            <div class="field">
+              <label for="projectId">From project</label>
+              <select id="projectId"></select>
+            </div>
+            <div class="field">
+              <label for="targetId">Target</label>
+              <input id="targetId" value="gesture-timer">
+            </div>
+            <div class="field wide">
+              <label for="eventType">Event type</label>
+              <input id="eventType" value="timer.offer">
+            </div>
+            <div class="field wide">
+              <label for="payloadText">Payload JSON</label>
+              <textarea id="payloadText">{"minutes":5,"reason":"activity started","mode":"group"}</textarea>
+            </div>
+          </div>
+          <div class="button-row">
+            <button id="validateEventBtn" class="secondary">Validate event</button>
+            <button id="sendEventBtn">Send directed event</button>
+            <button id="broadcastEventBtn" class="secondary">Broadcast event</button>
+          </div>
+          <p class="small" id="manualStatus"></p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Live Bus</h2>
+          <span class="small" id="busCount">0 events</span>
+        </div>
+        <div class="panel-body">
+          <div class="event-list" id="eventList">
+            <div class="empty">Waiting for events. Run the mock room or publish a manual event.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Conversation</h2>
+          <span class="small">who needs whom</span>
+        </div>
+        <div class="panel-body">
+          <div class="conversation-list" id="conversationList"></div>
+        </div>
+        <div class="panel-header">
+          <h2>Cameras</h2>
+          <span class="small" id="cameraCount">0 cameras</span>
+        </div>
+        <div class="panel-body">
+          <div class="camera-list" id="cameraList">
+            <div class="empty">No camera state yet.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="workspace" style="margin-top:1rem">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Contracts</h2>
+          <span class="small" id="projectCount">0 projects</span>
+        </div>
+        <div class="panel-body">
+          <div class="project-list" id="projectList"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Routing Policy</h2>
+          <span class="small">ambient, broadcast, directed</span>
+        </div>
+        <div class="panel-body">
+          <div class="policy-list" id="policyList"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Runbook</h2>
+          <span class="small">Monday path</span>
+        </div>
+        <div class="panel-body">
+          <p><strong>Use contracts first.</strong> Hardware, browser mocks, Python scripts, and manual calls all send the same events.</p>
+          <p><strong>Timer contract:</strong> consume <code>timer.offer</code> or <code>timer.command</code>, emit <code>timer.started</code> and <code>timer.done</code>.</p>
+          <p><strong>Fiducial contract:</strong> consume <code>fiducial.request</code>, emit <code>fiducial.detected</code> or <code>fiducial.zone_entered</code>.</p>
+          <p><strong>J-EPA role:</strong> report the room state. The orchestrator decides what to ask next.</p>
+          <p><a href="/contract-doc" id="docsLink">Contract doc in repo</a></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="workspace" style="margin-top:1rem">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Readiness</h2>
+          <span class="small" id="readinessSummary">0 live</span>
+        </div>
+        <div class="panel-body">
+          <div class="project-list" id="readinessList"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Evidence Report</h2>
+          <span class="small">critique packet</span>
+        </div>
+        <div class="panel-body">
+          <div class="button-row">
+            <button id="refreshReportBtn" class="secondary">Refresh report</button>
+            <button id="copyReportBtn">Copy report</button>
+            <button id="downloadReportBtn" class="secondary">Download</button>
+          </div>
+          <textarea id="reportText" readonly style="min-height:22rem;margin-top:0.75rem"></textarea>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Critique Frame</h2>
+          <span class="small">design survives failure</span>
+        </div>
+        <div class="panel-body">
+          <p><strong>Minimum:</strong> heartbeat with project ID and intended capabilities.</p>
+          <p><strong>Better:</strong> one event consumed, one event emitted, and a mock path if hardware fails.</p>
+          <p><strong>Best:</strong> real object responds to room context and leaves evidence in the bus.</p>
+          <p>The portfolio is not just polish. It is proof that an interaction can exist, be tested, and be explained.</p>
+          <p><a href="/heartbeat">Student heartbeat page</a></p>
+          <p><a href="/showcase/report">Markdown report</a></p>
+          <p><a href="/showcase/demo-script">Demo script</a></p>
+          <p><a href="/projects/roster.csv">Roster CSV</a></p>
+          <p><a href="/projects/gesture-timer/packet.md">Example student packet</a></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const phaseOrder = ["unknown", "arrival", "lecture", "activity", "conclude", "departure"];
+    const state = {
+      apiKey: localStorage.getItem("classroom.apiKey") || "testkey",
+      subscriberId: localStorage.getItem("classroom.subscriberId") || "console",
+      phase: "unknown",
+      room: null,
+      health: null,
+      projects: [],
+      contracts: {},
+      readiness: null,
+      reportText: "",
+      policies: {},
+      events: [],
+      stateSource: null,
+      eventSource: null,
+      busy: false
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function esc(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function pretty(value) {
+      return JSON.stringify(value ?? {}, null, 2);
+    }
+
+    function timeLabel(value) {
+      if (!value) return "now";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return String(value);
+      return date.toLocaleTimeString();
+    }
+
+    function headers() {
+      return {
+        "Content-Type": "application/json",
+        "X-API-Key": state.apiKey
+      };
+    }
+
+    async function getJson(path) {
+      const res = await fetch(path);
+      if (!res.ok) throw new Error(`${path} returned ${res.status}`);
+      return res.json();
+    }
+
+    async function postJson(path, payload) {
+      const res = await fetch(path, {
+        method: "POST",
+        headers: headers(),
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.detail || `${path} returned ${res.status}`);
+      return data;
+    }
+
+    function setBusy(on) {
+      state.busy = on;
+      document.querySelectorAll("button").forEach((button) => {
+        if (button.id !== "reconnectBtn") button.disabled = on;
+      });
+    }
+
+    function setConnection(text, ok = true) {
+      $("connectionText").innerHTML = `<span class="${ok ? "ok" : "error"}">${esc(text)}</span>`;
+    }
+
+    function addEvent(event) {
+      if (!event || !event.event_type) return;
+      state.events.unshift(event);
+      const seen = new Set();
+      state.events = state.events.filter((item) => {
+        const key = `${item.source || ""}:${item.project_id || item.camera_id || ""}:${item.event_type}:${item.created_at || ""}:${JSON.stringify(item.payload || {})}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      }).slice(0, 100);
+      renderEvents();
+      renderConversation();
+    }
+
+    async function refreshAll() {
+      try {
+        const [health, room, phase, context, projects, contracts, readiness, projectStatus, capabilities, labsConfig, policy, bus, reportText] = await Promise.all([
+          getJson("/health"),
+          getJson("/state"),
+          getJson("/phase"),
+          getJson("/room/context"),
+          getJson("/projects"),
+          getJson("/contracts"),
+          getJson("/projects/readiness"),
+          getJson("/projects/status"),
+          getJson("/capabilities"),
+          getJson("/labs/config"),
+          getJson("/phase/policy"),
+          getJson("/bus/events?limit=80"),
+          fetch("/showcase/report").then((res) => res.text())
+        ]);
+        state.health = health;
+        state.room = room;
+        state.context = context;
+        state.phase = phase.phase || room.phase || "unknown";
+        state.projects = projects.projects || contracts.projects || [];
+        state.contracts = contracts.contracts || {};
+        state.readiness = readiness;
+        state.projectStatus = projectStatus.projects || [];
+        state.capabilities = capabilities.capabilities || {};
+        state.labsConfig = labsConfig;
+        state.policies = policy.policies || {};
+        state.events = (bus.events || []).slice(0, 100);
+        state.reportText = reportText;
+        render();
+        setConnection(`Live on ${location.origin}`);
+      } catch (err) {
+        setConnection(err.message, false);
+      }
+    }
+
+    function connectStreams() {
+      if (state.stateSource) state.stateSource.close();
+      if (state.eventSource) state.eventSource.close();
+
+      state.stateSource = new EventSource("/subscribe/state");
+      state.stateSource.addEventListener("state", (event) => {
+        state.room = JSON.parse(event.data);
+        state.phase = state.room.phase || state.phase;
+        renderRoom();
+      });
+      state.stateSource.onerror = () => setConnection("State stream reconnecting", false);
+
+      const sub = encodeURIComponent(state.subscriberId || "console");
+      state.eventSource = new EventSource(`/subscribe/events?subscriber_id=${sub}`);
+      state.eventSource.addEventListener("classroom_event", (event) => {
+        addEvent(JSON.parse(event.data));
+        setConnection(`Live as ${state.subscriberId || "console"}`);
+      });
+      state.eventSource.onerror = () => setConnection("Event stream reconnecting", false);
+    }
+
+    function render() {
+      renderPhaseButtons();
+      renderRoom();
+      renderProjects();
+      renderPolicies();
+      renderEvents();
+      renderConversation();
+      renderReadiness();
+      renderReport();
+    }
+
+    function renderRoom() {
+      const room = state.room || {};
+      const context = state.context || room.context || {};
+      $("metricPhase").textContent = state.phase || room.phase || "unknown";
+      $("metricMode").textContent = room.room_mode || "unknown";
+      $("metricFeeling").textContent = context.feeling || room.feeling || "settling";
+      $("metricPeople").textContent = room.total_persons ?? 0;
+      $("metricWhiteboard").textContent = room.whiteboard_active ? "active" : "idle";
+      $("lastUpdated").textContent = room.timestamp ? `updated ${timeLabel(room.timestamp)}` : "waiting";
+
+      const cameras = room.cameras || {};
+      const entries = Object.entries(cameras);
+      $("cameraCount").textContent = `${entries.length} cameras`;
+      $("cameraList").innerHTML = entries.length ? entries.map(([id, camera]) => `
+        <article class="camera">
+          <div class="camera-title"><span>${esc(id)}</span><span class="chip green">${esc(camera.room_mode || "?")}</span></div>
+          <div class="camera-meta">people ${esc(camera.person_count ?? 0)} | probe ${esc(camera.predicted_class || "?")} | confidence ${Math.round((camera.prediction_confidence || 0) * 100)}%</div>
+          <pre class="payload">${esc(pretty(camera))}</pre>
+        </article>
+      `).join("") : `<div class="empty">No camera state yet. Run a mock phase.</div>`;
+
+      document.querySelectorAll("#phaseButtons button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.phase === state.phase);
+      });
+    }
+
+    function renderPhaseButtons() {
+      $("phaseButtons").innerHTML = phaseOrder.map((phase) => `
+        <button class="secondary" data-phase="${esc(phase)}">${esc(phase)}</button>
+      `).join("");
+      document.querySelectorAll("[data-phase]").forEach((button) => {
+        button.addEventListener("click", () => setPhase(button.dataset.phase));
+      });
+    }
+
+    function renderProjects() {
+      const projects = state.projects || [];
+      $("projectCount").textContent = `${projects.length} projects`;
+      $("projectId").innerHTML = projects.map((project) => `
+        <option value="${esc(project.project_id)}">${esc(project.project_id)}</option>
+      `).join("");
+      if (!$("projectId").value && projects[0]) $("projectId").value = projects[0].project_id;
+
+      $("projectList").innerHTML = projects.length ? projects.map((project) => {
+        const contract = project.contract || state.contracts[project.project_id] || {};
+        const status = (state.projectStatus || []).find((item) => item.project_id === project.project_id) || {};
+        const consumes = contract.consumes || project.subscribed_events || [];
+        const emits = contract.emits || [];
+        return `
+          <article class="project">
+            <div class="project-title"><span>${esc(project.display_name || project.project_id)}</span><span class="chip ${status.is_live ? "green" : "yellow"}">${esc(status.status || (project.is_active === false ? "inactive" : "mock"))}</span></div>
+            <div class="project-meta">${esc(project.project_id)} | ${esc(project.student_name || "unknown")}</div>
+            <p class="small">${esc(project.description || "")}</p>
+            <p class="small">${status.last_seen ? "last seen " + timeLabel(status.last_seen) : "registered contract, no heartbeat yet"}</p>
+            <div class="chip-row">${consumes.map((item) => `<span class="chip green">in ${esc(item)}</span>`).join("")}</div>
+            <div class="chip-row">${emits.map((item) => `<span class="chip pink">out ${esc(item)}</span>`).join("")}</div>
+            <div class="chip-row">${(status.capabilities || []).map((item) => `<span class="chip yellow">can ${esc(item)}</span>`).join("")}</div>
+          </article>
+        `;
+      }).join("") : `<div class="empty">No projects loaded.</div>`;
+    }
+
+    function renderReadiness() {
+      const readiness = state.readiness || { summary: {}, projects: [] };
+      const summary = readiness.summary || {};
+      $("readinessSummary").textContent = `${summary.live || 0} live, ${summary.needs_heartbeat || 0} need heartbeat`;
+      const projects = readiness.projects || [];
+      $("readinessList").innerHTML = projects.length ? projects.map((project) => {
+        const chipClass = project.level === "live" ? "green" : project.level === "needs-heartbeat" ? "pink" : "yellow";
+        return `
+          <article class="project">
+            <div class="project-title"><span>${esc(project.project_id)}</span><span class="chip ${chipClass}">${esc(project.level)}</span></div>
+            <div class="project-meta">${esc(project.display_name || "")} | score ${project.score}/${project.score_max} | events ${project.event_count}</div>
+            <p class="small">${esc(project.message || project.description || "")}</p>
+            <div class="chip-row">
+              <span class="chip ${project.has_contract ? "green" : ""}">contract ${project.has_contract ? "yes" : "no"}</span>
+              <span class="chip ${project.has_heartbeat ? "green" : ""}">heartbeat ${project.has_heartbeat ? "yes" : "no"}</span>
+              <span class="chip ${project.is_live ? "green" : ""}">live ${project.is_live ? "yes" : "no"}</span>
+            </div>
+          </article>
+        `;
+      }).join("") : `<div class="empty">No readiness data yet.</div>`;
+    }
+
+    function renderReport() {
+      $("reportText").value = state.reportText || "";
+    }
+
+    function renderPolicies() {
+      const policies = state.policies || {};
+      $("policyList").innerHTML = Object.entries(policies).map(([phase, rules]) => `
+        <article class="policy">
+          <div class="policy-title"><span>${esc(phase)}</span><span class="chip yellow">${rules.length} rules</span></div>
+          <div class="chip-row">
+            ${rules.map((rule) => `<span class="chip">${esc((rule.event_types || []).join(", "))}: ${esc(rule.salience)}${rule.targets && rule.targets.length ? " -> " + esc(rule.targets.join(", ")) : ""}</span>`).join("")}
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderEvents() {
+      $("busCount").textContent = `${state.events.length} events`;
+      $("eventList").innerHTML = state.events.length ? state.events.map((event) => {
+        const source = event.source || (event.project_id ? "project" : "detector");
+        const className = source === "project" ? "project-source" : source === "orchestrator" ? "orchestrator-source" : "detector-source";
+        const owner = event.project_id || event.camera_id || source;
+        const target = event.target || (event.payload && event.payload.target);
+        return `
+          <article class="event ${className}">
+            <div class="event-title"><span>${esc(event.event_type)}</span><span class="chip">${esc(source)}</span></div>
+            <div class="event-meta">${esc(owner)}${target ? " -> " + esc(Array.isArray(target) ? target.join(", ") : target) : ""} | ${timeLabel(event.created_at)}</div>
+            <pre class="payload">${esc(pretty(event.payload || {}))}</pre>
+          </article>
+        `;
+      }).join("") : `<div class="empty">Waiting for events. Run the mock room or publish a manual event.</div>`;
+    }
+
+    function renderConversation() {
+      const important = state.events
+        .filter((event) => event.target || ["timer.offer", "fiducial.request", "timer.started", "timer.done", "fiducial.detected", "phase_change", "room_mode_change"].includes(event.event_type))
+        .slice(0, 12);
+
+      $("conversationList").innerHTML = important.length ? important.map((event) => {
+        const from = event.project_id || event.camera_id || event.source || "room";
+        const to = event.target || (event.payload && event.payload.target) || "broadcast";
+        return `
+          <article class="conversation">
+            <div class="event-title"><span>${esc(from)}</span><span class="chip yellow">${esc(Array.isArray(to) ? to.join(", ") : to)}</span></div>
+            <div class="event-meta">${esc(event.event_type)} | ${timeLabel(event.created_at)}</div>
+          </article>
+        `;
+      }).join("") : `<div class="empty">Directed asks and replies will appear here.</div>`;
+    }
+
+    async function setPhaseRaw(phase) {
+      const data = await postJson("/phase", { phase });
+      state.phase = data.phase;
+      return data;
+    }
+
+    async function setPhase(phase) {
+      await runAction(async () => {
+        await setPhaseRaw(phase);
+        await refreshAll();
+      }, `Phase set to ${phase}`);
+    }
+
+    async function pushState(cameraId, fields) {
+      return postJson("/push/state", { camera_id: cameraId, ...fields });
+    }
+
+    async function publish(projectId, eventType, payload, target = null) {
+      const body = { event_type: eventType, payload };
+      if (target) body.target = target;
+      return postJson(`/projects/${encodeURIComponent(projectId)}/events`, body);
+    }
+
+    async function runAction(fn, success) {
+      setBusy(true);
+      try {
+        await fn();
+        if (success !== undefined) {
+          $("manualStatus").innerHTML = success ? `<span class="ok">${esc(success)}</span>` : "";
+        }
+      } catch (err) {
+        $("manualStatus").innerHTML = `<span class="error">${esc(err.message)}</span>`;
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    function wait(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    async function mockArrival() {
+      await setPhaseRaw("arrival");
+      await pushState("orbit", {
+        person_detected: false,
+        person_count: 0,
+        predicted_class: "empty",
+        prediction_confidence: 0.7,
+        fatigue_detected: false,
+        whiteboard_text_detected: false,
+        whiteboard_text: []
+      });
+      await wait(250);
+      await pushState("orbit", {
+        person_detected: true,
+        person_count: 12,
+        predicted_class: "arrival",
+        prediction_confidence: 0.76,
+        fatigue_detected: false,
+        whiteboard_text_detected: false,
+        whiteboard_text: []
+      });
+    }
+
+    async function mockLecture() {
+      await setPhaseRaw("lecture");
+      await pushState("orbit", {
+        person_detected: true,
+        person_count: 13,
+        predicted_class: "presentation",
+        prediction_confidence: 0.88,
+        whiteboard_text_detected: true,
+        whiteboard_text: ["contracts", "room state", "SSE"]
+      });
+      await wait(250);
+      await pushState("orbit", { fatigue_detected: true });
+    }
+
+    async function mockActivity() {
+      await setPhaseRaw("activity");
+      await pushState("orbit", {
+        person_detected: true,
+        person_count: 14,
+        predicted_class: "discussion",
+        prediction_confidence: 0.91,
+        whiteboard_text_detected: false
+      });
+      await publish("smart-stage", "timer.offer", { minutes: 5, reason: "activity mode started", mode: "group" }, "gesture-timer");
+      await publish("smart-stage", "fiducial.request", { marker_family: "tag36h11", needed_for: "smart-stage", zones: ["podium", "whiteboard", "collaboration"] }, "horizon");
+      await wait(350);
+      await publish("gesture-timer", "timer.started", { minutes: 5, started_by: "mock", ends_at: new Date(Date.now() + 5 * 60000).toISOString() });
+      await publish("horizon", "fiducial.detected", { tag_id: 3, name: "Whiteboard Marker", x: 0.52, y: 0.08, zone: "whiteboard", confidence: 0.92 });
+      await wait(350);
+      await publish("gesture-timer", "timer.done", { minutes: 5, completed: true }, "prof-dm");
+    }
+
+    async function mockConclude() {
+      await setPhaseRaw("conclude");
+      await pushState("orbit", {
+        person_detected: true,
+        person_count: 12,
+        predicted_class: "wrap_up",
+        prediction_confidence: 0.8,
+        whiteboard_text_detected: true,
+        whiteboard_text: ["next week: bring working contract"]
+      });
+      await publish("assignment-tracker", "assignment.suggested", { title: "Connect your project to the classroom bus", due: "Monday" });
+    }
+
+    async function runMock(which) {
+      await runAction(async () => {
+        const scenario = which === "reset" ? "reset" : which;
+        if (which === "labs") {
+          await postJson("/labs/import", { provider: "horizon" });
+        } else {
+          await postJson("/mock/scenario", { scenario });
+        }
+        await wait(200);
+        await refreshAll();
+      }, `Mock ${which} complete`);
+    }
+
+    function initEvents() {
+      $("apiKey").value = state.apiKey;
+      $("subscriberId").value = state.subscriberId;
+      $("apiKey").addEventListener("change", () => {
+        state.apiKey = $("apiKey").value.trim() || "testkey";
+        localStorage.setItem("classroom.apiKey", state.apiKey);
+      });
+      $("subscriberId").addEventListener("change", () => {
+        state.subscriberId = $("subscriberId").value.trim() || "console";
+        localStorage.setItem("classroom.subscriberId", state.subscriberId);
+        connectStreams();
+      });
+      $("reconnectBtn").addEventListener("click", () => {
+        connectStreams();
+        refreshAll();
+      });
+      document.querySelectorAll("[data-mock]").forEach((button) => {
+        button.addEventListener("click", () => runMock(button.dataset.mock));
+      });
+      $("validateEventBtn").addEventListener("click", () => validateManual());
+      $("sendEventBtn").addEventListener("click", () => sendManual(true));
+      $("broadcastEventBtn").addEventListener("click", () => sendManual(false));
+      $("refreshReportBtn").addEventListener("click", refreshReport);
+      $("copyReportBtn").addEventListener("click", copyReport);
+      $("downloadReportBtn").addEventListener("click", downloadReport);
+    }
+
+    async function sendManual(directed) {
+      await runAction(async () => {
+        const project = $("projectId").value || "smart-stage";
+        const eventType = $("eventType").value.trim();
+        const payload = JSON.parse($("payloadText").value || "{}");
+        const target = directed ? $("targetId").value.trim() : null;
+        await publish(project, eventType, payload, target);
+        await wait(150);
+        await refreshAll();
+      }, directed ? "Directed event sent" : "Broadcast event sent");
+    }
+
+    async function validateManual() {
+      await runAction(async () => {
+        const project = $("projectId").value || "smart-stage";
+        const eventType = $("eventType").value.trim();
+        const payload = JSON.parse($("payloadText").value || "{}");
+        const target = $("targetId").value.trim() || null;
+        const result = await postJson("/contracts/validate", {
+          project_id: project,
+          event_type: eventType,
+          payload,
+          target
+        });
+        if (!result.ok) {
+          throw new Error(result.errors.map((item) => `${item.field}: ${item.message}`).join("; "));
+        }
+        const warningText = result.warnings && result.warnings.length ? ` (${result.warnings.join("; ")})` : "";
+        $("manualStatus").innerHTML = `<span class="ok">Contract valid${esc(warningText)}</span>`;
+      });
+    }
+
+    async function refreshReport() {
+      state.reportText = await fetch("/showcase/report").then((res) => res.text());
+      renderReport();
+    }
+
+    async function copyReport() {
+      await navigator.clipboard.writeText($("reportText").value || "");
+      $("manualStatus").innerHTML = `<span class="ok">Report copied</span>`;
+    }
+
+    function downloadReport() {
+      const blob = new Blob([$("reportText").value || ""], { type: "text/markdown" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `smart-classroom-report-${new Date().toISOString().slice(0, 10)}.md`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    initEvents();
+    renderPhaseButtons();
+    connectStreams();
+    refreshAll();
+    setInterval(refreshAll, 10000);
+  </script>
+</body>
+</html>
