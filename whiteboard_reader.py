@@ -57,6 +57,9 @@ parser.add_argument('--fps-limit', type=int, default=None,
                     help='FPS limit (default: 5 for RVC2, 30 for RVC4)')
 parser.add_argument('--device', type=str, default=None,
                     help='Optional DeviceID or IP of the camera')
+parser.add_argument('--focus', type=str, default='continuous',
+                    help='Focus mode: "continuous" (default), "auto" (one-shot), '
+                         'or 0-255 for manual lens position (0=far, 255=close)')
 args = parser.parse_args()
 
 # Camera resolution (larger than model input to keep detail)
@@ -323,6 +326,26 @@ def run_detection():
 
             # Camera input
             cam = pipeline.create(dai.node.Camera).build()
+
+            # Configure focus
+            try:
+                focus_val = int(args.focus)
+                # Manual focus: 0 = infinity/far, 255 = close-up
+                cam.initialControl.setManualFocus(max(0, min(255, focus_val)))
+                log_event(f"Focus: manual (lens position {focus_val})")
+            except ValueError:
+                if args.focus == 'continuous':
+                    cam.initialControl.setAutoFocusMode(
+                        dai.CameraControl.AutoFocusMode.CONTINUOUS_VIDEO
+                    )
+                    log_event("Focus: continuous autofocus")
+                else:
+                    # 'auto' or anything else — one-shot autofocus (default)
+                    cam.initialControl.setAutoFocusMode(
+                        dai.CameraControl.AutoFocusMode.AUTO
+                    )
+                    log_event("Focus: one-shot autofocus")
+
             cam_out = cam.requestOutput(
                 size=(REQ_WIDTH, REQ_HEIGHT), type=frame_type, fps=fps_limit
             )

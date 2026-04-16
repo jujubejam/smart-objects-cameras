@@ -1079,13 +1079,18 @@ def run_detection():
                         log_event("Display window closed by user")
                         break
 
-                # Periodic status file update
+                # Periodic status file update (always use latest OCR text)
                 current_time = time.time()
                 if current_time - last_status_update_time >= STATUS_UPDATE_INTERVAL:
                     detected = last_text_detected
-                    content = last_text_content
-                    regions = len(content)
-                    update_status_file(detected, content, regions,
+                    # Use current frame's text, not stale last_text_content,
+                    # so content changes are visible even without a
+                    # presence transition (e.g. adding "SET 5 MIN TIMER"
+                    # while text is already on the board).
+                    consensus = aggregator.consensus_text
+                    current_content = consensus if consensus else text_lines
+                    regions = num_regions if num_regions else 0
+                    update_status_file(detected, current_content, regions,
                                      running=True, username=username, hostname=hostname)
                     last_status_update_time = current_time
 
