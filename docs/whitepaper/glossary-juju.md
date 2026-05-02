@@ -13,26 +13,12 @@ One of you owns each row. Your job: explain your assigned term in **two sentence
 
 | Term | Owner | Plain-language definition (2 sentences) | Analogy |
 |---|---|---|---|
-| EAR (Eye Aspect Ratio) |  |  |  |
-| YOLO |  |  |  |
-| SSE (Server-Sent Events) |  |  |  |
-| Probe classification |  |  |  |
-| OAK-D |  |  |  |
-| DepthAI pipeline |  |  |  |
-| Temporal debouncing |  |  |  |
-| Head pose |  |  |  |
-| Gaze vector |  |  |  |
-| Webhook |  |  |  |
-| Event loop |  |  |  |
-| Supabase |  |  |  |
-| API endpoint |  |  |  |
-| Room mode | Gordon |  |  |
-| V-JEPA | Gordon |  |  |
-| Whiteboard OCR |  |  |  |
-| Stereo depth |  |  |  |
-| Neural network stage |  |  |  |
-| Fatigue debounce |  |  |  |
-| Blob (neural network) |  |  |  |
+| Media Pipe | JuJu | A free toolkit made by Google that can identify and track things in live video — like hands, faces, or body outlines — in real time on a regular laptop. It's designed to be fast enough to keep up with a moving camera feed. | Like a set of pre-built LEGO pieces for computer vision — instead of building from scratch, you snap together what you need. |
+| YOLOv8 | JuJu | A popular AI model that scans an entire image in one pass and instantly draws boxes around every object it recognizes. "YOLO" stands for "You Only Look Once," meaning it doesn't double-check — it just decides fast. |Like a security guard who glances at a crowd once and immediately spots everyone wearing a red jacket.|
+| Roboflow | JuJu | A web tool that helps you prepare photos to train an AI model — you upload images, draw boxes around the things you want the model to learn, and it organizes everything into the right format. | Like a teacher's gradebook that formats all the homework into a standard layout before handing it to the grading machine. |
+| VIAM | JuJu |  A platform that lets you connect to and control physical hardware — like cameras or motors — remotely over the internet using simple code. | Like a universal remote that works over Wi-Fi for robots and sensors instead of TVs. |
+| ONNX | JuJu | A standard file format for saving AI models so they can run on different devices and software without being rewritten. It's the common language that lets a model trained in one tool run in another. | Like saving a document as a PDF — it doesn't matter what app made it, anyone can open it. |
+
 
 ---
 
